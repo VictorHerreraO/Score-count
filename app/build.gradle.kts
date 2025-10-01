@@ -87,7 +87,11 @@ dependencies {
     // implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3") // Example, prefer version catalog
 
     // Test dependencies
-    testImplementation(libs.junit)
+    // testImplementation(libs.junit) // Comment out or remove this line (it's likely JUnit 4)
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3") // Or align with your project's coroutine version
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4) // For Compose UI tests

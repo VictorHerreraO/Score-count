@@ -44,21 +44,21 @@ This file tracks the development progress of the Score-Count application.
     *   Adjusted `fontWeight` of section headers to `SemiBold`.
 
 *   **`SettingsScreen.kt` & `MainActivity.kt` Fixes for Compilation and Previews**:
-    *   **Fixed `FakeSettingsRepositoryPreview` (in `SettingsScreen.kt`)**:
-        *   Aligned with `SettingsRepository` interface methods: `getSettings(): Flow<GameSettings>` and `saveSettings(settings: GameSettings)`.
+    *   **Fixed `FakeSettingsRepositoryPreview` (in `SettingsScreen.kt`)**:\n        *   Aligned with `SettingsRepository` interface methods: `getSettings(): Flow<GameSettings>` and `saveSettings(settings: GameSettings)`.
         *   Removed individual `updateXYZ` methods not present in the interface.
-    *   **Fixed `FakeScoreRepositoryPreview` (in `SettingsScreen.kt`)**:
-        *   Ensured alignment with `ScoreRepository` interface methods.
+    *   **Fixed `FakeScoreRepositoryPreview` (in `SettingsScreen.kt`)**:\n        *   Ensured alignment with `ScoreRepository` interface methods.
         *   Corrected `GameState` handling and import.
-    *   **Corrected ViewModel Logic & Calls**:
-        *   Added missing `updateWinByTwo` and `updateServeChangeAfterDeuce` methods to `SettingsViewModel.kt`.
+    *   **Corrected ViewModel Logic & Calls**:\n        *   Added missing `updateWinByTwo` and `updateServeChangeAfterDeuce` methods to `SettingsViewModel.kt`.
         *   Ensured calls from `SettingsScreen` to `SettingsViewModel` match available methods.
     *   **Cleaned up Imports**: Addressed unused import warnings in `SettingsScreen.kt`.
-    *   **Fixed `SettingsScreenPreview`**:
-        *   Corrected instantiation of `ScoreViewModel` and `SettingsViewModel`, ensuring proper passing of fake/preview repositories (`FakeScoreRepositoryPreview`, `FakeSettingsRepositoryPreview`).
-    *   **Fixed `MainActivity.kt` Navigation Call**:
-        *   Corrected the parameters passed to the `SettingsScreen` composable within the `NavHost` to match its definition (`onNavigateBack`, `scoreViewModel`, `settingsViewModel`).
+    *   **Fixed `SettingsScreenPreview`**:\n        *   Corrected instantiation of `ScoreViewModel` and `SettingsViewModel`, ensuring proper passing of fake/preview repositories (`FakeScoreRepositoryPreview`, `FakeSettingsRepositoryPreview`).
+    *   **Fixed `MainActivity.kt` Navigation Call**:\n        *   Corrected the parameters passed to the `SettingsScreen` composable within the `NavHost` to match its definition (`onNavigateBack`, `scoreViewModel`, `settingsViewModel`).
 *   **Successful Project Compilation**: The application now compiles successfully after the above fixes.
+*   **Unit Testing Setup & `SettingsViewModel` Tests**:
+    *   Successfully configured the project for JUnit 5 and `kotlinx-coroutines-test` in `app/build.gradle.kts`.
+    *   Resolved build dependency issues, including the removal of the JUnit 4-based `ExampleUnitTest.kt` which was causing conflicts.
+    *   Implemented `SettingsViewModelTest.kt` with comprehensive unit tests for `SettingsViewModel`, covering state updates, interaction with the repository, and value coercions.
+    *   All unit tests for `SettingsViewModel` are passing, ensuring the robustness of the settings management logic.
 
 
 ## Next Steps:

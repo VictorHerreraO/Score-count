@@ -11,7 +11,7 @@ The Score-Count application follows a layered architecture pattern, influenced b
 *   **Framework**: Jetpack Compose for declarative UI development.
 *   **Components**:
     *   **Screens (`ScoreScreen.kt`, `SettingsScreen.kt`)**: Composables responsible for displaying data and capturing user input. They observe state from ViewModels.
-    *   **ViewModels (`ScoreViewModel.kt`, `SettingsViewModel.kt`)**: Prepare and manage data for the UI. They expose UI state (e.g., `GameState`, `GameSettings`) as `StateFlow`s and handle user actions by delegating to UseCases or directly to Repositories for simple operations.
+    *   **ViewModels (`ScoreViewModel.kt`, `SettingsViewModel.kt`)**: Prepare and manage data for the UI. They expose UI state (e.g., `GameState`, `GameSettings`) as `StateFlow`s and handle user actions by delegating to UseCases or directly to Repositories for simple operations. They are designed to be unit-testable by injecting dependencies (like Repositories or UseCases), often using fakes or mocks in test environments.
     *   **Navigation**: Jetpack Navigation Compose (`NavHost`, `Screen.kt` for routes) is used for navigating between screens.
     *   **Preview Data**: Fake/Preview versions of Repositories are used within screen previews to provide sample data and facilitate UI development (e.g., `PreviewSettingsRepository` in `SettingsScreen.kt`, `FakeScoreRepositoryPreview` in `ScoreScreen.kt`).
 *   **Responsibilities**: Displaying application state, handling user interactions, and delegating business logic to lower layers.
@@ -50,6 +50,7 @@ The Score-Count application follows a layered architecture pattern, influenced b
 *   **Repository Pattern**: Decouples the Domain layer from data source implementations.
 *   **UseCase Pattern**: Encapsulates discrete units of business logic, promoting reusability and testability.
 *   **Settings Integration**: Game settings are deeply integrated into the `LocalScoreDataSource` to dynamically control game rules and behavior.
+*   **Testability**: The architecture promotes testability at different levels. Unit tests are implemented for components like ViewModels (e.g., `SettingsViewModelTest.kt` for `SettingsViewModel`), which rely on fakes or mocks of their dependencies (Repositories, UseCases). UseCases themselves are also highly testable.
 
 ## Project Structure (Simplified)
 
@@ -72,6 +73,9 @@ app/
 │   │   │   │   └── navigation/     # Screen.kt, NavHost setup
 │   │   │   └── ScoreCountApplication.kt # Application class
 │   │   └── res/                    # Android resources
+│   │   test/java/com/soyvictorherrera/scorecount/ # Unit tests
+│   │       └── ui/settings/
+│   │           └── SettingsViewModelTest.kt
 │   └── AndroidManifest.xml
 ├── build.gradle.kts
 ARCHITECTURE.md  # This file
