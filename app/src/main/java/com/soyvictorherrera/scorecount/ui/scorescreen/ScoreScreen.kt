@@ -3,7 +3,7 @@ package com.soyvictorherrera.scorecount.ui.scorescreen
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Undo // Changed import
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Settings
@@ -13,36 +13,53 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.domain.model.Player
 import com.soyvictorherrera.scorecount.domain.repository.ScoreRepository
+import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import com.soyvictorherrera.scorecount.domain.usecase.*
+import com.soyvictorherrera.scorecount.ui.Screen
 import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOf
 
 @OptIn(ExperimentalMaterial3Api::class) // File-level opt-in
 @Composable
 fun ScoreScreen(
-    viewModel: ScoreViewModel // In a real app, inject this, often with Hilt: hiltViewModel()
+    viewModel: ScoreViewModel,
+    navController: NavController
 ) {
     val gameState by viewModel.gameState.collectAsState()
+    val gameSettings by viewModel.gameSettings.collectAsState()
 
     ScoreCountTheme { // Apply your app's theme
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Table Tennis", fontWeight = FontWeight.Bold) },
-                    actions = {
-                        IconButton(onClick = { /* TODO: History action */ }) {
-                            Icon(Icons.Outlined.History, contentDescription = "History")
+                    title = {
+                        if (gameSettings?.showTitle == true) {
+                            Text("Table Tennis", fontWeight = FontWeight.Bold)
+                        } else {
+                            Text("", fontWeight = FontWeight.Bold) // Empty text if title is hidden
                         }
-                        IconButton(onClick = { /* TODO: Settings action */ }) {
+                    },
+                    actions = {
+                        if (gameSettings?.showPreviousSets == true) {
+                            IconButton(onClick = { /* TODO: History action */ }) {
+                                Icon(Icons.Outlined.History, contentDescription = "History")
+                            }
+                        }
+                        IconButton(onClick = { navController.navigate(Screen.SettingsScreen.route) }) {
                             Icon(Icons.Outlined.Settings, contentDescription = "Settings")
                         }
                     },
@@ -59,7 +76,15 @@ fun ScoreScreen(
                 )
             }
         ) { paddingValues ->
-            gameState?.let { currentGameState ->
+            val currentGameState = gameState
+            val currentSettings = gameSettings
+
+            if (currentGameState != null && currentSettings != null) {
+                val isDeuce = currentSettings.markDeuce &&
+                        currentGameState.player1.score >= currentSettings.pointsToWinSet - 1 &&
+                        currentGameState.player2.score >= currentSettings.pointsToWinSet - 1 &&
+                        currentGameState.player1.score == currentGameState.player2.score
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -69,16 +94,17 @@ fun ScoreScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     PlayerScoreCard(
-                        playerName = currentGameState.player1.name,
+                        playerName = if (currentSettings.showNames) currentGameState.player1.name else "Player 1",
                         score = currentGameState.player1.score,
-                        isServing = currentGameState.servingPlayerId == currentGameState.player1.id,
+                        isServing = currentSettings.markServe && currentGameState.servingPlayerId == currentGameState.player1.id,
+                        isDeuce = isDeuce,
                         onIncrement = { viewModel.incrementScore(currentGameState.player1.id) },
                         onDecrement = { viewModel.decrementScore(currentGameState.player1.id) },
                         modifier = Modifier.weight(1f)
                     )
 
                     Button(
-                        onClick = { viewModel.switchServe() },
+                        onClick = { viewModel.manualSwitchServe() }, // Updated to call manualSwitchServe
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant,
                             contentColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -91,15 +117,24 @@ fun ScoreScreen(
                     }
 
                     PlayerScoreCard(
-                        playerName = currentGameState.player2.name,
+                        playerName = if (currentSettings.showNames) currentGameState.player2.name else "Player 2",
                         score = currentGameState.player2.score,
-                        isServing = currentGameState.servingPlayerId == currentGameState.player2.id,
+                        isServing = currentSettings.markServe && currentGameState.servingPlayerId == currentGameState.player2.id,
+                        isDeuce = isDeuce,
                         onIncrement = { viewModel.incrementScore(currentGameState.player2.id) },
                         onDecrement = { viewModel.decrementScore(currentGameState.player2.id) },
                         modifier = Modifier.weight(1f)
                     )
+                    // TODO: Display sets information if currentSettings.showSets is true
+                    if (currentSettings.showSets) {
+                        Text(
+                            text = "Sets: ${currentGameState.player1SetsWon} - ${currentGameState.player2SetsWon}",
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
-            } ?: run {
+            } else {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
@@ -113,6 +148,7 @@ fun PlayerScoreCard(
     playerName: String,
     score: Int,
     isServing: Boolean,
+    isDeuce: Boolean, // Added isDeuce parameter
     onIncrement: () -> Unit,
     onDecrement: () -> Unit,
     modifier: Modifier = Modifier
@@ -142,6 +178,15 @@ fun PlayerScoreCard(
                             Icons.Filled.SportsTennis,
                             contentDescription = "Serving",
                             tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    if (isDeuce) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "DEUCE",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.error
                         )
                     }
                 }
@@ -219,101 +264,80 @@ fun BottomBarActions(onReset: () -> Unit, onUndo: () -> Unit) {
     }
 }
 
+// Dummy repository for preview - needs SettingsRepository for GameSettings
+private class FakeSettingsRepository : SettingsRepository {
+    private val _settings = MutableStateFlow(GameSettings(pointsToWinSet = 11, markDeuce = true, showSets = true))
+    override fun getSettings(): Flow<GameSettings> = _settings.asStateFlow() // Corrected
+    override suspend fun saveSettings(settings: GameSettings) { 
+        _settings.value = settings
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun ScoreScreenPreview() {
-    val dummyP1 = Player(id = 1, name = "Player 1", score = 5)
-    val dummyP2 = Player(id = 2, name = "Player 2", score = 3)
-    val dummyGameState = GameState(player1 = dummyP1, player2 = dummyP2, servingPlayerId = 1, isFinished = false)
+    val dummyP1 = Player(id = 1, name = "Player 1", score = 10)
+    val dummyP2 = Player(id = 2, name = "Player 2", score = 10) // Scores for deuce preview
+    val previewGameState = GameState(
+        player1 = dummyP1, 
+        player2 = dummyP2, 
+        servingPlayerId = 1, 
+        player1SetsWon = 1,
+        player2SetsWon = 0,
+        isFinished = false
+    )
+    val fakeScoreRepo = FakeScoreRepositoryPreview(initialState = previewGameState) // Use preview-specific fake repo
 
     val previewViewModel = ScoreViewModel(
-        getGameStateUseCase = GetGameStateUseCase(FakeScoreRepository()),
-        incrementScoreUseCase = IncrementScoreUseCase(FakeScoreRepository()),
-        decrementScoreUseCase = DecrementScoreUseCase(FakeScoreRepository()),
-        switchServeUseCase = SwitchServeUseCase(FakeScoreRepository()),
-        resetGameUseCase = ResetGameUseCase(FakeScoreRepository()),
-        undoLastActionUseCase = UndoLastActionUseCase(FakeScoreRepository())
+        getGameStateUseCase = GetGameStateUseCase(fakeScoreRepo),
+        incrementScoreUseCase = IncrementScoreUseCase(fakeScoreRepo),
+        decrementScoreUseCase = DecrementScoreUseCase(fakeScoreRepo),
+        manualSwitchServeUseCase = ManualSwitchServeUseCase(fakeScoreRepo), // Corrected
+        resetGameUseCase = ResetGameUseCase(fakeScoreRepo),
+        undoLastActionUseCase = UndoLastActionUseCase(fakeScoreRepo),
+        settingsRepository = FakeSettingsRepository() // Added fake settings repository
     )
+    val navController = rememberNavController()
 
     ScoreCountTheme {
-        ScoreScreenContentForPreview(dummyGameState)
+        ScoreScreen(viewModel = previewViewModel, navController = navController)
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class) // Added OptIn here
-@Composable
-fun ScoreScreenContentForPreview(gameState: GameState) {
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Table Tennis Preview") }) },
-        bottomBar = { BottomBarActions(onReset = {}, onUndo = {}) }
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(it).padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            PlayerScoreCard(
-                playerName = gameState.player1.name,
-                score = gameState.player1.score,
-                isServing = gameState.servingPlayerId == gameState.player1.id,
-                onIncrement = { },
-                onDecrement = { },
-                modifier = Modifier.weight(1f)
-            )
-            Button(onClick = { }, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)) { // This is line 248 if previous OptIn is line 229
-                Icon(Icons.Filled.SwapHoriz, contentDescription = "Switch Serve")
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Switch Serve")
-            }
-            PlayerScoreCard(
-                playerName = gameState.player2.name,
-                score = gameState.player2.score,
-                isServing = gameState.servingPlayerId == gameState.player2.id,
-                onIncrement = { },
-                onDecrement = { },
-                modifier = Modifier.weight(1f)
-            )
-        }
-    }
-}
+// Fake repository for preview, allowing initial state for specific scenarios
+class FakeScoreRepositoryPreview(initialState: GameState) : ScoreRepository {
+    private val _gameState = MutableStateFlow(initialState)
 
-// Fake repository for preview
-class FakeScoreRepository : ScoreRepository {
-    private val _gameState = MutableStateFlow(
-        GameState(
-            player1 = Player(id = 1, name = "P1 Preview", score = 0),
-            player2 = Player(id = 2, name = "P2 Preview", score = 0),
-            servingPlayerId = 1,
-            isFinished = false
-        )
-    )
-
-    override fun getGameState(): Flow<GameState> = flowOf(_gameState.value)
+    override fun getGameState(): Flow<GameState> = _gameState.asStateFlow()
 
     override suspend fun incrementScore(playerId: Int) {
         val current = _gameState.value
-        if (playerId == current.player1.id) {
-            _gameState.value = current.copy(player1 = current.player1.copy(score = current.player1.score + 1))
-        } else if (playerId == current.player2.id) {
-            _gameState.value = current.copy(player2 = current.player2.copy(score = current.player2.score + 1))
-        }
+        val newP1Score = if (playerId == current.player1.id) current.player1.score + 1 else current.player1.score
+        val newP2Score = if (playerId == current.player2.id) current.player2.score + 1 else current.player2.score
+        // Simplified increment, doesn't handle game/set logic for preview
+        _gameState.value = current.copy(
+            player1 = current.player1.copy(score = newP1Score),
+            player2 = current.player2.copy(score = newP2Score)
+        )
     }
 
     override suspend fun decrementScore(playerId: Int) {
         val current = _gameState.value
-        if (playerId == current.player1.id && current.player1.score > 0) {
-            _gameState.value = current.copy(player1 = current.player1.copy(score = current.player1.score - 1))
-        } else if (playerId == current.player2.id && current.player2.score > 0) {
-            _gameState.value = current.copy(player2 = current.player2.copy(score = current.player2.score - 1))
-        }
+        val newP1Score = if (playerId == current.player1.id && current.player1.score > 0) current.player1.score - 1 else current.player1.score
+        val newP2Score = if (playerId == current.player2.id && current.player2.score > 0) current.player2.score - 1 else current.player2.score
+        _gameState.value = current.copy(
+            player1 = current.player1.copy(score = newP1Score),
+            player2 = current.player2.copy(score = newP2Score)
+        )
     }
 
-    override suspend fun switchServe() {
+    override suspend fun manualSwitchServe() {
         val current = _gameState.value
         _gameState.value = current.copy(servingPlayerId = if (current.servingPlayerId == current.player1.id) current.player2.id else current.player1.id)
     }
 
     override suspend fun resetGame() {
+        // For preview, reset might just go back to the specific initial state or a generic one
         _gameState.value = GameState(
             player1 = Player(id = 1, name = "P1 Preview", score = 0),
             player2 = Player(id = 2, name = "P2 Preview", score = 0),

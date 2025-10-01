@@ -18,8 +18,8 @@ class ScoreRepositoryImpl @Inject constructor(private val localDataSource: Local
         localDataSource.decrementScore(playerId)
     }
 
-    override suspend fun switchServe() {
-        localDataSource.switchServe()
+    override suspend fun manualSwitchServe() { // Renamed from switchServe()
+        localDataSource.manualSwitchServe()
     }
 
     override suspend fun resetGame() {

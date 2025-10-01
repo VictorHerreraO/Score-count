@@ -1,70 +1,95 @@
-# Architecture
+# Score-Count Application Architecture
 
-This document contains technical documentation about the Score-Count project.
+## Overview
 
-The Score-Count application follows a layered architecture based on modern Android development practices, emphasizing separation of concerns, testability, and maintainability.
+The Score-Count application follows a layered architecture pattern, influenced by Clean Architecture principles, to promote separation of concerns, testability, and maintainability.
 
 ## Layers
 
-The architecture is primarily divided into three main layers:
+### 1. UI (Presentation Layer)
 
-1.  **UI Layer**: Responsible for displaying application data on the screen and handling user interactions.
-    *   **Activity (`MainActivity.kt`)**: The main entry point of the application, annotated with `@AndroidEntryPoint` for Hilt integration. It hosts the Jetpack Compose UI.
-    *   **Compose UI (`ui/scorescreen/ScoreScreen.kt`)**: Jetpack Compose is used for building the user interface. The main screen is `ScoreScreen.kt`, which displays player scores, serving indicators, and action buttons.
-    *   **ViewModel (`ui/scorescreen/ScoreViewModel.kt`)**: `ScoreViewModel` acts as a state holder for the `ScoreScreen`. It's annotated with `@HiltViewModel` and dependencies (Use Cases) are injected via its constructor. It prepares and manages UI-related data, exposes it to the Composable UI via `StateFlow`, and handles user actions by delegating to the domain layer.
-    *   **Theme (`ui/theme/`)**: This package contains Compose UI theming definitions (`Color.kt`, `Type.kt`, `Theme.kt`), including light and dark color schemes and typography.
+*   **Framework**: Jetpack Compose for declarative UI development.
+*   **Components**:
+    *   **Screens (`ScoreScreen.kt`, `SettingsScreen.kt`)**: Composables responsible for displaying data and capturing user input. They observe state from ViewModels.
+    *   **ViewModels (`ScoreViewModel.kt`, `SettingsViewModel.kt`)**: Prepare and manage data for the UI. They expose UI state (e.g., `GameState`, `GameSettings`) as `StateFlow`s and handle user actions by delegating to UseCases or directly to Repositories for simple operations.
+    *   **Navigation**: Jetpack Navigation Compose (`NavHost`, `Screen.kt` for routes) is used for navigating between screens.
+    *   **Preview Data**: Fake/Preview versions of Repositories are used within screen previews to provide sample data and facilitate UI development (e.g., `PreviewSettingsRepository` in `SettingsScreen.kt`, `FakeScoreRepositoryPreview` in `ScoreScreen.kt`).
+*   **Responsibilities**: Displaying application state, handling user interactions, and delegating business logic to lower layers.
 
-2.  **Domain Layer**: Contains the core business logic of the application. This layer is independent of the UI and Data layers.
-    *   **Models (`domain/model/`)**:
-        *   `Player.kt`: Represents a player with an `id: Int`, `name: String`, and `score: Int`.
-        *   `GameState.kt`: Represents the overall state of the game, including two `Player` objects, the `servingPlayerId: Int?` (ID of the serving player), and `isFinished: Boolean`.
-    *   **Use Cases (`domain/usecase/`)**: Encapsulate specific business operations. Each use case typically has a single public `execute` method and injects `ScoreRepository`.
-        *   `GetGameStateUseCase.kt`: Retrieves the current game state.
-        *   `IncrementScoreUseCase.kt`: Increments a player's score.
-        *   `DecrementScoreUseCase.kt`: Decrements a player's score.
-        *   `SwitchServeUseCase.kt`: Switches the serving player.
-        *   `ResetGameUseCase.kt`: Resets the game to its initial state.
-        *   `UndoLastActionUseCase.kt`: Reverts the game to its previous state (logic might be a placeholder or viewmodel-managed initially).
-    *   **Repository Interface (`domain/repository/ScoreRepository.kt`)**: Defines the contract for data operations related to the game score and state. This allows the domain layer to be independent of specific data source implementations.
+### 2. Domain Layer
 
-3.  **Data Layer**: Responsible for providing and managing data for the application.
-    *   **Repository Implementation (`data/repository/ScoreRepositoryImpl.kt`)**: Implements the `ScoreRepository` interface. It injects and orchestrates data from one or more data sources.
-    *   **Data Sources (`data/datasource/LocalScoreDataSource.kt`)**: Provides an abstraction for storing and retrieving game state. Currently, this is an in-memory implementation that manages `GameState`.
+*   **Components**:
+    *   **Models (`GameState.kt`, `Player.kt`, `GameSettings.kt`)**: Kotlin data classes representing the core entities and state of the application. These are plain Kotlin objects with no Android framework dependencies.
+        *   `GameState`: Holds the current state of a game, including player scores, set scores, serving player, and whether the game is finished.
+        *   `GameSettings`: Holds all user-configurable settings that affect game rules and UI display.
+    *   **UseCases (e.g., `IncrementScoreUseCase.kt`, `ManualSwitchServeUseCase.kt`, `GetGameStateUseCase.kt`, `GetSettingsUseCase.kt`, `SaveSettingsUseCase.kt`)**: Encapsulate specific pieces of business logic. They are invoked by ViewModels and interact with Repositories.
+    *   **Repository Interfaces (`ScoreRepository.kt`, `SettingsRepository.kt`)**: Define contracts for data access. These interfaces are implemented by the Data layer.
+*   **Responsibilities**: Contains the core business logic and rules of the application. This layer is independent of UI and Data implementation details.
 
-## Data Flow
+### 3. Data Layer
 
-*   User interaction in the **UI Layer** (e.g., button click on `ScoreScreen`) calls a method in the `ScoreViewModel`.
-*   The `ScoreViewModel` invokes the appropriate **Use Case** from the Domain Layer.
-*   The Use Case executes business logic, interacting with the `ScoreRepository` to fetch or modify data.
-*   The `ScoreRepository` (implemented in the Data Layer by `ScoreRepositoryImpl`) retrieves or persists data using one or more Data Sources (e.g., `LocalScoreDataSource`).
-*   Data flows back up the chain: Data Source -> Repository -> Use Case -> ViewModel.
-*   The `ScoreViewModel` updates its `StateFlow` (often by re-fetching state from the Use Case after an action), which the Compose UI (`ScoreScreen`) observes and re-renders accordingly.
+*   **Components**:
+    *   **Repositories (`ScoreRepositoryImpl.kt`, `SettingsRepositoryImpl.kt`)**: Implement the Repository interfaces defined in the Domain layer. They coordinate data fetching from one or more Data Sources.
+    *   **Data Sources**:
+        *   **Local (`LocalScoreDataSource.kt`, `SettingsLocalDataSource.kt`)**: Manage data persistence locally.
+            *   `LocalScoreDataSource`: Manages the `GameState` in memory (using `MutableStateFlow`). Contains the core game logic for score updates, set/match completion, and serve switching, all influenced by `GameSettings`.
+            *   `SettingsLocalDataSource`: Persists `GameSettings` using Android's `SharedPreferences`.
+        *   *(Remote Data Sources would reside here if the application had network interactions)*
+*   **Responsibilities**: Data retrieval, storage, and management. Abstracts the origin of the data (e.g., memory, database, network) from the Domain layer.
 
-## Dependency Management
+## Dependency Injection
 
-*   **Hilt** is used for dependency injection throughout the application.
-*   **Application Class**: `com.soyvictorherrera.scorecount.ScoreCountApplication` (defined in `ScoreCountApplication.kt`) is annotated with `@HiltAndroidApp` to enable Hilt in the application. This class is registered in the `AndroidManifest.xml`.
-*   **ViewModel Injection**: ViewModels, such as `ScoreViewModel`, are annotated with `@HiltViewModel`. Dependencies (like Use Cases) are injected into their constructors using `@Inject`.
-*   **Activity/Fragment Injection**: UI entry points like `MainActivity` are annotated with `@AndroidEntryPoint` to allow Hilt to inject dependencies, including ViewModels using `hiltViewModel()`.
-*   **Providing Dependencies**: Hilt modules (e.g., `DataModule.kt`, `RepositoryModule.kt` located in `di` package) are used to define how Hilt should provide instances of interfaces (like `ScoreRepository` by binding it to `ScoreRepositoryImpl`) or classes that cannot be constructor-injected (e.g., `LocalScoreDataSource` provided as a singleton).
+*   **Framework**: Hilt is used for managing dependencies throughout the application.
+*   **Modules (`DataModule.kt`, `RepositoryModule.kt`, `AppModule.kt`)**: Define how dependencies are provided and injected (e.g., providing `SharedPreferences`, binding Repository implementations to their interfaces).
 
-## Package Structure
+## Key Architectural Decisions & Patterns
 
-The project follows a feature-oriented package structure within functional layers:
+*   **Unidirectional Data Flow (UDF)**: UI observes state from ViewModels, and user actions flow from the UI to ViewModels, which then update the state.
+*   **State Management**: `StateFlow` from Kotlin Coroutines is used to expose observable state from ViewModels and Data Sources.
+*   **Immutability**: `GameState` and `GameSettings` are primarily handled as immutable data classes. Updates involve creating new instances with modified values.
+*   **Repository Pattern**: Decouples the Domain layer from data source implementations.
+*   **UseCase Pattern**: Encapsulates discrete units of business logic, promoting reusability and testability.
+*   **Settings Integration**: Game settings are deeply integrated into the `LocalScoreDataSource` to dynamically control game rules and behavior.
 
-*   `com.soyvictorherrera.scorecount`
-    *   `di/` (Dependency Injection modules for Hilt)
-    *   `ui/`
-        *   `scorescreen/` (UI for the main score screen: `ScoreScreen.kt`, `ScoreViewModel.kt`)
-        *   `theme/` (Compose theming: `Color.kt`, `Type.kt`, `Theme.kt`)
-    *   `domain/`
-        *   `model/` (`Player.kt`, `GameState.kt`)
-        *   `usecase/` (All use case classes)
-        *   `repository/` (`ScoreRepository.kt` interface)
-    *   `data/`
-        *   `repository/` (`ScoreRepositoryImpl.kt`)
-        *   `datasource/` (`LocalScoreDataSource.kt`)
-    *   `ScoreCountApplication.kt` (Application class for Hilt)
-    *   `MainActivity.kt` (Main UI Activity)
+## Project Structure (Simplified)
 
-This architecture is designed to be scalable, testable, and maintainable.
+```
+app/
+├── src/
+│   ├── main/
+│   │   ├── java/com/soyvictorherrera/scorecount/
+│   │   │   ├── di/                 # Hilt Modules
+│   │   │   ├── domain/
+│   │   │   │   ├── model/          # GameState, Player, GameSettings
+│   │   │   │   ├── repository/     # ScoreRepository, SettingsRepository (interfaces)
+│   │   │   │   └── usecase/        # Business logic classes
+│   │   │   ├── data/
+│   │   │   │   ├── datasource/     # LocalScoreDataSource, SettingsLocalDataSource
+│   │   │   │   └── repository/     # ScoreRepositoryImpl, SettingsRepositoryImpl
+│   │   │   ├── ui/
+│   │   │   │   ├── scorescreen/    # ScoreScreen.kt, ScoreViewModel.kt
+│   │   │   │   ├── settings/       # SettingsScreen.kt, SettingsViewModel.kt
+│   │   │   │   └── navigation/     # Screen.kt, NavHost setup
+│   │   │   └── ScoreCountApplication.kt # Application class
+│   │   └── res/                    # Android resources
+│   └── AndroidManifest.xml
+├── build.gradle.kts
+ARCHITECTURE.md  # This file
+ACTIVE_CONTEXT.md
+```
+
+## Diagram (Conceptual)
+
+```
++---------------------+     +---------------------+     +----------------------+
+|        UI           | --> |       Domain        | --> |         Data         |
+| (Compose, ViewModel)|     | (Models, UseCases,  |     | (Repositories,       |
+|                     | <-- |  Repo Interfaces)   | <-- |  DataSources)        |
++---------------------+     +---------------------+     +----------------------+
+          ^                           ^                           ^
+          |                           |                           |
+          +---------------------------HILT--------------------------+
+                                (Dependency Injection)
+```
+
+This architecture aims to create a scalable, testable, and maintainable codebase for the Score-Count application.

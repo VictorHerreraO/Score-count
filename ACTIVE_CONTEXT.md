@@ -4,54 +4,75 @@ This file tracks the development progress of the Score-Count application.
 
 ## Accomplished So Far:
 
-*   **Project Initialization & Understanding**:
-    *   Understood the request to build a Compose UI similar to an HTML example.
-    *   Clarified the package name to `com.soyvictorherrera.scorecount`.
-*   **Architecture Planning**:
-    *   Defined a layered architecture: UI, Domain, and Data layers.
-    *   Planned for ViewModels, Use Cases, Repositories, and Data Sources.
-*   **Core Directory Structure**:
-    *   Established the main package structure for `ui`, `domain`, and `data` layers.
-*   **Domain Layer Implementation**:
-    *   Models: `Player.kt` (with `id`, `name`, `score`), `GameState.kt` (with `player1`, `player2`, `servingPlayerId`, `isFinished`).
-    *   Repository Interface: `ScoreRepository.kt`.
-    *   Use Cases: Implemented all core use cases (`GetGameStateUseCase`, `IncrementScoreUseCase`, `DecrementScoreUseCase`, `SwitchServeUseCase`, `ResetGameUseCase`, `UndoLastActionUseCase`), injecting `ScoreRepository`.
-*   **Data Layer Implementation**:
-    *   DataSource: `LocalScoreDataSource.kt` (in-memory, aligned with refined `Player` and `GameState` models).
-    *   Repository Implementation: `ScoreRepositoryImpl.kt`.
-*   **UI Theming (`ui/theme/`)**:
-    *   Created `Color.kt` with a basic color palette.
-    *   Created `Type.kt` with basic typography definitions.
-    *   Created `Theme.kt` with the main `ScoreCountTheme` Composable, including light/dark theme handling.
-*   **Dependency Injection with Hilt**:
-    *   Added Hilt and KSP dependencies and plugins to `gradle/libs.versions.toml` and `app/build.gradle.kts`.
-    *   Created `ScoreCountApplication.kt` annotated with `@HiltAndroidApp` and updated `AndroidManifest.xml`.
-    *   Annotated `ScoreViewModel.kt` with `@HiltViewModel` and used `@Inject constructor(...)` for its Use Case dependencies.
-    *   Created Hilt modules (`DataModule.kt`, `RepositoryModule.kt`) to provide `LocalScoreDataSource` and bind `ScoreRepository`.
-*   **UI Layer Integration**:
-    *   Created `MainActivity.kt` annotated with `@AndroidEntryPoint`, responsible for setting up `ScoreScreen` with a Hilt-injected `ScoreViewModel`.
-    *   Updated `ScoreScreen.kt` and `ScoreViewModel.kt` to align with refined domain models and Hilt integration.
-*   **Gradle & Build Configuration**:
-    *   Updated `gradle/libs.versions.toml` with versions and aliases for Jetpack Compose, ViewModel, Lifecycle, Coroutines, Activity Compose, Hilt, and KSP.
-    *   Configured Kotlin Compose Compiler, Hilt, and KSP plugins in `app/build.gradle.kts`.
-*   **Build & Error Resolution**:
-    *   Resolved Kotlin Kapt plugin alias issue by applying `id("org.jetbrains.kotlin.kapt")` directly.
-    *   Fixed experimental API opt-in issues for Material 3 components (e.g., `TopAppBar`, `Button`).
-    *   Addressed deprecated API usage (e.g., `Icons.Filled.Undo` changed to `Icons.AutoMirrored.Filled.Undo`).
-    *   Corrected `GameState.kt` content to align with the intended architecture (including `isFinished` and ensuring players hold scores).
-    *   Fixed Hilt/Dagger `MissingBinding` error for `ScoreRepositoryImpl` by adding `@Inject` to its constructor, allowing the app to compile.
+*   **Project Initialization & Core Architecture**: Established layered architecture (UI, Domain, Data), core models, use cases for game logic, and initial UI for `ScoreScreen` with Hilt for DI.
+*   **Build & Error Resolution**: Iteratively fixed compilation issues related to Hilt, Compose, Kotlin syntax, and API changes. This included resolving mismatches between repository interfaces and their preview/fake implementations.
+*   **Settings Screen Implementation (Core Functionality)**:
+    *   **Navigation**: Added Jetpack Navigation Compose, defined routes in `Screen.kt`, and updated `MainActivity.kt` to host `NavHost`. Navigation from `ScoreScreen` to `SettingsScreen` via a top app bar icon is functional.
+    *   **UI Structure**: Created `SettingsScreen.kt` with Compose UI elements. This includes sections for "Game Controls & Actions" (using `LazyVerticalGrid`) and "Table Tennis Rules Configuration" (using `LazyColumn` with custom row composables like `ActionSettingCard`, `ToggleSettingCard`, `StepperSettingRow`, `SwitchSettingRow`).
+    *   **ViewModel**: Created `SettingsViewModel.kt` to manage the state and logic for the settings, exposing `GameSettings` via a `StateFlow`.
+    *   **Data Model**: Defined `GameSettings.kt` in the domain layer to hold all configurable setting values. Added `winByTwo` and refined other settings.
+    *   **Persistence**: Implemented settings persistence using SharedPreferences:
+        *   `SettingsRepository.kt` (domain layer interface).
+        *   `SettingsLocalDataSource.kt` (data layer, handles SharedPreferences interaction).
+        *   `SettingsRepositoryImpl.kt` (data layer implementation).
+    *   **Dependency Injection**: Updated Hilt modules (`DataModule.kt`, `RepositoryModule.kt`) to provide `SharedPreferences`, `SettingsLocalDataSource`, `LocalScoreDataSource` (with `SettingsRepository` dependency), and bind `SettingsRepository`. Added `androidx.hilt:hilt-navigation-compose` dependency.
+    *   **Preview**: Implemented `PreviewSettingsRepository` and `FakeSettingsRepository` in `SettingsScreen.kt` and `ScoreScreen.kt` respectively for reliable Compose previews, ensuring alignment with repository interfaces.
+    *   **Initial Functionality**: Connected "Switch serve" button in settings to `ScoreViewModel.manualSwitchServe()`.
+
+*   **Integration of Settings with Game Logic/UI**:
+    *   **ViewModel Updates**: `ScoreViewModel.kt` now injects `SettingsRepository`, fetches `GameSettings`, and exposes them as a `StateFlow`.
+    *   **Core Game Logic in `LocalScoreDataSource.kt`**:
+        *   Injected `SettingsRepository`.
+        *   `incrementScore()`: Now considers `pointsToWinSet`, `winByTwo`, and `numberOfSets` from `GameSettings` to determine set/match winners. Includes logic to reset scores after a set and mark the game as finished.
+        *   `determineNextServer()`: New private helper to manage serve changes based on `serveRotationAfterPoints`, `winnerServesNextGame`, and `serveChangeAfterDeuce` from `GameSettings`.
+        *   `manualSwitchServe()`: Renamed from `switchServe` for clarity.
+        *   `resetGame()`: Resets scores and set counts; player names are derived from `initialGameState` (display is settings-dependent at UI).
+    *   **`GameState.kt` Update**: Added `player1SetsWon` and `player2SetsWon` to track set scores.
+    *   **Repository & UseCase Updates**:
+        *   `ScoreRepository.kt` and `ScoreRepositoryImpl.kt`: Updated `switchServe` to `manualSwitchServe`.
+        *   Created `ManualSwitchServeUseCase.kt`.
+        *   Old `SwitchServeUseCase.kt` marked as obsolete.
+    *   **`ScoreScreen.kt` UI Updates**:
+        *   Observes `gameSettings` from `ScoreViewModel`.
+        *   Conditionally renders UI elements based on settings: top app bar title (`showTitle`), history icon (`showPreviousSets`), player names (`showNames`), serving indicator (`markServe`).
+        *   Displays set scores ("Sets: X - Y") if `showSets` is true.
+        *   Displays "DEUCE" indicator next to player names if `markDeuce` is true and game is in deuce state.
+
+*   **Settings Screen UI Refinement**:
+    *   Updated icons in the "Game Controls & Actions" section to outlined variants to match the target design.
+    *   Modified `ToggleSettingCard` and `ActionSettingCard` for consistent background color (`surfaceColorAtElevation(3.dp)`), and improved visual feedback for checked states on `ToggleSettingCard` (primary color tint, checkmark icon).
+    *   Adjusted `fontWeight` of section headers to `SemiBold`.
 
 ## Currently Working On:
 
-*   The application now compiles successfully after resolving the Hilt DI issues.
+*   **Compilation Error Resolution**: Addressing any remaining compilation errors after the recent Settings Screen UI refinements to ensure the app is buildable and runnable.
+*   **Finalizing Settings Screen**: Ensuring all UI elements behave as expected and settings are correctly saved and loaded.
 
 ## Next Steps:
 
-1.  **Thorough Testing**: Test the application on an emulator/device to ensure all functionalities work as expected with injected dependencies and recent fixes.
-2.  **Refine UI and UX**: Polish the UI, add animations if desired, and improve the overall user experience based on testing.
-3.  **Implement `UndoLastActionUseCase` Logic**: Fully implement the undo logic within `UndoLastActionUseCase` and `LocalScoreDataSource` if the current implementation is a placeholder.
-4.  **Persistence Strategy**: Evaluate and potentially implement a persistence solution (e.g., SharedPreferences for simple state or Room for more complex data) to replace the in-memory `LocalScoreDataSource`.
-5.  **Address `TODO`s**: Review the codebase for any pending `TODO` items and implement them.
-6.  **Refine Composable Previews**: Enhance `@Preview` setups in `ScoreScreen.kt` for better UI iteration, ensuring they work correctly with the latest model and state structures.
-7.  **Update Documentation**: Continuously update `ARCHITECTURE.md` and other relevant documentation as the project evolves.
+1.  **Compile & Verify**: Ensure the application compiles successfully with all recent changes.
+2.  **Deploy & Test (Thoroughly)**:
+    *   Navigation to and from the Settings screen.
+    *   All UI elements on the Settings screen (toggles, steppers, action buttons, switches). Verify correct state representation and persistence.
+    *   Persistence of all settings: Change every setting, close and reopen the app, and verify settings are retained.
+    *   "Switch serve" functionality from the Settings screen.
+    *   Game logic respecting all settings:
+        *   Points to win set (e.g., 11, 21).
+        *   Win by two rule.
+        *   Number of sets for a match.
+        *   Serve rotation rules (normal and after deuce).
+        *   Winner serves next game rule.
+    *   UI display respecting all settings on `ScoreScreen`: title, names, sets, serve marker, deuce marker, previous sets icon.
+3.  **Refine `determineNextServer` Logic**: Improve robustness in `LocalScoreDataSource.kt` for edge cases (e.g., first serve of match, alternating server after set if `winnerServesNextGame` is false).
+4.  **Implement History Action**: If `showPreviousSets` is true, implement the functionality for the history icon in `ScoreScreen.kt`'s `TopAppBar`. This might involve a new screen or dialog to show previous set scores or game actions.
+5.  **Refine `UndoLastActionUseCase` Logic**: The current `undoLastAction()` in `LocalScoreDataSource` is basic. Enhance this to be more robust, potentially storing a more detailed history of `GameState` changes if complex undos are desired.
+6.  **Address `TODO`s**: Review and address any pending `TODO` items in the codebase.
+7.  **Remove Obsolete Code**: Delete `SwitchServeUseCase.kt` and the old `FakeScoreRepository` in `ScoreScreen.kt` if no longer used.
+8.  **Documentation Update**: Keep `ARCHITECTURE.MD` and `ACTIVE_CONTEXT.md` updated as the project evolves (ongoing).
 
+## Potential Future Enhancements:
+
+*   Setting for who serves first in a match.
+*   Setting for how to decide who serves first in subsequent sets if `winnerServesNextGame` is false (e.g., alternate).
+*   More detailed game history/log.
+*   Player name customization directly in the app.

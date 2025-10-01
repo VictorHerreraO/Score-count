@@ -72,6 +72,8 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.navigation.compose) // Added navigation compose
+    implementation(libs.androidx.hilt.navigation.compose) // Added hilt navigation compose
 
     // ViewModel & Lifecycle for Compose
     implementation(libs.androidx.lifecycle.viewmodel.compose)

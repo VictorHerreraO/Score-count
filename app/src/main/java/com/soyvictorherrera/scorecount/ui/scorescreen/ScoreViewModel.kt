@@ -2,13 +2,15 @@ package com.soyvictorherrera.scorecount.ui.scorescreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
-import com.soyvictorherrera.scorecount.domain.model.Player
+import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import com.soyvictorherrera.scorecount.domain.usecase.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,85 +20,78 @@ class ScoreViewModel @Inject constructor(
     private val getGameStateUseCase: GetGameStateUseCase,
     private val incrementScoreUseCase: IncrementScoreUseCase,
     private val decrementScoreUseCase: DecrementScoreUseCase,
-    private val switchServeUseCase: SwitchServeUseCase,
+    private val manualSwitchServeUseCase: ManualSwitchServeUseCase, // Updated Usecase name
     private val resetGameUseCase: ResetGameUseCase,
-    private val undoLastActionUseCase: UndoLastActionUseCase
+    private val undoLastActionUseCase: UndoLastActionUseCase,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     private val _gameState = MutableStateFlow<GameState?>(null)
     val gameState: StateFlow<GameState?> = _gameState.asStateFlow()
 
-    private val history: MutableList<GameState> = mutableListOf()
+    private val _gameSettings = MutableStateFlow<GameSettings?>(null)
+    val gameSettings: StateFlow<GameSettings?> = _gameSettings.asStateFlow()
+
+    // Using a simpler history for undo: just the immediate previous state.
+    // LocalScoreDataSource now manages its own previous state for undo.
+    // This ViewModel history might be redundant or could be used for more complex scenarios if needed.
+    private var lastKnownGoodState: GameState? = null
 
     init {
         viewModelScope.launch {
-            val initialState = getGameStateUseCase.execute().first() // Get initial state from repository
-            _gameState.value = initialState
-            history.add(initialState.copy()) // Save initial state for undo
+            settingsRepository.getSettings().collect { settings ->
+                _gameSettings.value = settings
+                // If settings change, we might need to re-evaluate current game state or re-fetch.
+                // For now, assume settings are mostly applied on new actions or resets.
+            }
+        }
+        viewModelScope.launch {
+            getGameStateUseCase.execute().collect { currentGameState ->
+                _gameState.value = currentGameState
+                lastKnownGoodState = currentGameState // Keep track for simple undo
+            }
         }
     }
 
-    private fun updateStateAndStoreHistory(newState: GameState) {
-        val current = _gameState.value
-        if (current != null && current != newState) { // Store only if state actually changed
-            history.add(current.copy()) // Store current state before update
-            if (history.size > 10) { // Limit history size
-                history.removeAt(0)
-            }
-        }
-        _gameState.value = newState
-    }
+    // The updateStateAndStoreHistory is not strictly needed if LocalScoreDataSource handles undo history.
+    // The getGameStateUseCase.execute().first() pattern after every action might also be simplified
+    // if getGameStateUseCase().collect {} is the single source of truth for _gameState.
 
     fun incrementScore(playerId: Int) {
         viewModelScope.launch {
             incrementScoreUseCase.execute(playerId)
-            // State will be updated via observing getGameStateUseCase
-            val updatedState = getGameStateUseCase.execute().first()
-            updateStateAndStoreHistory(updatedState)
+            // GameState is updated via the collect block in init
         }
     }
 
     fun decrementScore(playerId: Int) {
         viewModelScope.launch {
             decrementScoreUseCase.execute(playerId)
-            val updatedState = getGameStateUseCase.execute().first()
-            updateStateAndStoreHistory(updatedState)
+            // GameState is updated via the collect block in init
         }
     }
 
-    fun switchServe() {
+    // Renamed to reflect it's a manual action from UI
+    fun manualSwitchServe() {
         viewModelScope.launch {
-            switchServeUseCase.execute()
-            val updatedState = getGameStateUseCase.execute().first()
-            updateStateAndStoreHistory(updatedState)
+            manualSwitchServeUseCase.execute() // Calls the renamed use case
+            // GameState is updated via the collect block in init
         }
     }
 
     fun resetGame() {
         viewModelScope.launch {
             resetGameUseCase.execute()
-            val updatedState = getGameStateUseCase.execute().first()
-            // When resetting, clear history and add the new initial state
-            history.clear()
-            history.add(updatedState.copy())
-            _gameState.value = updatedState // Explicitly set, as updateStateAndStoreHistory might not if state is same due to race
+            // GameState is updated via the collect block in init
         }
     }
 
     fun undoLastAction() {
         viewModelScope.launch {
-            if (history.size > 1) {
-                history.removeLast() // Remove current state from history tail
-                val previousState = history.last().copy()
-                _gameState.value = previousState // Restore previous state
-                // No need to call repository's undo, as we are managing history here
-                // However, if repository's undo is the source of truth for undo, then call it:
-                // undoLastActionUseCase.execute()
-                // val restoredState = getGameStateUseCase.execute().first()
-                // _gameState.value = restoredState
-                // And history might need to be rebuilt or aligned with repo's state changes.
-                // For now, ViewModel manages undo history independently after an action.
-            }
+            undoLastActionUseCase.execute()
+            // GameState is updated via the collect block in init
+            // The LocalScoreDataSource handles the undo logic.
+            // The ViewModel's history might be used for UI-specific undo if different from data source.
         }
     }
 }

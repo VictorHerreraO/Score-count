@@ -7,7 +7,7 @@ interface ScoreRepository {
     fun getGameState(): Flow<GameState>
     suspend fun incrementScore(playerId: Int)
     suspend fun decrementScore(playerId: Int)
-    suspend fun switchServe()
+    suspend fun manualSwitchServe() // Renamed from switchServe()
     suspend fun resetGame()
     suspend fun undoLastAction() // Basic undo, might need more complex state management
 }
