@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -23,17 +22,13 @@ import androidx.compose.material.icons.automirrored.filled.RotateRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.EmojiEvents // Trophy icon for "Set to"
-import androidx.compose.material.icons.filled.History // Keep for "Show previous sets" action button
 import androidx.compose.material.icons.filled.MilitaryTech // Medal icon for "Match"
 import androidx.compose.material.icons.filled.Person // For "Winner serves"
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.filled.SportsTennis // Keep for "Mark serve" action button
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Title // Keep for "Show title" action button
 import androidx.compose.material.icons.outlined.AccountBox // For "Show names"
-import androidx.compose.material.icons.outlined.EventNote // For "Show sets" (alternative)
 import androidx.compose.material.icons.outlined.History // For "Show previous sets" (outlined)
-import androidx.compose.material.icons.outlined.PriorityHigh // For "Mark deuce" (alternative)
 import androidx.compose.material.icons.outlined.ReportProblem // For "Mark deuce"
 import androidx.compose.material.icons.outlined.SportsTennis // For "Mark serve" (outlined)
 import androidx.compose.material.icons.outlined.Timer // For "Show sets"
@@ -56,13 +51,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.Player
 import com.soyvictorherrera.scorecount.domain.repository.ScoreRepository
@@ -394,8 +389,8 @@ fun SwitchSettingItem(item: SettingItemData.SwitchSetting) {
 class FakeSettingsRepositoryPreview : SettingsRepository {
     private val _settings = MutableStateFlow(
         GameSettings(
-            player1Name = "Player 1",
-            player2Name = "Player 2",
+//            player1Name = "Player 1", // GameSettings does not have player names directly
+//            player2Name = "Player 2",
             pointsToWinSet = 11,
             winByTwo = true,
             numberOfSets = 3,
@@ -415,21 +410,6 @@ class FakeSettingsRepositoryPreview : SettingsRepository {
     override suspend fun saveSettings(settings: GameSettings) {
         _settings.value = settings
     }
-    // Individual update methods
-    override suspend fun updatePlayer1Name(name: String) { _settings.value = _settings.value.copy(player1Name = name) }
-    override suspend fun updatePlayer2Name(name: String) { _settings.value = _settings.value.copy(player2Name = name) }
-    override suspend fun updatePointsToWinSet(points: Int) { _settings.value = _settings.value.copy(pointsToWinSet = points) }
-    override suspend fun updateWinByTwo(winByTwo: Boolean) { _settings.value = _settings.value.copy(winByTwo = winByTwo) }
-    override suspend fun updateNumberOfSets(sets: Int) { _settings.value = _settings.value.copy(numberOfSets = sets) }
-    override suspend fun updateServeRotationAfterPoints(points: Int) { _settings.value = _settings.value.copy(serveRotationAfterPoints = points) }
-    override suspend fun updateServeChangeAfterDeuce(points: Int) { _settings.value = _settings.value.copy(serveChangeAfterDeuce = points) }
-    override suspend fun updateWinnerServesNextGame(servesNext: Boolean) { _settings.value = _settings.value.copy(winnerServesNextGame = servesNext) }
-    override suspend fun updateShowTitle(show: Boolean) { _settings.value = _settings.value.copy(showTitle = show) }
-    override suspend fun updateShowNames(show: Boolean) { _settings.value = _settings.value.copy(showNames = show) }
-    override suspend fun updateShowSets(show: Boolean) { _settings.value = _settings.value.copy(showSets = show) }
-    override suspend fun updateMarkServe(mark: Boolean) { _settings.value = _settings.value.copy(markServe = mark) }
-    override suspend fun updateMarkDeuce(mark: Boolean) { _settings.value = _settings.value.copy(markDeuce = mark) }
-    override suspend fun updateShowPreviousSets(show: Boolean) { _settings.value = _settings.value.copy(showPreviousSets = show) }
 }
 
 class FakeScoreRepositoryPreview : ScoreRepository {
@@ -464,7 +444,7 @@ fun SettingsScreenPreview() {
             SettingsScreen(
                 onNavigateBack = {},
                 scoreViewModel = ScoreViewModel(
-                    scoreRepository = fakeScoreRepo,
+                    settingsRepository = fakeSettingsRepo,
                     getGameStateUseCase = com.soyvictorherrera.scorecount.domain.usecase.GetGameStateUseCase(fakeScoreRepo),
                     incrementScoreUseCase = com.soyvictorherrera.scorecount.domain.usecase.IncrementScoreUseCase(fakeScoreRepo),
                     decrementScoreUseCase = com.soyvictorherrera.scorecount.domain.usecase.DecrementScoreUseCase(fakeScoreRepo),

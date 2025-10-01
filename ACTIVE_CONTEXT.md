@@ -43,14 +43,27 @@ This file tracks the development progress of the Score-Count application.
     *   Modified `ToggleSettingCard` and `ActionSettingCard` for consistent background color (`surfaceColorAtElevation(3.dp)`), and improved visual feedback for checked states on `ToggleSettingCard` (primary color tint, checkmark icon).
     *   Adjusted `fontWeight` of section headers to `SemiBold`.
 
-## Currently Working On:
+*   **`SettingsScreen.kt` & `MainActivity.kt` Fixes for Compilation and Previews**:
+    *   **Fixed `FakeSettingsRepositoryPreview` (in `SettingsScreen.kt`)**:
+        *   Aligned with `SettingsRepository` interface methods: `getSettings(): Flow<GameSettings>` and `saveSettings(settings: GameSettings)`.
+        *   Removed individual `updateXYZ` methods not present in the interface.
+    *   **Fixed `FakeScoreRepositoryPreview` (in `SettingsScreen.kt`)**:
+        *   Ensured alignment with `ScoreRepository` interface methods.
+        *   Corrected `GameState` handling and import.
+    *   **Corrected ViewModel Logic & Calls**:
+        *   Added missing `updateWinByTwo` and `updateServeChangeAfterDeuce` methods to `SettingsViewModel.kt`.
+        *   Ensured calls from `SettingsScreen` to `SettingsViewModel` match available methods.
+    *   **Cleaned up Imports**: Addressed unused import warnings in `SettingsScreen.kt`.
+    *   **Fixed `SettingsScreenPreview`**:
+        *   Corrected instantiation of `ScoreViewModel` and `SettingsViewModel`, ensuring proper passing of fake/preview repositories (`FakeScoreRepositoryPreview`, `FakeSettingsRepositoryPreview`).
+    *   **Fixed `MainActivity.kt` Navigation Call**:
+        *   Corrected the parameters passed to the `SettingsScreen` composable within the `NavHost` to match its definition (`onNavigateBack`, `scoreViewModel`, `settingsViewModel`).
+*   **Successful Project Compilation**: The application now compiles successfully after the above fixes.
 
-*   **Compilation Error Resolution**: Addressing any remaining compilation errors after the recent Settings Screen UI refinements to ensure the app is buildable and runnable.
-*   **Finalizing Settings Screen**: Ensuring all UI elements behave as expected and settings are correctly saved and loaded.
 
 ## Next Steps:
 
-1.  **Compile & Verify**: Ensure the application compiles successfully with all recent changes.
+1.  **~~Compile & Verify~~**: ~~Ensure the application compiles successfully with all recent changes, especially in `SettingsScreen.kt`.~~ (Completed)
 2.  **Deploy & Test (Thoroughly)**:
     *   Navigation to and from the Settings screen.
     *   All UI elements on the Settings screen (toggles, steppers, action buttons, switches). Verify correct state representation and persistence.
@@ -68,7 +81,7 @@ This file tracks the development progress of the Score-Count application.
 5.  **Refine `UndoLastActionUseCase` Logic**: The current `undoLastAction()` in `LocalScoreDataSource` is basic. Enhance this to be more robust, potentially storing a more detailed history of `GameState` changes if complex undos are desired.
 6.  **Address `TODO`s**: Review and address any pending `TODO` items in the codebase.
 7.  **Remove Obsolete Code**: Delete `SwitchServeUseCase.kt` and the old `FakeScoreRepository` in `ScoreScreen.kt` if no longer used.
-8.  **Documentation Update**: Keep `ARCHITECTURE.MD` and `ACTIVE_CONTEXT.md` updated as the project evolves (ongoing).
+8.  **Documentation Update**: Keep `ARCHITECTURE.MD` and `ACTIVE_CONTEXT.MD` updated as the project evolves (ongoing).
 
 ## Potential Future Enhancements:
 

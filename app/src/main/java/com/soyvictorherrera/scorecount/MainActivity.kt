@@ -37,9 +37,9 @@ class MainActivity : ComponentActivity() {
                         val settingsViewModel: SettingsViewModel = hiltViewModel()
                         val scoreViewModel: ScoreViewModel = hiltViewModel() // For Switch Serve action
                         SettingsScreen(
-                            navController = navController,
-                            viewModel = settingsViewModel,
-                            scoreViewModel = scoreViewModel
+                            onNavigateBack = { navController.popBackStack() },
+                            scoreViewModel = scoreViewModel,
+                            settingsViewModel = settingsViewModel
                         )
                     }
                 }

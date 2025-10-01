@@ -70,6 +70,13 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun updateWinByTwo(winByTwo: Boolean) {
+        if (_settings.value.winByTwo != winByTwo) {
+            _settings.value = _settings.value.copy(winByTwo = winByTwo)
+            saveSettings()
+        }
+    }
+
     fun updateNumberOfSets(sets: Int) {
         val newSets = sets.coerceIn(1, 99) // Best of X, so X must be odd, or allow even?
         if (_settings.value.numberOfSets != newSets) {
@@ -82,6 +89,14 @@ class SettingsViewModel @Inject constructor(
         val newPoints = points.coerceIn(1, 99)
          if (_settings.value.serveRotationAfterPoints != newPoints) {
             _settings.value = _settings.value.copy(serveRotationAfterPoints = newPoints)
+            saveSettings()
+        }
+    }
+
+    fun updateServeChangeAfterDeuce(points: Int) {
+        val newPoints = points.coerceIn(0, 99) // Allow 0 to disable
+        if (_settings.value.serveChangeAfterDeuce != newPoints) {
+            _settings.value = _settings.value.copy(serveChangeAfterDeuce = newPoints)
             saveSettings()
         }
     }
