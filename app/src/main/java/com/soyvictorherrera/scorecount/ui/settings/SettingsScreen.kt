@@ -20,18 +20,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.RotateRight
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.EmojiEvents // Trophy icon for "Set to"
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MilitaryTech // Medal icon for "Match"
 import androidx.compose.material.icons.filled.Person // For "Winner serves"
+import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Title // Keep for "Show title" action button
-import androidx.compose.material.icons.outlined.AccountBox // For "Show names"
-import androidx.compose.material.icons.outlined.History // For "Show previous sets" (outlined)
-import androidx.compose.material.icons.outlined.ReportProblem // For "Mark deuce"
-import androidx.compose.material.icons.outlined.SportsTennis // For "Mark serve" (outlined)
-import androidx.compose.material.icons.outlined.Timer // For "Show sets"
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -57,8 +56,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
+import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.domain.model.Player
 import com.soyvictorherrera.scorecount.domain.repository.ScoreRepository
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
@@ -113,28 +112,22 @@ fun SettingsScreen(
     val gameControls = listOf(
         SettingItemData.ActionItem("Switch serve", Icons.Filled.SwapHoriz) { scoreViewModel.manualSwitchServe() },
         SettingItemData.ToggleItem("Show title", Icons.Filled.Title, settings.showTitle) { settingsViewModel.updateShowTitle(it) },
-        SettingItemData.ToggleItem("Show names", Icons.Outlined.AccountBox, settings.showNames) { settingsViewModel.updateShowNames(it) },
-        SettingItemData.ToggleItem("Show sets", Icons.Outlined.Timer, settings.showSets) { settingsViewModel.updateShowSets(it) },
-        SettingItemData.ToggleItem("Mark serve", Icons.Outlined.SportsTennis, settings.markServe) { settingsViewModel.updateMarkServe(it) },
-        SettingItemData.ToggleItem("Mark deuce", Icons.Outlined.ReportProblem, settings.markDeuce) { settingsViewModel.updateMarkDeuce(it) },
-        SettingItemData.ActionItem("Show previous sets", Icons.Outlined.History) { /* TODO: Implement History action */ }
+        SettingItemData.ToggleItem("Show names", Icons.Filled.Badge, settings.showNames) { settingsViewModel.updateShowNames(it) },
+        SettingItemData.ToggleItem("Show sets", Icons.Filled.CalendarToday, settings.showSets) { settingsViewModel.updateShowSets(it) },
+        SettingItemData.ToggleItem("Mark serve", Icons.Filled.PersonSearch, settings.markServe) { settingsViewModel.updateMarkServe(it) },
+        SettingItemData.ToggleItem("Mark deuce", Icons.Filled.Info, settings.markDeuce) { settingsViewModel.updateMarkDeuce(it) },
+        SettingItemData.ActionItem("Show previous sets", Icons.Filled.History) { /* TODO: Implement History action */ }
     )
 
     val tableTennisRules = listOf(
         SettingItemData.StepperItem(
             text = "Set to",
-            subtitle = if (settings.winByTwo) "Win by 2" else null,
+            subtitle = "Win by 2",
             icon = Icons.Filled.EmojiEvents,
             value = settings.pointsToWinSet,
             onIncrement = { settingsViewModel.updatePointsToWinSet(settings.pointsToWinSet + 1) },
             onDecrement = { settingsViewModel.updatePointsToWinSet(settings.pointsToWinSet - 1) },
             valueRange = 1..100
-        ),
-        SettingItemData.SwitchSetting( // Assuming WinByTwo is a simple switch now
-            text = "Win by two",
-            icon = Icons.Filled.EmojiEvents, // Can use the same icon or a related one
-            isChecked = settings.winByTwo,
-            onToggle = { settingsViewModel.updateWinByTwo(it) }
         ),
         SettingItemData.StepperItem(
             text = "Match",
@@ -147,21 +140,12 @@ fun SettingsScreen(
         ),
         SettingItemData.StepperItem(
             text = "Serve rotation after",
-            subtitle = if (settings.serveChangeAfterDeuce > 0) "${settings.serveChangeAfterDeuce} after deuce" else null,
+            subtitle = "1 after deuce",
             icon = Icons.AutoMirrored.Filled.RotateRight,
             value = settings.serveRotationAfterPoints,
             onIncrement = { settingsViewModel.updateServeRotationAfterPoints(settings.serveRotationAfterPoints + 1) },
             onDecrement = { settingsViewModel.updateServeRotationAfterPoints(settings.serveRotationAfterPoints - 1) },
             valueRange = 1..10
-        ),
-        SettingItemData.StepperItem( // Added for serveChangeAfterDeuce
-            text = "Serve change (deuce)",
-            subtitle = "Points before switch",
-            icon = Icons.AutoMirrored.Filled.RotateRight,
-            value = settings.serveChangeAfterDeuce,
-            onIncrement = { settingsViewModel.updateServeChangeAfterDeuce(settings.serveChangeAfterDeuce + 1) },
-            onDecrement = { settingsViewModel.updateServeChangeAfterDeuce(settings.serveChangeAfterDeuce - 1) },
-            valueRange = 0..5 // 0 to disable
         ),
         SettingItemData.SwitchSetting(
             text = "Winner serves",
@@ -274,17 +258,6 @@ fun ToggleSettingCard(item: SettingItemData.ToggleItem) {
                     textAlign = TextAlign.Center
                 )
             }
-            if (item.isChecked) {
-                Icon(
-                    Icons.Filled.CheckCircle,
-                    contentDescription = "Checked",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(8.dp)
-                        .size(20.dp)
-                )
-            }
         }
     }
 }
@@ -299,7 +272,7 @@ fun ActionSettingCard(item: SettingItemData.ActionItem) {
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-            contentColor = MaterialTheme.colorScheme.primary // Action items usually have primary color for icon/text
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
         )
     ) {
         Column(
