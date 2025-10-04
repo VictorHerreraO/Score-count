@@ -1,15 +1,35 @@
-*.iml
+# Build files
+/build
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Android Studio
+/.idea
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+*.iml
 .DS_Store
-/build
 /captures
 .externalNativeBuild
 .cxx
-local.properties
+
+# Keystore files
+*.jks
+*.keystore
+
+# Google Services
+google-services.json
+
+# Proguard
+proguard/
+
+# Log files
+*.log
+
+# Crashlytics
+com_crashlytics_export_strings.xml
+
+# Profiler
+*.hprof
