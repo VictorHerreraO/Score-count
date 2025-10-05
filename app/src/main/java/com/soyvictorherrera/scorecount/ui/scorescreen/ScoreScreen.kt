@@ -125,7 +125,7 @@ fun ScoreScreen(
                     PlayerScoreCard(
                         playerName = currentGameState.player1.name,
                         score = currentGameState.player1.score,
-                        isServing = currentGameState.servingPlayerId == currentGameState.player1.id,
+                        isServing = currentSettings.markServe && currentGameState.servingPlayerId == currentGameState.player1.id,
                         isFinished = currentGameState.isFinished,
                         showPlayerName = currentSettings.showNames,
                         onIncrement = { viewModel.incrementScore(currentGameState.player1.id) },
@@ -136,7 +136,7 @@ fun ScoreScreen(
                     PlayerScoreCard(
                         playerName = currentGameState.player2.name,
                         score = currentGameState.player2.score,
-                        isServing = currentGameState.servingPlayerId == currentGameState.player2.id,
+                        isServing = currentSettings.markServe && currentGameState.servingPlayerId == currentGameState.player2.id,
                         isFinished = currentGameState.isFinished,
                         showPlayerName = currentSettings.showNames,
                         onIncrement = { viewModel.incrementScore(currentGameState.player2.id) },
