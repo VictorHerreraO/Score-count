@@ -94,7 +94,12 @@ fun ScoreScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "Player 1", style = MaterialTheme.typography.labelMedium)
+                            if (currentSettings.showNames) {
+                                Text(
+                                    text = currentGameState.player1.name,
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            }
                             Text(
                                 text = currentGameState.player1SetsWon.toString(),
                                 style = MaterialTheme.typography.headlineSmall
@@ -102,7 +107,12 @@ fun ScoreScreen(
                         }
                         Text(text = ":", style = MaterialTheme.typography.headlineSmall)
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "Player 2", style = MaterialTheme.typography.labelMedium)
+                            if (currentSettings.showNames) {
+                                Text(
+                                    text = currentGameState.player2.name,
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            }
                             Text(
                                 text = currentGameState.player2SetsWon.toString(),
                                 style = MaterialTheme.typography.headlineSmall
@@ -111,20 +121,22 @@ fun ScoreScreen(
                     }
 
                     PlayerScoreCard(
-                        playerName = "Player 1",
+                        playerName = currentGameState.player1.name,
                         score = currentGameState.player1.score,
                         isServing = currentGameState.servingPlayerId == currentGameState.player1.id,
                         isFinished = currentGameState.isFinished,
+                        showPlayerName = currentSettings.showNames,
                         onIncrement = { viewModel.incrementScore(currentGameState.player1.id) },
                         onDecrement = { viewModel.decrementScore(currentGameState.player1.id) },
                         modifier = Modifier.weight(1f)
                     )
 
                     PlayerScoreCard(
-                        playerName = "Player 2",
+                        playerName = currentGameState.player2.name,
                         score = currentGameState.player2.score,
                         isServing = currentGameState.servingPlayerId == currentGameState.player2.id,
                         isFinished = currentGameState.isFinished,
+                        showPlayerName = currentSettings.showNames,
                         onIncrement = { viewModel.incrementScore(currentGameState.player2.id) },
                         onDecrement = { viewModel.decrementScore(currentGameState.player2.id) },
                         modifier = Modifier.weight(1f)
@@ -146,6 +158,7 @@ fun PlayerScoreCard(
     score: Int,
     isServing: Boolean,
     isFinished: Boolean,
+    showPlayerName: Boolean,
     onIncrement: () -> Unit,
     onDecrement: () -> Unit,
     modifier: Modifier = Modifier
@@ -167,10 +180,12 @@ fun PlayerScoreCard(
                 verticalArrangement = Arrangement.Center
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        playerName,
-                        style = MaterialTheme.typography.labelMedium
-                    )
+                    if (showPlayerName) {
+                        Text(
+                            playerName,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
                     if (isServing) {
                         Spacer(modifier = Modifier.width(8.dp))
                         Icon(
