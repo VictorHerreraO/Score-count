@@ -89,34 +89,36 @@ fun ScoreScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            if (currentSettings.showNames) {
+                    if (currentSettings.showSets) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                if (currentSettings.showNames) {
+                                    Text(
+                                        text = currentGameState.player1.name,
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
                                 Text(
-                                    text = currentGameState.player1.name,
-                                    style = MaterialTheme.typography.labelMedium
+                                    text = currentGameState.player1SetsWon.toString(),
+                                    style = MaterialTheme.typography.headlineSmall
                                 )
                             }
-                            Text(
-                                text = currentGameState.player1SetsWon.toString(),
-                                style = MaterialTheme.typography.headlineSmall
-                            )
-                        }
-                        Text(text = ":", style = MaterialTheme.typography.headlineSmall)
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            if (currentSettings.showNames) {
+                            Text(text = ":", style = MaterialTheme.typography.headlineSmall)
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                if (currentSettings.showNames) {
+                                    Text(
+                                        text = currentGameState.player2.name,
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
                                 Text(
-                                    text = currentGameState.player2.name,
-                                    style = MaterialTheme.typography.labelMedium
+                                    text = currentGameState.player2SetsWon.toString(),
+                                    style = MaterialTheme.typography.headlineSmall
                                 )
                             }
-                            Text(
-                                text = currentGameState.player2SetsWon.toString(),
-                                style = MaterialTheme.typography.headlineSmall
-                            )
                         }
                     }
 
