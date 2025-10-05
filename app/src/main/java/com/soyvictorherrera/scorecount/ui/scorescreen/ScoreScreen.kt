@@ -70,6 +70,7 @@ fun ScoreScreen(
                 if (currentGameState != null) {
                     BottomBarActions(
                         isFinished = currentGameState.isFinished,
+                        showSwitchServe = gameSettings?.markServe == true,
                         onReset = { viewModel.resetGame() },
                         onSwitchServe = { viewModel.manualSwitchServe() },
                         onStartNewGame = { viewModel.resetGame() } // Resetting the game for now
@@ -250,6 +251,7 @@ fun SmallIconButton(
 @Composable
 fun BottomBarActions(
     isFinished: Boolean,
+    showSwitchServe: Boolean,
     onReset: () -> Unit,
     onSwitchServe: () -> Unit,
     onStartNewGame: () -> Unit
@@ -283,13 +285,15 @@ fun BottomBarActions(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Reset")
                 }
-                OutlinedButton(
-                    onClick = onSwitchServe,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Icon(Icons.Default.SwapHoriz, contentDescription = "Switch Serve")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Switch Serve")
+                if (showSwitchServe) {
+                    OutlinedButton(
+                        onClick = onSwitchServe,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Icon(Icons.Default.SwapHoriz, contentDescription = "Switch Serve")
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Switch Serve")
+                    }
                 }
             }
         }
