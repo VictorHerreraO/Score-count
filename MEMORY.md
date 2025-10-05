@@ -8,7 +8,9 @@ This file tracks development work that is currently in progress and has not yet 
 
 ## Next Steps:
 
-1.  **Test the Updated Settings Screen**: Thoroughly test all UI components and verify that settings are saved and correctly applied to the game logic.
-2.  **Implement Pending Actions**: The "Show previous sets" action is not yet implemented. This should be addressed.
-3.  **Code Cleanup**: Review the codebase for any obsolete code or `TODO` comments that can be addressed.
-4.  **Documentation**: Keep project documentation (`ARCHITECTURE.MD`, etc.) up-to-date with any changes.
+1.  **Test DataStore Migration**: Thoroughly test the recent migration from `SharedPreferences` to `Preferences DataStore`. This includes:
+    *   Verifying that settings are correctly saved and loaded across app restarts.
+    *   Ensuring the reactive `getSettings` stream updates the UI and game logic correctly when settings change.
+2.  **Implement Pending UI Actions**: The "Show previous sets" feature is still pending implementation.
+3.  **Code Cleanup**: Review the codebase for any remaining artifacts from the `SharedPreferences` implementation or other obsolete code.
+4.  **Review and Refine Game Logic**: Assess the core game logic in `LocalScoreDataSource` to ensure it correctly handles all edge cases related to the configurable settings.

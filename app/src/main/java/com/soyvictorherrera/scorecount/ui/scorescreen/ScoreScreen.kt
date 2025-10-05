@@ -46,7 +46,11 @@ fun ScoreScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Table Tennis", fontWeight = FontWeight.Bold) },
+                    title = {
+                        if (gameSettings?.showTitle == true) {
+                            Text("Table Tennis", fontWeight = FontWeight.Bold)
+                        }
+                    },
                     actions = {
                         IconButton(onClick = { /* TODO: History action */ }) {
                             Icon(Icons.Default.History, contentDescription = "History")

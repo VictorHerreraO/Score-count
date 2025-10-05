@@ -57,6 +57,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.datastore.preferences)
     // Remove material if only using Compose Material 3
     // implementation(libs.material)
 

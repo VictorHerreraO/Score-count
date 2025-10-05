@@ -1,5 +1,31 @@
 # Completed Tasks
 
+## Data Layer: Migrate to Preferences DataStore
+
+*   **Objective**: Replace `SharedPreferences` with `Preferences DataStore` for managing application settings and adopt a reactive approach for data retrieval.
+*   **Status**: Completed.
+
+### Changes Implemented:
+
+1.  **Dependency Update**:
+    *   Added the `androidx.datastore:datastore-preferences:1.1.7` dependency to `app/build.gradle.kts` and `gradle/libs.versions.toml`.
+
+2.  **DataStore Implementation**:
+    *   Created `SettingsDataStore.kt` to define a project-wide `DataStore<Preferences>` instance using the `preferencesDataStore` delegate.
+
+3.  **Refactor `SettingsLocalDataSource`**:
+    *   Replaced the `SharedPreferences` injection with `DataStore<Preferences>`.
+    *   Updated `getSettings()` to return a `Flow<GameSettings>` by mapping over `dataStore.data`. This provides a reactive stream of settings updates.
+    *   Updated `saveSettings()` to use `dataStore.edit()` to persist settings asynchronously.
+    *   Replaced constant string keys with `booleanPreferencesKey` and `intPreferencesKey` for type safety.
+
+4.  **Hilt Module Update**:
+    *   In `di/DataModule.kt`, removed the `SharedPreferences` provider and the explicit provider for `SettingsLocalDataSource`.
+    *   Added a new provider for `DataStore<Preferences>` to be injected across the application.
+
+5.  **Architecture Documentation**:
+    *   Updated `ARCHITECTURE.md` to reflect the change from `SharedPreferences` to `Preferences DataStore` in the data layer description.
+
 ## UI Update: Settings Screen (`SettingsScreen.kt`)
 
 *   **Objective**: Align the settings screen UI with the provided `screen.png` design.
@@ -22,3 +48,4 @@
 
 3.  **Code Cleanup**:
     *   Removed unused import statements (`androidx.compose.material.icons.filled.Error`, `androidx.compose.material.icons.filled.Refresh`).
+

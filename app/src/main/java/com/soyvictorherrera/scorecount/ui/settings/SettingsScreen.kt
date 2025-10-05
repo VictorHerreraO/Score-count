@@ -22,15 +22,14 @@ import androidx.compose.material.icons.automirrored.filled.RotateRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.EmojiEvents // Trophy icon for "Set to"
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.MilitaryTech // Medal icon for "Match"
-import androidx.compose.material.icons.filled.Person // For "Winner serves"
+import androidx.compose.material.icons.filled.MilitaryTech
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material.icons.filled.Title // Keep for "Show title" action button
+import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -61,7 +60,6 @@ import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.domain.model.Player
 import com.soyvictorherrera.scorecount.domain.repository.ScoreRepository
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
-import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreViewModel
 import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -104,13 +102,11 @@ sealed class SettingItemData {
 @Composable
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
-    scoreViewModel: ScoreViewModel = hiltViewModel(),
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val settings by settingsViewModel.settings.collectAsState()
 
     val gameControls = listOf(
-        SettingItemData.ActionItem("Switch serve", Icons.Filled.SwapHoriz) { scoreViewModel.manualSwitchServe() },
         SettingItemData.ToggleItem("Show title", Icons.Filled.Title, settings.showTitle) { settingsViewModel.updateShowTitle(it) },
         SettingItemData.ToggleItem("Show names", Icons.Filled.Badge, settings.showNames) { settingsViewModel.updateShowNames(it) },
         SettingItemData.ToggleItem("Show sets", Icons.Filled.CalendarToday, settings.showSets) { settingsViewModel.updateShowSets(it) },
@@ -416,15 +412,6 @@ fun SettingsScreenPreview() {
             val fakeScoreRepo = FakeScoreRepositoryPreview()
             SettingsScreen(
                 onNavigateBack = {},
-                scoreViewModel = ScoreViewModel(
-                    settingsRepository = fakeSettingsRepo,
-                    getGameStateUseCase = com.soyvictorherrera.scorecount.domain.usecase.GetGameStateUseCase(fakeScoreRepo),
-                    incrementScoreUseCase = com.soyvictorherrera.scorecount.domain.usecase.IncrementScoreUseCase(fakeScoreRepo),
-                    decrementScoreUseCase = com.soyvictorherrera.scorecount.domain.usecase.DecrementScoreUseCase(fakeScoreRepo),
-                    manualSwitchServeUseCase = com.soyvictorherrera.scorecount.domain.usecase.ManualSwitchServeUseCase(fakeScoreRepo),
-                    resetGameUseCase = com.soyvictorherrera.scorecount.domain.usecase.ResetGameUseCase(fakeScoreRepo),
-                    undoLastActionUseCase = com.soyvictorherrera.scorecount.domain.usecase.UndoLastActionUseCase(fakeScoreRepo)
-                ),
                 settingsViewModel = SettingsViewModel(fakeSettingsRepo)
             )
         }
@@ -456,7 +443,7 @@ fun ToggleSettingCardPreviewUnchecked() {
 fun ActionSettingCardPreview() {
     ScoreCountTheme {
         ActionSettingCard(
-            SettingItemData.ActionItem("Switch Serve", Icons.Filled.SwapHoriz) {}
+            SettingItemData.ActionItem("Switch Serve", Icons.AutoMirrored.Filled.ArrowBack) {}
         )
     }
 }

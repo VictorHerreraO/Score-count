@@ -33,14 +33,14 @@ The Score-Count application follows a layered architecture pattern, influenced b
     *   **Data Sources**:
         *   **Local (`LocalScoreDataSource.kt`, `SettingsLocalDataSource.kt`)**: Manage data persistence locally.
             *   `LocalScoreDataSource`: Manages the `GameState` in memory (using `MutableStateFlow`). Contains the core game logic for score updates, set/match completion, and serve switching, all influenced by `GameSettings`.
-            *   `SettingsLocalDataSource`: Persists `GameSettings` using Android's `SharedPreferences`.
+            *   `SettingsLocalDataSource`: Persists `GameSettings` using Android's `Preferences DataStore`.
         *   *(Remote Data Sources would reside here if the application had network interactions)*
 *   **Responsibilities**: Data retrieval, storage, and management. Abstracts the origin of the data (e.g., memory, database, network) from the Domain layer.
 
 ## Dependency Injection
 
 *   **Framework**: Hilt is used for managing dependencies throughout the application.
-*   **Modules (`DataModule.kt`, `RepositoryModule.kt`, `AppModule.kt`)**: Define how dependencies are provided and injected (e.g., providing `SharedPreferences`, binding Repository implementations to their interfaces).
+*   **Modules (`DataModule.kt`, `RepositoryModule.kt`, `AppModule.kt`)**: Define how dependencies are provided and injected (e.g., providing the `DataStore`, binding Repository implementations to their interfaces).
 
 ## Key Architectural Decisions & Patterns
 

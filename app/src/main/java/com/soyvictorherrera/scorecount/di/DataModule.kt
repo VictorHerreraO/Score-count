@@ -1,9 +1,10 @@
 package com.soyvictorherrera.scorecount.di
 
 import android.content.Context
-import android.content.SharedPreferences
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.soyvictorherrera.scorecount.data.datasource.LocalScoreDataSource
-import com.soyvictorherrera.scorecount.data.datasource.SettingsLocalDataSource
+import com.soyvictorherrera.scorecount.data.datasource.settingsDataStore
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import dagger.Module
 import dagger.Provides
@@ -24,13 +25,7 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
-        return context.getSharedPreferences("score_count_prefs", Context.MODE_PRIVATE)
-    }
-
-    @Provides
-    @Singleton
-    fun provideSettingsLocalDataSource(sharedPreferences: SharedPreferences): SettingsLocalDataSource {
-        return SettingsLocalDataSource(sharedPreferences)
+    fun provideSettingsDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return context.settingsDataStore
     }
 }
