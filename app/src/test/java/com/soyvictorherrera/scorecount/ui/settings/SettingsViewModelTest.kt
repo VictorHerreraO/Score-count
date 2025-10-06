@@ -117,19 +117,6 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `updateShowPreviousSets updates settings and saves`() = runTest {
-        val initialSettings = viewModel.settings.first()
-        val newValue = !initialSettings.showPreviousSets
-
-        viewModel.updateShowPreviousSets(newValue)
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        val updatedSettings = viewModel.settings.first()
-        assertEquals(newValue, updatedSettings.showPreviousSets)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
-    }
-
-    @Test
     fun `updatePointsToWinSet updates settings, coerces value, and saves`() = runTest {
         viewModel.updatePointsToWinSet(50)
         testDispatcher.scheduler.advanceUntilIdle()

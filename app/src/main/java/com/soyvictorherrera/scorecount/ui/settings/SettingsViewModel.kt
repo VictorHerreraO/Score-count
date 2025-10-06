@@ -57,11 +57,6 @@ class SettingsViewModel @Inject constructor(
         saveSettings()
     }
 
-    fun updateShowPreviousSets(show: Boolean) {
-        _settings.value = _settings.value.copy(showPreviousSets = show)
-        saveSettings()
-    }
-
     fun updatePointsToWinSet(points: Int) {
         val newPoints = points.coerceIn(1, 99)
         if (_settings.value.pointsToWinSet != newPoints) {

@@ -6,7 +6,6 @@ data class GameSettings(
     val showSets: Boolean = false, // Assuming this is not a core feature yet
     val markServe: Boolean = true,
     val markDeuce: Boolean = true,
-    val showPreviousSets: Boolean = false, // Assuming this is not a core feature yet
     val pointsToWinSet: Int = 11,
     val winByTwo: Boolean = true,
     val numberOfSets: Int = 5, // Best of 5 sets

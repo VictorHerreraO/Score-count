@@ -20,7 +20,6 @@ class SettingsLocalDataSource @Inject constructor(
         val KEY_SHOW_SETS = booleanPreferencesKey("show_sets")
         val KEY_MARK_SERVE = booleanPreferencesKey("mark_serve")
         val KEY_MARK_DEUCE = booleanPreferencesKey("mark_deuce")
-        val KEY_SHOW_PREVIOUS_SETS = booleanPreferencesKey("show_previous_sets")
         val KEY_POINTS_TO_WIN_SET = intPreferencesKey("points_to_win_set")
         val KEY_WIN_BY_TWO = booleanPreferencesKey("win_by_two")
         val KEY_NUMBER_OF_SETS = intPreferencesKey("number_of_sets")
@@ -37,7 +36,6 @@ class SettingsLocalDataSource @Inject constructor(
             showSets = preferences[PreferencesKeys.KEY_SHOW_SETS] ?: default.showSets,
             markServe = preferences[PreferencesKeys.KEY_MARK_SERVE] ?: default.markServe,
             markDeuce = preferences[PreferencesKeys.KEY_MARK_DEUCE] ?: default.markDeuce,
-            showPreviousSets = preferences[PreferencesKeys.KEY_SHOW_PREVIOUS_SETS] ?: default.showPreviousSets,
             pointsToWinSet = preferences[PreferencesKeys.KEY_POINTS_TO_WIN_SET] ?: default.pointsToWinSet,
             winByTwo = preferences[PreferencesKeys.KEY_WIN_BY_TWO] ?: default.winByTwo,
             numberOfSets = preferences[PreferencesKeys.KEY_NUMBER_OF_SETS] ?: default.numberOfSets,
@@ -54,7 +52,6 @@ class SettingsLocalDataSource @Inject constructor(
             preferences[PreferencesKeys.KEY_SHOW_SETS] = settings.showSets
             preferences[PreferencesKeys.KEY_MARK_SERVE] = settings.markServe
             preferences[PreferencesKeys.KEY_MARK_DEUCE] = settings.markDeuce
-            preferences[PreferencesKeys.KEY_SHOW_PREVIOUS_SETS] = settings.showPreviousSets
             preferences[PreferencesKeys.KEY_POINTS_TO_WIN_SET] = settings.pointsToWinSet
             preferences[PreferencesKeys.KEY_WIN_BY_TWO] = settings.winByTwo
             preferences[PreferencesKeys.KEY_NUMBER_OF_SETS] = settings.numberOfSets
