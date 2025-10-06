@@ -3,6 +3,9 @@ package com.soyvictorherrera.scorecount.di
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.room.Room
+import com.soyvictorherrera.scorecount.data.database.AppDatabase
+import com.soyvictorherrera.scorecount.data.database.dao.MatchDao
 import com.soyvictorherrera.scorecount.data.datasource.LocalScoreDataSource
 import com.soyvictorherrera.scorecount.data.datasource.settingsDataStore
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
@@ -16,6 +19,22 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataModule {
+
+    @Provides
+    @Singleton
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
+        return Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            "score-count-database"
+        ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideMatchDao(database: AppDatabase): MatchDao {
+        return database.matchDao()
+    }
 
     @Provides
     @Singleton

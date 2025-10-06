@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.soyvictorherrera.scorecount.ui.Screen
+import com.soyvictorherrera.scorecount.ui.matchhistory.MatchHistoryScreen
 import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreScreen
 import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreViewModel
 import com.soyvictorherrera.scorecount.ui.settings.SettingsScreen
@@ -37,6 +38,11 @@ class MainActivity : ComponentActivity() {
                         SettingsScreen(
                             onNavigateBack = { navController.popBackStack() },
                             settingsViewModel = settingsViewModel
+                        )
+                    }
+                    composable(Screen.MatchHistoryScreen.route) {
+                        MatchHistoryScreen(
+                            onNavigateBack = { navController.popBackStack() }
                         )
                     }
                 }

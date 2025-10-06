@@ -24,7 +24,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
+import com.soyvictorherrera.scorecount.domain.model.Match
 import com.soyvictorherrera.scorecount.domain.model.Player
+import com.soyvictorherrera.scorecount.domain.repository.MatchRepository
 import com.soyvictorherrera.scorecount.domain.repository.ScoreRepository
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import com.soyvictorherrera.scorecount.domain.usecase.*
@@ -33,6 +35,7 @@ import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +56,7 @@ fun ScoreScreen(
                         }
                     },
                     actions = {
-                        IconButton(onClick = { /* TODO: History action */ }) {
+                        IconButton(onClick = { navController.navigate(Screen.MatchHistoryScreen.route) }) {
                             Icon(Icons.Default.History, contentDescription = "History")
                         }
                         IconButton(onClick = { navController.navigate(Screen.SettingsScreen.route) }) {
@@ -334,6 +337,14 @@ private class FakeSettingsRepository : SettingsRepository {
     }
 }
 
+private class FakeMatchRepository : MatchRepository {
+    private val matches = mutableListOf<Match>()
+    override fun getMatchList(): Flow<List<Match>> = flowOf(matches)
+    override suspend fun saveMatch(match: Match) {
+        matches.add(match)
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun ScoreScreenPreview() {
@@ -349,6 +360,7 @@ fun ScoreScreenPreview() {
     )
     val fakeScoreRepo = FakeScoreRepositoryPreview(initialState = previewGameState)
     val fakeSettingsRepo = FakeSettingsRepository()
+    val fakeMatchRepo = FakeMatchRepository()
 
     val previewViewModel = ScoreViewModel(
         getGameStateUseCase = GetGameStateUseCase(fakeScoreRepo),
@@ -357,6 +369,7 @@ fun ScoreScreenPreview() {
         manualSwitchServeUseCase = ManualSwitchServeUseCase(fakeScoreRepo),
         resetGameUseCase = ResetGameUseCase(fakeScoreRepo),
         undoLastActionUseCase = UndoLastActionUseCase(fakeScoreRepo),
+        saveMatchUseCase = SaveMatchUseCase(fakeMatchRepo),
         settingsRepository = fakeSettingsRepo
     )
     val navController = rememberNavController()
@@ -381,6 +394,7 @@ fun ScoreScreenFinishedPreview() {
     )
     val fakeScoreRepo = FakeScoreRepositoryPreview(initialState = previewGameState)
     val fakeSettingsRepo = FakeSettingsRepository()
+    val fakeMatchRepo = FakeMatchRepository()
 
     val previewViewModel = ScoreViewModel(
         getGameStateUseCase = GetGameStateUseCase(fakeScoreRepo),
@@ -389,6 +403,7 @@ fun ScoreScreenFinishedPreview() {
         manualSwitchServeUseCase = ManualSwitchServeUseCase(fakeScoreRepo),
         resetGameUseCase = ResetGameUseCase(fakeScoreRepo),
         undoLastActionUseCase = UndoLastActionUseCase(fakeScoreRepo),
+        saveMatchUseCase = SaveMatchUseCase(fakeMatchRepo),
         settingsRepository = fakeSettingsRepo
     )
     val navController = rememberNavController()

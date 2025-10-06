@@ -10,47 +10,49 @@ The Score-Count application follows a layered architecture pattern, influenced b
 
 *   **Framework**: Jetpack Compose for declarative UI development.
 *   **Components**:
-    *   **Screens (`ScoreScreen.kt`, `SettingsScreen.kt`)**: Composables responsible for displaying data and capturing user input. They observe state from ViewModels.
-    *   **ViewModels (`ScoreViewModel.kt`, `SettingsViewModel.kt`)**: Prepare and manage data for the UI. They expose UI state (e.g., `GameState`, `GameSettings`) as `StateFlow`s and handle user actions by delegating to UseCases or directly to Repositories for simple operations. They are designed to be unit-testable by injecting dependencies (like Repositories or UseCases), often using fakes or mocks in test environments.
+    *   **Screens (`ScoreScreen.kt`, `SettingsScreen.kt`, `MatchHistoryScreen.kt`)**: Composables responsible for displaying data and capturing user input. They observe state from ViewModels.
+    *   **ViewModels (`ScoreViewModel.kt`, `SettingsViewModel.kt`, `MatchHistoryViewModel.kt`)**: Prepare and manage data for the UI. They expose UI state (e.g., `GameState`, `GameSettings`) as `StateFlow`s and handle user actions by delegating to UseCases.
     *   **Navigation**: Jetpack Navigation Compose (`NavHost`, `Screen.kt` for routes) is used for navigating between screens.
-    *   **Preview Data**: Fake/Preview versions of Repositories are used within screen previews to provide sample data and facilitate UI development (e.g., `PreviewSettingsRepository` in `SettingsScreen.kt`, `FakeScoreRepositoryPreview` in `ScoreScreen.kt`).
+    *   **Preview Data**: Fake/Preview versions of Repositories are used within screen previews to provide sample data and facilitate UI development.
 *   **Responsibilities**: Displaying application state, handling user interactions, and delegating business logic to lower layers.
 
 ### 2. Domain Layer
 
 *   **Components**:
-    *   **Models (`GameState.kt`, `Player.kt`, `GameSettings.kt`)**: Kotlin data classes representing the core entities and state of the application. These are plain Kotlin objects with no Android framework dependencies.
-        *   `GameState`: Holds the current state of a game, including player scores, set scores, serving player, and whether the game is finished.
-        *   `GameSettings`: Holds all user-configurable settings that affect game rules and UI display.
-    *   **UseCases (e.g., `IncrementScoreUseCase.kt`, `ManualSwitchServeUseCase.kt`, `GetGameStateUseCase.kt`, `GetSettingsUseCase.kt`, `SaveSettingsUseCase.kt`)**: Encapsulate specific pieces of business logic. They are invoked by ViewModels and interact with Repositories.
-    *   **Repository Interfaces (`ScoreRepository.kt`, `SettingsRepository.kt`)**: Define contracts for data access. These interfaces are implemented by the Data layer.
+    *   **Models (`GameState.kt`, `Player.kt`, `GameSettings.kt`, `Match.kt`)**: Kotlin data classes representing the core entities of the application. These are plain Kotlin objects with no Android framework dependencies.
+    *   **UseCases (e.g., `IncrementScoreUseCase.kt`, `GetMatchesUseCase.kt`, `SaveMatchUseCase.kt`)**: Encapsulate specific pieces of business logic. They are invoked by ViewModels and interact with Repositories.
+    *   **Repository Interfaces (`ScoreRepository.kt`, `SettingsRepository.kt`, `MatchRepository.kt`)**: Define contracts for data access. These interfaces are implemented by the Data layer.
 *   **Responsibilities**: Contains the core business logic and rules of the application. This layer is independent of UI and Data implementation details.
 
 ### 3. Data Layer
 
 *   **Components**:
-    *   **Repositories (`ScoreRepositoryImpl.kt`, `SettingsRepositoryImpl.kt`)**: Implement the Repository interfaces defined in the Domain layer. They coordinate data fetching from one or more Data Sources.
+    *   **Repositories (`ScoreRepositoryImpl.kt`, `SettingsRepositoryImpl.kt`, `MatchRepositoryImpl.kt`)**: Implement the Repository interfaces. They coordinate data from different data sources.
     *   **Data Sources**:
-        *   **Local (`LocalScoreDataSource.kt`, `SettingsLocalDataSource.kt`)**: Manage data persistence locally.
-            *   `LocalScoreDataSource`: Manages the `GameState` in memory (using `MutableStateFlow`). Contains the core game logic for score updates, set/match completion, and serve switching, all influenced by `GameSettings`.
+        *   **Local**: Manage data persistence locally.
+            *   `LocalScoreDataSource`: Manages the `GameState` in memory.
             *   `SettingsLocalDataSource`: Persists `GameSettings` using Android's `Preferences DataStore`.
-        *   *(Remote Data Sources would reside here if the application had network interactions)*
-*   **Responsibilities**: Data retrieval, storage, and management. Abstracts the origin of the data (e.g., memory, database, network) from the Domain layer.
+            *   `LocalMatchDataSource`: Fetches and saves match data from the Room database.
+    *   **Database (`AppDatabase.kt`)**: A Room database that holds application data.
+        *   `MatchDao`: Defines the data access methods for match history.
+        *   `MatchEntity`: Represents a match record in the database.
+    *   **Mappers (`MatchMapper.kt`)**: Convert data between data layer entities and domain layer models.
+*   **Responsibilities**: Data retrieval, storage, and management. Abstracts the origin of the data from the Domain layer.
 
 ## Dependency Injection
 
 *   **Framework**: Hilt is used for managing dependencies throughout the application.
-*   **Modules (`DataModule.kt`, `RepositoryModule.kt`, `AppModule.kt`)**: Define how dependencies are provided and injected (e.g., providing the `DataStore`, binding Repository implementations to their interfaces).
+*   **Modules (`DataModule.kt`, `RepositoryModule.kt`, `DataSourceModule.kt`)**: Define how dependencies are provided and injected.
 
 ## Key Architectural Decisions & Patterns
 
 *   **Unidirectional Data Flow (UDF)**: UI observes state from ViewModels, and user actions flow from the UI to ViewModels, which then update the state.
-*   **State Management**: `StateFlow` from Kotlin Coroutines is used to expose observable state from ViewModels and Data Sources.
-*   **Immutability**: `GameState` and `GameSettings` are primarily handled as immutable data classes. Updates involve creating new instances with modified values.
+*   **State Management**: `StateFlow` from Kotlin Coroutines is used to expose observable state.
+*   **Immutability**: Domain models are handled as immutable data classes.
 *   **Repository Pattern**: Decouples the Domain layer from data source implementations.
 *   **UseCase Pattern**: Encapsulates discrete units of business logic, promoting reusability and testability.
-*   **Settings Integration**: Game settings are deeply integrated into the `LocalScoreDataSource` to dynamically control game rules and behavior.
-*   **Testability**: The architecture promotes testability at different levels. Unit tests are implemented for components like ViewModels (e.g., `SettingsViewModelTest.kt` for `SettingsViewModel`), which rely on fakes or mocks of their dependencies (Repositories, UseCases). UseCases themselves are also highly testable.
+*   **Room for Persistence**: Room is used for local database storage to persist match history.
+*   **Testability**: The architecture promotes testability. Unit tests are implemented for components like ViewModels, which rely on fakes or mocks of their dependencies.
 
 ## Project Structure (Simplified)
 
@@ -61,35 +63,35 @@ app/
 │   │   ├── java/com/soyvictorherrera/scorecount/
 │   │   │   ├── di/                 # Hilt Modules
 │   │   │   ├── domain/
-│   │   │   │   ├── model/          # GameState, Player, GameSettings
-│   │   │   │   ├── repository/     # ScoreRepository, SettingsRepository (interfaces)
-│   │   │   │   └── usecase/        # Business logic classes
+│   │   │   │   ├── model/          # Domain Models
+│   │   │   │   ├── repository/     # Repository Interfaces
+│   │   │   │   └── usecase/        # Business Logic Classes
 │   │   │   ├── data/
-│   │   │   │   ├── datasource/     # LocalScoreDataSource, SettingsLocalDataSource
-│   │   │   │   └── repository/     # ScoreRepositoryImpl, SettingsRepositoryImpl
+│   │   │   │   ├── database/       # Room Database (AppDatabase, DAOs, Entities)
+│   │   │   │   ├── datasource/     # Data Source Implementations
+│   │   │   │   ├── mapper/         # Data Mappers
+│   │   │   │   └── repository/     # Repository Implementations
 │   │   │   ├── ui/
-│   │   │   │   ├── scorescreen/    # ScoreScreen.kt, ScoreViewModel.kt
-│   │   │   │   ├── settings/       # SettingsScreen.kt, SettingsViewModel.kt
+│   │   │   │   ├── scorescreen/
+│   │   │   │   ├── settings/
+│   │   │   │   ├── matchhistory/
 │   │   │   │   └── navigation/     # Screen.kt, NavHost setup
-│   │   │   └── ScoreCountApplication.kt # Application class
-│   │   └── res/                    # Android resources
-│   │   test/java/com/soyvictorherrera/scorecount/ # Unit tests
-│   │       └── ui/settings/
-│   │           └── SettingsViewModelTest.kt
+│   │   │   └── ScoreCountApplication.kt
+│   │   └── res/
+│   ├── test/java/com/soyvictorherrera/scorecount/ # Unit tests
 │   └── AndroidManifest.xml
 ├── build.gradle.kts
 ARCHITECTURE.md  # This file
-ACTIVE_CONTEXT.md
 ```
 
 ## Diagram (Conceptual)
 
 ```
-+---------------------+     +---------------------+     +----------------------+
-|        UI           | --> |       Domain        | --> |         Data         |
-| (Compose, ViewModel)|     | (Models, UseCases,  |     | (Repositories,       |
-|                     | <-- |  Repo Interfaces)   | <-- |  DataSources)        |
-+---------------------+     +---------------------+     +----------------------+
++---------------------+     +---------------------+     +----------------------------+
+|         UI          | --> |       Domain        | --> |            Data            |
+| (Compose, ViewModel)|     | (Models, UseCases,  |     | (Repositories, Mappers,   |
+|                     | <-- |  Repo Interfaces)   | <-- |  DataSources, Database)  |
++---------------------+     +---------------------+     +----------------------------+
           ^                           ^                           ^
           |                           |                           |
           +---------------------------HILT--------------------------+

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
+import com.soyvictorherrera.scorecount.domain.model.Match
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import com.soyvictorherrera.scorecount.domain.usecase.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +22,7 @@ class ScoreViewModel @Inject constructor(
     private val manualSwitchServeUseCase: ManualSwitchServeUseCase, // Updated Usecase name
     private val resetGameUseCase: ResetGameUseCase,
     private val undoLastActionUseCase: UndoLastActionUseCase,
+    private val saveMatchUseCase: SaveMatchUseCase,
     settingsRepository: SettingsRepository
 ) : ViewModel() {
 
@@ -38,7 +40,12 @@ class ScoreViewModel @Inject constructor(
         }
         viewModelScope.launch {
             getGameStateUseCase.execute().collect { currentGameState ->
+                val previousState = _gameState.value
                 _gameState.value = currentGameState
+
+                if (currentGameState.isFinished && previousState?.isFinished == false) {
+                    saveMatch(currentGameState)
+                }
             }
         }
     }
@@ -70,6 +77,18 @@ class ScoreViewModel @Inject constructor(
     fun undoLastAction() {
         viewModelScope.launch {
             undoLastActionUseCase.execute()
+        }
+    }
+
+    private fun saveMatch(gameState: GameState) {
+        viewModelScope.launch {
+            val match = Match(
+                id = "",
+                players = gameState.player1 to gameState.player2,
+                score = gameState.player1SetsWon to gameState.player2SetsWon,
+                date = System.currentTimeMillis()
+            )
+            saveMatchUseCase.execute(match)
         }
     }
 }

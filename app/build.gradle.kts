@@ -84,6 +84,11 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
     // Coroutines (Ensure you have a version defined in libs.versions.toml or specify directly)
     // implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3") // Example, prefer version catalog
 
