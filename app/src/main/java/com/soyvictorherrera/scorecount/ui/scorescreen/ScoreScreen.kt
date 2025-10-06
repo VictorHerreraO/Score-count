@@ -124,10 +124,6 @@ fun ScoreScreen(
                         }
                     }
 
-                    if (currentSettings.markDeuce && currentGameState.isDeuce) {
-                        DeuceIndicator()
-                    }
-
                     PlayerScoreCard(
                         playerName = currentGameState.player1.name,
                         score = currentGameState.player1.score,
@@ -138,6 +134,10 @@ fun ScoreScreen(
                         onDecrement = { viewModel.decrementScore(currentGameState.player1.id) },
                         modifier = Modifier.weight(1f)
                     )
+
+                    if (currentSettings.markDeuce && currentGameState.isDeuce) {
+                        DeuceIndicator()
+                    }
 
                     PlayerScoreCard(
                         playerName = currentGameState.player2.name,
