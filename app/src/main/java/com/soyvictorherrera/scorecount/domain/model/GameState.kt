@@ -6,5 +6,6 @@ data class GameState(
     val servingPlayerId: Int?,
     val player1SetsWon: Int = 0,
     val player2SetsWon: Int = 0,
+    val isDeuce: Boolean = false,
     val isFinished: Boolean = false
 )

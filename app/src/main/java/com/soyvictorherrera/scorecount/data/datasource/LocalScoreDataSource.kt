@@ -25,6 +25,7 @@ private val initialGameState = GameState(
     servingPlayerId = initialPlayer1.id,
     player1SetsWon = 0,
     player2SetsWon = 0,
+    isDeuce = false,
     isFinished = false
 )
 
@@ -41,7 +42,7 @@ class LocalScoreDataSource @Inject constructor(
         _gameState.value = newState
     }
 
-    suspend fun incrementScore(playerId: Int) {
+    suspend fun incrementScore(playerId: Int, isDeuce: Boolean) {
         val currentState = _gameState.value
         if (currentState.isFinished) return // Game is already finished
 
@@ -69,13 +70,16 @@ class LocalScoreDataSource @Inject constructor(
         val p1WinsSet = p1CanWinSet && (!settings.winByTwo || scoreDiff >= 2)
         val p2WinsSet = p2CanWinSet && (!settings.winByTwo || scoreDiff >= 2)
 
-        if (p1WinsSet) {
-            newP1Sets++
-            lastSetWinnerId = currentState.player1.id
-            setJustEnded = true
-        } else if (p2WinsSet) {
-            newP2Sets++
-            lastSetWinnerId = currentState.player2.id
+        var deuce = isDeuce
+        if (p1WinsSet || p2WinsSet) {
+            deuce = false
+            if (p1WinsSet) {
+                newP1Sets++
+                lastSetWinnerId = currentState.player1.id
+            } else {
+                newP2Sets++
+                lastSetWinnerId = currentState.player2.id
+            }
             setJustEnded = true
         }
 
@@ -105,6 +109,7 @@ class LocalScoreDataSource @Inject constructor(
                 player1SetsWon = newP1Sets,
                 player2SetsWon = newP2Sets,
                 servingPlayerId = newServingPlayerId,
+                isDeuce = deuce,
                 isFinished = gameIsFinished
             )
         )

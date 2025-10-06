@@ -1,5 +1,6 @@
 package com.soyvictorherrera.scorecount.ui.scorescreen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -121,6 +122,10 @@ fun ScoreScreen(
                                 )
                             }
                         }
+                    }
+
+                    if (currentSettings.markDeuce && currentGameState.isDeuce) {
+                        DeuceIndicator()
                     }
 
                     PlayerScoreCard(
@@ -300,6 +305,27 @@ fun BottomBarActions(
     }
 }
 
+@Composable
+fun DeuceIndicator(
+    modifier: Modifier = Modifier
+) {
+    OutlinedButton(
+        onClick = { },
+        enabled = false,
+        modifier = modifier.fillMaxWidth(),
+        colors = ButtonDefaults.outlinedButtonColors(
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            disabledContentColor = MaterialTheme.colorScheme.primary
+        ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+    ) {
+        Text(
+            text = "DEUCE",
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
 private class FakeSettingsRepository : SettingsRepository {
     private val _settings = MutableStateFlow(GameSettings())
     override fun getSettings(): Flow<GameSettings> = _settings.asStateFlow()
@@ -318,18 +344,20 @@ fun ScoreScreenPreview() {
         player2 = dummyP2,
         servingPlayerId = 1,
         player1SetsWon = 2,
-        player2SetsWon = 1
+        player2SetsWon = 1,
+        isDeuce = true
     )
     val fakeScoreRepo = FakeScoreRepositoryPreview(initialState = previewGameState)
+    val fakeSettingsRepo = FakeSettingsRepository()
 
     val previewViewModel = ScoreViewModel(
         getGameStateUseCase = GetGameStateUseCase(fakeScoreRepo),
-        incrementScoreUseCase = IncrementScoreUseCase(fakeScoreRepo),
+        incrementScoreUseCase = IncrementScoreUseCase(fakeScoreRepo, fakeSettingsRepo),
         decrementScoreUseCase = DecrementScoreUseCase(fakeScoreRepo),
         manualSwitchServeUseCase = ManualSwitchServeUseCase(fakeScoreRepo),
         resetGameUseCase = ResetGameUseCase(fakeScoreRepo),
         undoLastActionUseCase = UndoLastActionUseCase(fakeScoreRepo),
-        settingsRepository = FakeSettingsRepository()
+        settingsRepository = fakeSettingsRepo
     )
     val navController = rememberNavController()
 
@@ -352,15 +380,16 @@ fun ScoreScreenFinishedPreview() {
         isFinished = true
     )
     val fakeScoreRepo = FakeScoreRepositoryPreview(initialState = previewGameState)
+    val fakeSettingsRepo = FakeSettingsRepository()
 
     val previewViewModel = ScoreViewModel(
         getGameStateUseCase = GetGameStateUseCase(fakeScoreRepo),
-        incrementScoreUseCase = IncrementScoreUseCase(fakeScoreRepo),
+        incrementScoreUseCase = IncrementScoreUseCase(fakeScoreRepo, fakeSettingsRepo),
         decrementScoreUseCase = DecrementScoreUseCase(fakeScoreRepo),
         manualSwitchServeUseCase = ManualSwitchServeUseCase(fakeScoreRepo),
         resetGameUseCase = ResetGameUseCase(fakeScoreRepo),
         undoLastActionUseCase = UndoLastActionUseCase(fakeScoreRepo),
-        settingsRepository = FakeSettingsRepository()
+        settingsRepository = fakeSettingsRepo
     )
     val navController = rememberNavController()
 
@@ -374,14 +403,15 @@ class FakeScoreRepositoryPreview(initialState: GameState) : ScoreRepository {
 
     override fun getGameState(): Flow<GameState> = _gameState.asStateFlow()
 
-    override suspend fun incrementScore(playerId: Int) {
+    override suspend fun incrementScore(playerId: Int, isDeuce: Boolean) {
         val current = _gameState.value
         if (current.isFinished) return
         val newP1Score = if (playerId == current.player1.id) current.player1.score + 1 else current.player1.score
         val newP2Score = if (playerId == current.player2.id) current.player2.score + 1 else current.player2.score
         _gameState.value = current.copy(
             player1 = current.player1.copy(score = newP1Score),
-            player2 = current.player2.copy(score = newP2Score)
+            player2 = current.player2.copy(score = newP2Score),
+            isDeuce = isDeuce
         )
     }
 

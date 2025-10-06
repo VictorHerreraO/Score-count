@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ScoreRepository {
     fun getGameState(): Flow<GameState>
-    suspend fun incrementScore(playerId: Int)
+    suspend fun incrementScore(playerId: Int, isDeuce: Boolean)
     suspend fun decrementScore(playerId: Int)
     suspend fun manualSwitchServe() // Renamed from switchServe()
     suspend fun resetGame()

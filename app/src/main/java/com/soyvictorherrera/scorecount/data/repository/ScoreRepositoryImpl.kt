@@ -10,8 +10,8 @@ class ScoreRepositoryImpl @Inject constructor(private val localDataSource: Local
 
     override fun getGameState(): Flow<GameState> = localDataSource.gameState
 
-    override suspend fun incrementScore(playerId: Int) {
-        localDataSource.incrementScore(playerId)
+    override suspend fun incrementScore(playerId: Int, isDeuce: Boolean) {
+        localDataSource.incrementScore(playerId, isDeuce)
     }
 
     override suspend fun decrementScore(playerId: Int) {

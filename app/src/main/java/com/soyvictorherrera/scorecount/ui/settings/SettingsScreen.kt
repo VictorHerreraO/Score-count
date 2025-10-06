@@ -393,7 +393,7 @@ class FakeScoreRepositoryPreview : ScoreRepository {
         )
     )
     override fun getGameState(): StateFlow<GameState> = _gameState.asStateFlow()
-    override suspend fun incrementScore(playerId: Int) {}
+    override suspend fun incrementScore(playerId: Int, isDeuce: Boolean) {}
     override suspend fun decrementScore(playerId: Int) {}
     override suspend fun manualSwitchServe() {
          _gameState.value = _gameState.value.copy(servingPlayerId = if (_gameState.value.servingPlayerId == 1) 2 else 1)
