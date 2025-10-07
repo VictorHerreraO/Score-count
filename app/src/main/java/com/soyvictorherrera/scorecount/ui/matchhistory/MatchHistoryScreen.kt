@@ -1,21 +1,24 @@
- package com.soyvictorherrera.scorecount.ui.matchhistory
+package com.soyvictorherrera.scorecount.ui.matchhistory
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -43,11 +46,7 @@ fun MatchHistoryScreen(
                 onNavigateBack = onNavigateBack
             )
         },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { /*TODO*/ }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = null)
-            }
-        }
+        contentWindowInsets = WindowInsets.safeDrawing
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier.padding(paddingValues),
@@ -65,7 +64,7 @@ fun MatchHistoryScreen(
 private fun MatchHistoryTopBar(
     onNavigateBack: () -> Unit
 ) {
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = { Text(text = stringResource(R.string.match_history_title)) },
         navigationIcon = {
             IconButton(onClick = onNavigateBack) {
@@ -74,7 +73,10 @@ private fun MatchHistoryTopBar(
                     contentDescription = stringResource(R.string.cd_navigate_back)
                 )
             }
-        }
+        },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+        )
     )
 }
 

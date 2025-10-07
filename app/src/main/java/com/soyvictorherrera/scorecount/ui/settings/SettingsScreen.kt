@@ -1,5 +1,6 @@
 package com.soyvictorherrera.scorecount.ui.settings
 
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,10 +9,12 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -50,15 +53,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
-import com.soyvictorherrera.scorecount.domain.model.GameState
-import com.soyvictorherrera.scorecount.domain.model.Player
-import com.soyvictorherrera.scorecount.domain.repository.ScoreRepository
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -166,7 +167,8 @@ fun SettingsScreen(
                     containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
                 )
             )
-        }
+        },
+        contentWindowInsets = WindowInsets.safeDrawing
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -201,11 +203,12 @@ fun SettingsGrid(
     items: List<SettingItemData>,
     modifier: Modifier = Modifier
 ) {
+    val configuration = LocalConfiguration.current
     FlowRow(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        maxItemsInEachRow = 2
+        maxItemsInEachRow = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else 2
     ) {
         items.forEach { item ->
             Box(Modifier.weight(1f)) { // Use weight to ensure items take equal space up to maxItemsInEachRow
