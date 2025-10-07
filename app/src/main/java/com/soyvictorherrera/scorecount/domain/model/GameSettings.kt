@@ -11,5 +11,6 @@ data class GameSettings(
     val numberOfSets: Int = 5, // Best of 5 sets
     val serveRotationAfterPoints: Int = 2,
     val serveChangeAfterDeuce: Int = 1,
-    val winnerServesNextGame: Boolean = true
+    val winnerServesNextGame: Boolean = true,
+    val keepScreenOn: Boolean = false
 )

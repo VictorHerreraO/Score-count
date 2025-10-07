@@ -101,6 +101,11 @@ class SettingsViewModel @Inject constructor(
         saveSettings()
     }
 
+    fun updateKeepScreenOn(keepOn: Boolean) {
+        _settings.value = _settings.value.copy(keepScreenOn = keepOn)
+        saveSettings()
+    }
+
     private fun saveSettings() {
         viewModelScope.launch {
             settingsRepository.saveSettings(_settings.value)

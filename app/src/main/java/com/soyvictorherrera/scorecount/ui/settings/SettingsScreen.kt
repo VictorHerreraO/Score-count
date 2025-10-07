@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.ScreenLockPortrait
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -110,7 +111,8 @@ fun SettingsScreen(
         SettingItemData.ToggleItem("Show names", Icons.Filled.Badge, settings.showNames) { settingsViewModel.updateShowNames(it) },
         SettingItemData.ToggleItem("Show sets", Icons.Filled.CalendarToday, settings.showSets) { settingsViewModel.updateShowSets(it) },
         SettingItemData.ToggleItem("Mark serve", Icons.Filled.PersonSearch, settings.markServe) { settingsViewModel.updateMarkServe(it) },
-        SettingItemData.ToggleItem("Mark deuce", Icons.Filled.Info, settings.markDeuce) { settingsViewModel.updateMarkDeuce(it) }
+        SettingItemData.ToggleItem("Mark deuce", Icons.Filled.Info, settings.markDeuce) { settingsViewModel.updateMarkDeuce(it) },
+        SettingItemData.ToggleItem("Keep screen on", Icons.Filled.ScreenLockPortrait, settings.keepScreenOn) { settingsViewModel.updateKeepScreenOn(it) }
     )
 
     val tableTennisRules = listOf(
@@ -351,96 +353,23 @@ fun SwitchSettingItem(item: SettingItemData.SwitchSetting) {
     )
 }
 
-
-// Preview
-class FakeSettingsRepositoryPreview : SettingsRepository {
-    private val _settings = MutableStateFlow(
-        GameSettings(
-//            player1Name = "Player 1", // GameSettings does not have player names directly
-//            player2Name = "Player 2",
-            pointsToWinSet = 11,
-            winByTwo = true,
-            numberOfSets = 3,
-            serveRotationAfterPoints = 2,
-            serveChangeAfterDeuce = 1,
-            winnerServesNextGame = false,
-            showTitle = true,
-            showNames = true,
-            showSets = true,
-            markServe = true,
-            markDeuce = true
-        )
-    )
-
-    override fun getSettings(): StateFlow<GameSettings> = _settings.asStateFlow()
-    override suspend fun saveSettings(settings: GameSettings) {
-        _settings.value = settings
-    }
-}
-
-class FakeScoreRepositoryPreview : ScoreRepository {
-    private val _gameState = MutableStateFlow(
-        GameState(
-            player1 = Player(id = 1, name = "P1 Prev", score = 10),
-            player2 = Player(id = 2, name = "P2 Prev", score = 10),
-            servingPlayerId = 1,
-            player1SetsWon = 0,
-            player2SetsWon = 1,
-            isFinished = false
-        )
-    )
-    override fun getGameState(): StateFlow<GameState> = _gameState.asStateFlow()
-    override suspend fun incrementScore(playerId: Int, isDeuce: Boolean) {}
-    override suspend fun decrementScore(playerId: Int) {}
-    override suspend fun manualSwitchServe() {
-         _gameState.value = _gameState.value.copy(servingPlayerId = if (_gameState.value.servingPlayerId == 1) 2 else 1)
-    }
-    override suspend fun resetGame() {}
-    override suspend fun undoLastAction() {}
-}
-
-
 @Preview(showBackground = true)
 @Composable
 fun SettingsScreenPreview() {
     ScoreCountTheme {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            val fakeSettingsRepo = FakeSettingsRepositoryPreview()
-            val fakeScoreRepo = FakeScoreRepositoryPreview()
+        Surface {
             SettingsScreen(
                 onNavigateBack = {},
-                settingsViewModel = SettingsViewModel(fakeSettingsRepo)
+                settingsViewModel = SettingsViewModel(
+                    settingsRepository = object : SettingsRepository {
+                        private val settingsFlow = MutableStateFlow(GameSettings())
+                        override fun getSettings(): StateFlow<GameSettings> = settingsFlow.asStateFlow()
+                        override suspend fun saveSettings(settings: GameSettings) {
+                            settingsFlow.value = settings
+                        }
+                    }
+                )
             )
         }
-    }
-}
-
-@Preview(showBackground = true, widthDp = 200)
-@Composable
-fun ToggleSettingCardPreviewChecked() {
-    ScoreCountTheme {
-        ToggleSettingCard(
-            SettingItemData.ToggleItem("Show Title", Icons.Filled.Title, true) {}
-        )
-    }
-}
-
-@Preview(showBackground = true, widthDp = 200)
-@Composable
-fun ToggleSettingCardPreviewUnchecked() {
-    ScoreCountTheme {
-        ToggleSettingCard(
-            SettingItemData.ToggleItem("Show Title", Icons.Filled.Title, false) {}
-        )
-    }
-}
-
-@Preview(showBackground = true, widthDp = 200)
-@Composable
-fun ActionSettingCardPreview() {
-    ScoreCountTheme {
-        ActionSettingCard(
-            SettingItemData.ActionItem("Switch Serve", Icons.AutoMirrored.Filled.ArrowBack) {}
-        )
     }
 }

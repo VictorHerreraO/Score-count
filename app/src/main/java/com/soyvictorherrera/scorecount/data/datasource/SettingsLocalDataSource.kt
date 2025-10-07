@@ -26,6 +26,7 @@ class SettingsLocalDataSource @Inject constructor(
         val KEY_SERVE_ROTATION_AFTER_POINTS = intPreferencesKey("serve_rotation_after_points")
         val KEY_SERVE_CHANGE_AFTER_DEUCE = intPreferencesKey("serve_change_after_deuce")
         val KEY_WINNER_SERVES_NEXT_GAME = booleanPreferencesKey("winner_serves_next_game")
+        val KEY_KEEP_SCREEN_ON = booleanPreferencesKey("keep_screen_on")
     }
 
     fun getSettings(): Flow<GameSettings> = dataStore.data.map { preferences ->
@@ -41,7 +42,8 @@ class SettingsLocalDataSource @Inject constructor(
             numberOfSets = preferences[PreferencesKeys.KEY_NUMBER_OF_SETS] ?: default.numberOfSets,
             serveRotationAfterPoints = preferences[PreferencesKeys.KEY_SERVE_ROTATION_AFTER_POINTS] ?: default.serveRotationAfterPoints,
             serveChangeAfterDeuce = preferences[PreferencesKeys.KEY_SERVE_CHANGE_AFTER_DEUCE] ?: default.serveChangeAfterDeuce,
-            winnerServesNextGame = preferences[PreferencesKeys.KEY_WINNER_SERVES_NEXT_GAME] ?: default.winnerServesNextGame
+            winnerServesNextGame = preferences[PreferencesKeys.KEY_WINNER_SERVES_NEXT_GAME] ?: default.winnerServesNextGame,
+            keepScreenOn = preferences[PreferencesKeys.KEY_KEEP_SCREEN_ON] ?: default.keepScreenOn
         )
     }
 
@@ -58,6 +60,7 @@ class SettingsLocalDataSource @Inject constructor(
             preferences[PreferencesKeys.KEY_SERVE_ROTATION_AFTER_POINTS] = settings.serveRotationAfterPoints
             preferences[PreferencesKeys.KEY_SERVE_CHANGE_AFTER_DEUCE] = settings.serveChangeAfterDeuce
             preferences[PreferencesKeys.KEY_WINNER_SERVES_NEXT_GAME] = settings.winnerServesNextGame
+            preferences[PreferencesKeys.KEY_KEEP_SCREEN_ON] = settings.keepScreenOn
         }
     }
 }
