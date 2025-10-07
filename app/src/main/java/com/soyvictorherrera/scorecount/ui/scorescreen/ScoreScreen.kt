@@ -676,7 +676,7 @@ class FakeScoreRepositoryPreview(initialState: GameState) : ScoreRepository {
         _gameState.value = current.copy(servingPlayerId = if (current.servingPlayerId == current.player1.id) current.player2.id else current.player1.id)
     }
 
-    override suspend fun resetGame() {
+    override suspend fun resetGame(lastGameWinnerId: Int?) {
         _gameState.value = GameState(
             player1 = Player(id = 1, name = "P1 Preview", score = 0),
             player2 = Player(id = 2, name = "P2 Preview", score = 0),

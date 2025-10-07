@@ -22,8 +22,8 @@ class ScoreRepositoryImpl @Inject constructor(private val localDataSource: Local
         localDataSource.manualSwitchServe()
     }
 
-    override suspend fun resetGame() {
-        localDataSource.resetGame()
+    override suspend fun resetGame(lastGameWinnerId: Int?) {
+        localDataSource.resetGame(lastGameWinnerId)
     }
 
     override suspend fun undoLastAction() {

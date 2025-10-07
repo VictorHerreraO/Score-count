@@ -187,13 +187,16 @@ class LocalScoreDataSource @Inject constructor(
         updateState(currentState.copy(servingPlayerId = nextServer))
     }
 
-    suspend fun resetGame() {
-        // Player names are part of initialGameState.
-        // showNames setting is handled at the UI layer.
-        // servingPlayerId can also be reset to a default or based on a new setting.
+    suspend fun resetGame(lastGameWinnerId: Int? = null) {
+        val settings = settingsRepository.getSettings().first()
+        val firstServer = if (settings.winnerServesNextGame && lastGameWinnerId != null) {
+            lastGameWinnerId
+        } else {
+            initialPlayer1.id
+        }
         updateState(
             initialGameState.copy(
-                 servingPlayerId = initialPlayer1.id // Or based on a future setting
+                servingPlayerId = firstServer
             )
         )
     }

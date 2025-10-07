@@ -6,7 +6,7 @@ import javax.inject.Inject
 class ResetGameUseCase @Inject constructor(
     private val scoreRepository: ScoreRepository
 ) {
-    suspend fun execute() {
-        scoreRepository.resetGame()
+    suspend fun execute(lastGameWinnerId: Int? = null) {
+        scoreRepository.resetGame(lastGameWinnerId)
     }
 }

@@ -70,7 +70,12 @@ class ScoreViewModel @Inject constructor(
 
     fun resetGame() {
         viewModelScope.launch {
-            resetGameUseCase.execute()
+            val winnerId = if (_gameState.value?.player1SetsWon ?: 0 > _gameState.value?.player2SetsWon ?: 0) {
+                _gameState.value?.player1?.id
+            } else {
+                _gameState.value?.player2?.id
+            }
+            resetGameUseCase.execute(winnerId)
         }
     }
 

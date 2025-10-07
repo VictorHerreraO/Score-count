@@ -8,6 +8,6 @@ interface ScoreRepository {
     suspend fun incrementScore(playerId: Int, isDeuce: Boolean)
     suspend fun decrementScore(playerId: Int)
     suspend fun manualSwitchServe() // Renamed from switchServe()
-    suspend fun resetGame()
+    suspend fun resetGame(lastGameWinnerId: Int? = null)
     suspend fun undoLastAction() // Basic undo, might need more complex state management
 }
