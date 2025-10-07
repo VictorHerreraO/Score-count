@@ -1,7 +1,21 @@
 package com.soyvictorherrera.scorecount.ui.scorescreen
 
+import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.History
@@ -10,12 +24,29 @@ import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,7 +60,13 @@ import com.soyvictorherrera.scorecount.domain.model.Player
 import com.soyvictorherrera.scorecount.domain.repository.MatchRepository
 import com.soyvictorherrera.scorecount.domain.repository.ScoreRepository
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
-import com.soyvictorherrera.scorecount.domain.usecase.*
+import com.soyvictorherrera.scorecount.domain.usecase.DecrementScoreUseCase
+import com.soyvictorherrera.scorecount.domain.usecase.GetGameStateUseCase
+import com.soyvictorherrera.scorecount.domain.usecase.IncrementScoreUseCase
+import com.soyvictorherrera.scorecount.domain.usecase.ManualSwitchServeUseCase
+import com.soyvictorherrera.scorecount.domain.usecase.ResetGameUseCase
+import com.soyvictorherrera.scorecount.domain.usecase.SaveMatchUseCase
+import com.soyvictorherrera.scorecount.domain.usecase.UndoLastActionUseCase
 import com.soyvictorherrera.scorecount.ui.Screen
 import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
 import kotlinx.coroutines.flow.Flow
@@ -37,7 +74,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOf
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScoreScreen(
     viewModel: ScoreViewModel,
@@ -45,119 +81,318 @@ fun ScoreScreen(
 ) {
     val gameState by viewModel.gameState.collectAsState()
     val gameSettings by viewModel.gameSettings.collectAsState()
+    val configuration = LocalConfiguration.current
 
     ScoreCountTheme {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        if (gameSettings?.showTitle == true) {
-                            Text("Table Tennis", fontWeight = FontWeight.Bold)
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { navController.navigate(Screen.MatchHistoryScreen.route) }) {
-                            Icon(Icons.Default.History, contentDescription = "History")
-                        }
-                        IconButton(onClick = { navController.navigate(Screen.SettingsScreen.route) }) {
-                            Icon(Icons.Default.Settings, contentDescription = "Settings")
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface
+        val currentGameState = gameState
+        val currentSettings = gameSettings
+
+        if (currentGameState != null && currentSettings != null) {
+            when (configuration.orientation) {
+                Configuration.ORIENTATION_LANDSCAPE -> {
+                    ScoreScreenLandscape(
+                        navController = navController,
+                        gameState = currentGameState,
+                        gameSettings = currentSettings,
+                        onIncrement = viewModel::incrementScore,
+                        onDecrement = viewModel::decrementScore,
+                        onReset = viewModel::resetGame,
+                        onSwitchServe = viewModel::manualSwitchServe,
+                        onStartNewGame = viewModel::resetGame
                     )
-                )
-            },
-            bottomBar = {
-                val currentGameState = gameState
-                if (currentGameState != null) {
-                    BottomBarActions(
-                        isFinished = currentGameState.isFinished,
-                        showSwitchServe = gameSettings?.markServe == true,
-                        onReset = { viewModel.resetGame() },
-                        onSwitchServe = { viewModel.manualSwitchServe() },
-                        onStartNewGame = { viewModel.resetGame() } // Resetting the game for now
+                }
+                else -> {
+                    ScoreScreenPortrait(
+                        navController = navController,
+                        gameState = currentGameState,
+                        gameSettings = currentSettings,
+                        onIncrement = viewModel::incrementScore,
+                        onDecrement = viewModel::decrementScore,
+                        onReset = viewModel::resetGame,
+                        onSwitchServe = viewModel::manualSwitchServe,
+                        onStartNewGame = viewModel::resetGame
                     )
                 }
             }
-        ) { paddingValues ->
-            val currentGameState = gameState
-            val currentSettings = gameSettings
+        } else {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        }
+    }
+}
 
-            if (currentGameState != null && currentSettings != null) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ScoreScreenPortrait(
+    navController: NavController,
+    gameState: GameState,
+    gameSettings: GameSettings,
+    onIncrement: (Int) -> Unit,
+    onDecrement: (Int) -> Unit,
+    onReset: () -> Unit,
+    onSwitchServe: () -> Unit,
+    onStartNewGame: () -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    if (gameSettings.showTitle) {
+                        Text("Table Tennis", fontWeight = FontWeight.Bold)
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { navController.navigate(Screen.MatchHistoryScreen.route) }) {
+                        Icon(Icons.Default.History, contentDescription = "History")
+                    }
+                    IconButton(onClick = { navController.navigate(Screen.SettingsScreen.route) }) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                )
+            )
+        },
+        bottomBar = {
+            BottomBarActions(
+                isFinished = gameState.isFinished,
+                showSwitchServe = gameSettings.markServe,
+                onReset = onReset,
+                onSwitchServe = onSwitchServe,
+                onStartNewGame = onStartNewGame
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            if (gameSettings.showSets) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (currentSettings.showSets) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                if (currentSettings.showNames) {
-                                    Text(
-                                        text = currentGameState.player1.name,
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                }
-                                Text(
-                                    text = currentGameState.player1SetsWon.toString(),
-                                    style = MaterialTheme.typography.headlineSmall
-                                )
-                            }
-                            Text(text = ":", style = MaterialTheme.typography.headlineSmall)
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                if (currentSettings.showNames) {
-                                    Text(
-                                        text = currentGameState.player2.name,
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                }
-                                Text(
-                                    text = currentGameState.player2SetsWon.toString(),
-                                    style = MaterialTheme.typography.headlineSmall
-                                )
-                            }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        if (gameSettings.showNames) {
+                            Text(
+                                text = gameState.player1.name,
+                                style = MaterialTheme.typography.labelMedium
+                            )
                         }
+                        Text(
+                            text = gameState.player1SetsWon.toString(),
+                            style = MaterialTheme.typography.headlineSmall
+                        )
                     }
-
-                    PlayerScoreCard(
-                        playerName = currentGameState.player1.name,
-                        score = currentGameState.player1.score,
-                        isServing = currentSettings.markServe && currentGameState.servingPlayerId == currentGameState.player1.id,
-                        isFinished = currentGameState.isFinished,
-                        showPlayerName = currentSettings.showNames,
-                        onIncrement = { viewModel.incrementScore(currentGameState.player1.id) },
-                        onDecrement = { viewModel.decrementScore(currentGameState.player1.id) },
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    if (currentSettings.markDeuce && currentGameState.isDeuce) {
-                        DeuceIndicator()
+                    Text(text = ":", style = MaterialTheme.typography.headlineSmall)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        if (gameSettings.showNames) {
+                            Text(
+                                text = gameState.player2.name,
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
+                        Text(
+                            text = gameState.player2SetsWon.toString(),
+                            style = MaterialTheme.typography.headlineSmall
+                        )
                     }
+                }
+            }
 
-                    PlayerScoreCard(
-                        playerName = currentGameState.player2.name,
-                        score = currentGameState.player2.score,
-                        isServing = currentSettings.markServe && currentGameState.servingPlayerId == currentGameState.player2.id,
-                        isFinished = currentGameState.isFinished,
-                        showPlayerName = currentSettings.showNames,
-                        onIncrement = { viewModel.incrementScore(currentGameState.player2.id) },
-                        onDecrement = { viewModel.decrementScore(currentGameState.player2.id) },
-                        modifier = Modifier.weight(1f)
-                    )
+            PlayerScoreCard(
+                playerName = gameState.player1.name,
+                score = gameState.player1.score,
+                isServing = gameSettings.markServe && gameState.servingPlayerId == gameState.player1.id,
+                isFinished = gameState.isFinished,
+                showPlayerName = gameSettings.showNames,
+                onIncrement = { onIncrement(gameState.player1.id) },
+                onDecrement = { onDecrement(gameState.player1.id) },
+                modifier = Modifier.weight(1f)
+            )
+
+            if (gameSettings.markDeuce && gameState.isDeuce) {
+                DeuceIndicator()
+            }
+
+            PlayerScoreCard(
+                playerName = gameState.player2.name,
+                score = gameState.player2.score,
+                isServing = gameSettings.markServe && gameState.servingPlayerId == gameState.player2.id,
+                isFinished = gameState.isFinished,
+                showPlayerName = gameSettings.showNames,
+                onIncrement = { onIncrement(gameState.player2.id) },
+                onDecrement = { onDecrement(gameState.player2.id) },
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+fun ScoreScreenLandscape(
+    navController: NavController,
+    gameState: GameState,
+    gameSettings: GameSettings,
+    onIncrement: (Int) -> Unit,
+    onDecrement: (Int) -> Unit,
+    onReset: () -> Unit,
+    onSwitchServe: () -> Unit,
+    onStartNewGame: () -> Unit,
+) {
+    Scaffold { paddingValues ->
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            PlayerScoreCard(
+                playerName = gameState.player1.name,
+                score = gameState.player1.score,
+                isServing = gameSettings.markServe && gameState.servingPlayerId == gameState.player1.id,
+                isFinished = gameState.isFinished,
+                showPlayerName = gameSettings.showNames,
+                onIncrement = { onIncrement(gameState.player1.id) },
+                onDecrement = { onDecrement(gameState.player1.id) },
+                modifier = Modifier.weight(1f)
+            )
+
+            CentralControls(
+                modifier = Modifier.padding(horizontal = 4.dp),
+                navController = navController,
+                gameState = gameState,
+                gameSettings = gameSettings,
+                onReset = onReset,
+                onSwitchServe = onSwitchServe,
+                onStartNewGame = onStartNewGame
+            )
+
+            PlayerScoreCard(
+                playerName = gameState.player2.name,
+                score = gameState.player2.score,
+                isServing = gameSettings.markServe && gameState.servingPlayerId == gameState.player2.id,
+                isFinished = gameState.isFinished,
+                showPlayerName = gameSettings.showNames,
+                onIncrement = { onIncrement(gameState.player2.id) },
+                onDecrement = { onDecrement(gameState.player2.id) },
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun CentralControls(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    gameState: GameState,
+    gameSettings: GameSettings,
+    onReset: () -> Unit,
+    onSwitchServe: () -> Unit,
+    onStartNewGame: () -> Unit
+) {
+    Column(
+        modifier = modifier.fillMaxHeight(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            IconButton(onClick = { navController.navigate(Screen.MatchHistoryScreen.route) }) {
+                Icon(Icons.Default.History, contentDescription = "History")
+            }
+            IconButton(onClick = { navController.navigate(Screen.SettingsScreen.route) }) {
+                Icon(Icons.Default.Settings, contentDescription = "Settings")
+            }
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            if (gameSettings.showSets) {
+                SetsIndicator(
+                    player1Name = "P1",
+                    player2Name = "P2",
+                    player1Sets = gameState.player1SetsWon,
+                    player2Sets = gameState.player2SetsWon
+                )
+            }
+            if (gameSettings.markDeuce && gameState.isDeuce) {
+                DeuceIndicator()
+            }
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            if (gameState.isFinished) {
+                Button(
+                    onClick = onStartNewGame,
+                    shape = MaterialTheme.shapes.extraLarge,
+                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
+                ) {
+                    Icon(Icons.Default.RestartAlt, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("New Game")
                 }
             } else {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+                OutlinedButton(
+                    onClick = onReset,
+                    shape = MaterialTheme.shapes.extraLarge,
+                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
+                ) {
+                    Icon(Icons.Default.RestartAlt, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Reset")
+                }
+                if (gameSettings.markServe) {
+                    OutlinedButton(
+                        onClick = onSwitchServe,
+                        shape = MaterialTheme.shapes.extraLarge,
+                        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
+                    ) {
+                        Icon(Icons.Default.SwapHoriz, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Switch")
+                    }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun SetsIndicator(
+    player1Name: String,
+    player2Name: String,
+    player1Sets: Int,
+    player2Sets: Int
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = player1Name, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(text = player1Sets.toString(), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        }
+        Text(text = ":", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.outline)
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = player2Name, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(text = player2Sets.toString(), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -178,6 +413,7 @@ fun PlayerScoreCard(
         onClick = onIncrement,
         enabled = !isFinished,
         modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
     ) {
         Box(
@@ -187,14 +423,14 @@ fun PlayerScoreCard(
         ) {
             Column(
                 modifier = Modifier.align(Alignment.Center),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (showPlayerName) {
                         Text(
                             playerName,
-                            style = MaterialTheme.typography.labelMedium
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     if (isServing) {
@@ -202,16 +438,17 @@ fun PlayerScoreCard(
                         Icon(
                             Icons.Default.SportsTennis,
                             contentDescription = "Serving",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(16.dp)
                         )
                     }
                 }
                 Text(
                     text = score.toString(),
-                    fontSize = 72.sp,
+                    fontSize = 96.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    lineHeight = 72.sp
+                    lineHeight = 96.sp,
+                    letterSpacing = (-4).sp
                 )
             }
             Row(
@@ -312,19 +549,18 @@ fun BottomBarActions(
 fun DeuceIndicator(
     modifier: Modifier = Modifier
 ) {
-    OutlinedButton(
-        onClick = { },
-        enabled = false,
-        modifier = modifier.fillMaxWidth(),
-        colors = ButtonDefaults.outlinedButtonColors(
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-            disabledContentColor = MaterialTheme.colorScheme.primary
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f))
     ) {
         Text(
             text = "DEUCE",
-            fontWeight = FontWeight.Bold
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
         )
     }
 }
@@ -348,30 +584,18 @@ private class FakeMatchRepository : MatchRepository {
 @Preview(showBackground = true)
 @Composable
 fun ScoreScreenPreview() {
-    val dummyP1 = Player(id = 1, name = "Player 1", score = 10)
-    val dummyP2 = Player(id = 2, name = "Player 2", score = 10)
-    val previewGameState = GameState(
-        player1 = dummyP1,
-        player2 = dummyP2,
-        servingPlayerId = 1,
-        player1SetsWon = 2,
-        player2SetsWon = 1,
-        isDeuce = true
-    )
-    val fakeScoreRepo = FakeScoreRepositoryPreview(initialState = previewGameState)
-    val fakeSettingsRepo = FakeSettingsRepository()
-    val fakeMatchRepo = FakeMatchRepository()
+    val previewViewModel = createPreviewViewModel()
+    val navController = rememberNavController()
 
-    val previewViewModel = ScoreViewModel(
-        getGameStateUseCase = GetGameStateUseCase(fakeScoreRepo),
-        incrementScoreUseCase = IncrementScoreUseCase(fakeScoreRepo, fakeSettingsRepo),
-        decrementScoreUseCase = DecrementScoreUseCase(fakeScoreRepo),
-        manualSwitchServeUseCase = ManualSwitchServeUseCase(fakeScoreRepo),
-        resetGameUseCase = ResetGameUseCase(fakeScoreRepo),
-        undoLastActionUseCase = UndoLastActionUseCase(fakeScoreRepo),
-        saveMatchUseCase = SaveMatchUseCase(fakeMatchRepo),
-        settingsRepository = fakeSettingsRepo
-    )
+    ScoreCountTheme {
+        ScoreScreen(viewModel = previewViewModel, navController = navController)
+    }
+}
+
+@Preview(showBackground = true, device = "spec:width=411dp,height=891dp,dpi=420,orientation=landscape")
+@Composable
+fun ScoreScreenLandscapePreview() {
+    val previewViewModel = createPreviewViewModel()
     val navController = rememberNavController()
 
     ScoreCountTheme {
@@ -382,21 +606,31 @@ fun ScoreScreenPreview() {
 @Preview(showBackground = true)
 @Composable
 fun ScoreScreenFinishedPreview() {
-    val dummyP1 = Player(id = 1, name = "Player 1", score = 0)
-    val dummyP2 = Player(id = 2, name = "Player 2", score = 0)
+    val previewViewModel = createPreviewViewModel(finished = true)
+    val navController = rememberNavController()
+
+    ScoreCountTheme {
+        ScoreScreen(viewModel = previewViewModel, navController = navController)
+    }
+}
+
+private fun createPreviewViewModel(finished: Boolean = false): ScoreViewModel {
+    val dummyP1 = Player(id = 1, name = "Player 1", score = if (finished) 0 else 10)
+    val dummyP2 = Player(id = 2, name = "Player 2", score = if (finished) 0 else 10)
     val previewGameState = GameState(
         player1 = dummyP1,
         player2 = dummyP2,
         servingPlayerId = 1,
         player1SetsWon = 3,
         player2SetsWon = 1,
-        isFinished = true
+        isDeuce = !finished,
+        isFinished = finished
     )
     val fakeScoreRepo = FakeScoreRepositoryPreview(initialState = previewGameState)
     val fakeSettingsRepo = FakeSettingsRepository()
     val fakeMatchRepo = FakeMatchRepository()
 
-    val previewViewModel = ScoreViewModel(
+    return ScoreViewModel(
         getGameStateUseCase = GetGameStateUseCase(fakeScoreRepo),
         incrementScoreUseCase = IncrementScoreUseCase(fakeScoreRepo, fakeSettingsRepo),
         decrementScoreUseCase = DecrementScoreUseCase(fakeScoreRepo),
@@ -406,11 +640,6 @@ fun ScoreScreenFinishedPreview() {
         saveMatchUseCase = SaveMatchUseCase(fakeMatchRepo),
         settingsRepository = fakeSettingsRepo
     )
-    val navController = rememberNavController()
-
-    ScoreCountTheme {
-        ScoreScreen(viewModel = previewViewModel, navController = navController)
-    }
 }
 
 class FakeScoreRepositoryPreview(initialState: GameState) : ScoreRepository {

@@ -2,8 +2,9 @@
 
 This file tracks development work that is currently in progress and has not yet been completed for the Score-Count application.
 
-## In Progress:
+## Completed:
 
+*   **Feature: Score Screen UI Update**: The UI for the Score Screen has been updated to support both portrait and landscape layouts, providing an improved user experience on different device orientations.
 *   **Feature: Match History Screen**: The initial implementation of the Match History screen is complete. This includes the domain, data, and UI layers, as well as navigation from the main score screen.
 
 ## Next Steps:

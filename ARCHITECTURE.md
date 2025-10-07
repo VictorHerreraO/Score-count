@@ -10,7 +10,7 @@ The Score-Count application follows a layered architecture pattern, influenced b
 
 *   **Framework**: Jetpack Compose for declarative UI development.
 *   **Components**:
-    *   **Screens (`ScoreScreen.kt`, `SettingsScreen.kt`, `MatchHistoryScreen.kt`)**: Composables responsible for displaying data and capturing user input. They observe state from ViewModels.
+    *   **Screens (`ScoreScreen.kt`, `SettingsScreen.kt`, `MatchHistoryScreen.kt`)**: Composables responsible for displaying data and capturing user input. They observe state from ViewModels. The `ScoreScreen` now includes conditional logic to display different layouts for portrait and landscape orientations.
     *   **ViewModels (`ScoreViewModel.kt`, `SettingsViewModel.kt`, `MatchHistoryViewModel.kt`)**: Prepare and manage data for the UI. They expose UI state (e.g., `GameState`, `GameSettings`) as `StateFlow`s and handle user actions by delegating to UseCases.
     *   **Navigation**: Jetpack Navigation Compose (`NavHost`, `Screen.kt` for routes) is used for navigating between screens.
     *   **Preview Data**: Fake/Preview versions of Repositories are used within screen previews to provide sample data and facilitate UI development.
