@@ -1,14 +1,14 @@
 pluginManagement {
     repositories {
+        gradlePluginPortal()
         google {
             content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("com.android.*")
+                includeGroupByRegex("com.google.*")
                 includeGroupByRegex("androidx.*")
             }
         }
         mavenCentral()
-        gradlePluginPortal()
     }
 }
 dependencyResolutionManagement {
@@ -21,4 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "Score-count"
 include(":app")
- 

@@ -25,7 +25,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -50,16 +50,12 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-    hilt {
-        enableAggregatingTask = false
-    }
 }
 
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.datastore.preferences)
-    // Remove material if only using Compose Material 3
-    // implementation(libs.material)
+    implementation("com.squareup:javapoet:1.13.0")
 
     // Jetpack Compose Dependencies - using BOM
     val composeBom = platform(libs.androidx.compose.bom)
@@ -89,19 +85,16 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
-    // Coroutines (Ensure you have a version defined in libs.versions.toml or specify directly)
-    // implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3") // Example, prefer version catalog
-
     // Test dependencies
-    // testImplementation(libs.junit) // Comment out or remove this line (it's likely JUnit 4)
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3") // Or align with your project's coroutine version
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4) // For Compose UI tests
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 
     // Debug implementation for UI Tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
