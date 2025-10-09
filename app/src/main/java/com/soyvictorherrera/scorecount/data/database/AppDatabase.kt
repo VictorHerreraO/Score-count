@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import com.soyvictorherrera.scorecount.data.database.dao.MatchDao
 import com.soyvictorherrera.scorecount.data.database.entity.MatchEntity
 
-@Database(entities = [MatchEntity::class], version = 1)
+@Database(entities = [MatchEntity::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun matchDao(): MatchDao
 }
