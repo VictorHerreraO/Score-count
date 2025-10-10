@@ -1,7 +1,7 @@
 package com.soyvictorherrera.scorecount.domain.repository
 
 import com.soyvictorherrera.scorecount.domain.model.GameState
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Repository for managing game state.
@@ -10,9 +10,11 @@ import kotlinx.coroutines.flow.Flow
  */
 interface ScoreRepository {
     /**
-     * Get the current game state as a Flow.
+     * Get the current game state as a StateFlow.
+     * StateFlow guarantees there's always a current value and new collectors
+     * immediately receive the latest state.
      */
-    fun getGameState(): Flow<GameState>
+    fun getGameState(): StateFlow<GameState>
 
     /**
      * Update the game state with a new state.

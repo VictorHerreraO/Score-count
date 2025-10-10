@@ -6,13 +6,21 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class SettingsLocalDataSource @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private object PreferencesKeys {
         val KEY_SHOW_TITLE = booleanPreferencesKey("show_title")
@@ -29,7 +37,7 @@ class SettingsLocalDataSource @Inject constructor(
         val KEY_KEEP_SCREEN_ON = booleanPreferencesKey("keep_screen_on")
     }
 
-    fun getSettings(): Flow<GameSettings> = dataStore.data.map { preferences ->
+    val settings: StateFlow<GameSettings> = dataStore.data.map { preferences ->
         val default = GameSettings()
         GameSettings(
             showTitle = preferences[PreferencesKeys.KEY_SHOW_TITLE] ?: default.showTitle,
@@ -45,7 +53,11 @@ class SettingsLocalDataSource @Inject constructor(
             winnerServesNextGame = preferences[PreferencesKeys.KEY_WINNER_SERVES_NEXT_GAME] ?: default.winnerServesNextGame,
             keepScreenOn = preferences[PreferencesKeys.KEY_KEEP_SCREEN_ON] ?: default.keepScreenOn
         )
-    }
+    }.stateIn(
+        scope = scope,
+        started = SharingStarted.Eagerly,
+        initialValue = GameSettings()
+    )
 
     suspend fun saveSettings(settings: GameSettings) {
         dataStore.edit { preferences ->

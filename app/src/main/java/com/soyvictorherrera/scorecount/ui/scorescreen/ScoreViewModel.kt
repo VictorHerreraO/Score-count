@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ScoreViewModel @Inject constructor(
-    getGameStateUseCase: GetGameStateUseCase,
+    private val scoreRepository: com.soyvictorherrera.scorecount.domain.repository.ScoreRepository,
     private val incrementScoreUseCase: IncrementScoreUseCase,
     private val decrementScoreUseCase: DecrementScoreUseCase,
     private val manualSwitchServeUseCase: ManualSwitchServeUseCase,
@@ -25,26 +25,19 @@ class ScoreViewModel @Inject constructor(
     settingsRepository: SettingsRepository
 ) : ViewModel() {
 
-    private val _gameState = MutableStateFlow<GameState?>(null)
-    val gameState: StateFlow<GameState?> = _gameState.asStateFlow()
-
-    private val _gameSettings = MutableStateFlow<GameSettings?>(null)
-    val gameSettings: StateFlow<GameSettings?> = _gameSettings.asStateFlow()
+    // Directly expose StateFlows from repositories - no need for intermediate copying
+    val gameState: StateFlow<GameState> = scoreRepository.getGameState()
+    val gameSettings: StateFlow<GameSettings> = settingsRepository.getSettings()
 
     init {
+        // Monitor game state changes to auto-save matches
         viewModelScope.launch {
-            settingsRepository.getSettings().collect { settings ->
-                _gameSettings.value = settings
-            }
-        }
-        viewModelScope.launch {
-            getGameStateUseCase.execute().collect { currentGameState ->
-                val previousState = _gameState.value
-                _gameState.value = currentGameState
-
+            var previousState: GameState? = null
+            gameState.collect { currentGameState ->
                 if (currentGameState.isFinished && previousState?.isFinished == false) {
                     saveMatch(currentGameState)
                 }
+                previousState = currentGameState
             }
         }
     }
@@ -69,10 +62,11 @@ class ScoreViewModel @Inject constructor(
 
     fun resetGame() {
         viewModelScope.launch {
-            val winnerId = if (_gameState.value?.player1SetsWon ?: 0 > _gameState.value?.player2SetsWon ?: 0) {
-                _gameState.value?.player1?.id
+            val currentState = gameState.value
+            val winnerId = if (currentState.player1SetsWon > currentState.player2SetsWon) {
+                currentState.player1.id
             } else {
-                _gameState.value?.player2?.id
+                currentState.player2.id
             }
             resetGameUseCase.execute(winnerId)
         }

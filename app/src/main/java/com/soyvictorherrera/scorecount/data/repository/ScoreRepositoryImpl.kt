@@ -4,7 +4,7 @@ import com.soyvictorherrera.scorecount.data.datasource.LocalScoreDataSource
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.domain.repository.ScoreRepository
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Implementation of ScoreRepository.
@@ -14,7 +14,7 @@ class ScoreRepositoryImpl @Inject constructor(
     private val localDataSource: LocalScoreDataSource
 ) : ScoreRepository {
 
-    override fun getGameState(): Flow<GameState> = localDataSource.gameState
+    override fun getGameState(): StateFlow<GameState> = localDataSource.gameState
 
     override suspend fun updateGameState(newState: GameState) {
         localDataSource.updateState(newState)

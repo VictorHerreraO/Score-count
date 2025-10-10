@@ -61,7 +61,6 @@ import com.soyvictorherrera.scorecount.domain.repository.MatchRepository
 import com.soyvictorherrera.scorecount.domain.repository.ScoreRepository
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import com.soyvictorherrera.scorecount.domain.usecase.DecrementScoreUseCase
-import com.soyvictorherrera.scorecount.domain.usecase.GetGameStateUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.IncrementScoreUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.ManualSwitchServeUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.ResetGameUseCase
@@ -70,6 +69,7 @@ import com.soyvictorherrera.scorecount.ui.Screen
 import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOf
 
@@ -83,39 +83,30 @@ fun ScoreScreen(
     val configuration = LocalConfiguration.current
 
     ScoreCountTheme {
-        val currentGameState = gameState
-        val currentSettings = gameSettings
-
-        if (currentGameState != null && currentSettings != null) {
-            when (configuration.orientation) {
-                Configuration.ORIENTATION_LANDSCAPE -> {
-                    ScoreScreenLandscape(
-                        navController = navController,
-                        gameState = currentGameState,
-                        gameSettings = currentSettings,
-                        onIncrement = viewModel::incrementScore,
-                        onDecrement = viewModel::decrementScore,
-                        onReset = viewModel::resetGame,
-                        onSwitchServe = viewModel::manualSwitchServe,
-                        onStartNewGame = viewModel::resetGame
-                    )
-                }
-                else -> {
-                    ScoreScreenPortrait(
-                        navController = navController,
-                        gameState = currentGameState,
-                        gameSettings = currentSettings,
-                        onIncrement = viewModel::incrementScore,
-                        onDecrement = viewModel::decrementScore,
-                        onReset = viewModel::resetGame,
-                        onSwitchServe = viewModel::manualSwitchServe,
-                        onStartNewGame = viewModel::resetGame
-                    )
-                }
+        when (configuration.orientation) {
+            Configuration.ORIENTATION_LANDSCAPE -> {
+                ScoreScreenLandscape(
+                    navController = navController,
+                    gameState = gameState,
+                    gameSettings = gameSettings,
+                    onIncrement = viewModel::incrementScore,
+                    onDecrement = viewModel::decrementScore,
+                    onReset = viewModel::resetGame,
+                    onSwitchServe = viewModel::manualSwitchServe,
+                    onStartNewGame = viewModel::resetGame
+                )
             }
-        } else {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+            else -> {
+                ScoreScreenPortrait(
+                    navController = navController,
+                    gameState = gameState,
+                    gameSettings = gameSettings,
+                    onIncrement = viewModel::incrementScore,
+                    onDecrement = viewModel::decrementScore,
+                    onReset = viewModel::resetGame,
+                    onSwitchServe = viewModel::manualSwitchServe,
+                    onStartNewGame = viewModel::resetGame
+                )
             }
         }
     }
@@ -566,7 +557,7 @@ fun DeuceIndicator(
 
 private class FakeSettingsRepository : SettingsRepository {
     private val _settings = MutableStateFlow(GameSettings())
-    override fun getSettings(): Flow<GameSettings> = _settings.asStateFlow()
+    override fun getSettings(): StateFlow<GameSettings> = _settings.asStateFlow()
     override suspend fun saveSettings(settings: GameSettings) {
         _settings.value = settings
     }
@@ -630,7 +621,7 @@ private fun createPreviewViewModel(finished: Boolean = false): ScoreViewModel {
     val fakeMatchRepo = FakeMatchRepository()
 
     return ScoreViewModel(
-        getGameStateUseCase = GetGameStateUseCase(fakeScoreRepo),
+        scoreRepository = fakeScoreRepo,
         incrementScoreUseCase = IncrementScoreUseCase(fakeScoreRepo, fakeSettingsRepo),
         decrementScoreUseCase = DecrementScoreUseCase(fakeScoreRepo),
         manualSwitchServeUseCase = ManualSwitchServeUseCase(fakeScoreRepo),
@@ -643,7 +634,7 @@ private fun createPreviewViewModel(finished: Boolean = false): ScoreViewModel {
 class FakeScoreRepositoryPreview(initialState: GameState) : ScoreRepository {
     private val _gameState = MutableStateFlow(initialState)
 
-    override fun getGameState(): Flow<GameState> = _gameState.asStateFlow()
+    override fun getGameState(): StateFlow<GameState> = _gameState.asStateFlow()
 
     override suspend fun updateGameState(newState: GameState) {
         _gameState.value = newState
