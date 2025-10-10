@@ -2,6 +2,27 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Critical Evaluation - READ THIS FIRST
+
+**Before implementing ANY task, you MUST:**
+
+1. **Question the premise** - Does this task solve a real problem or is it refactoring for refactoring's sake?
+2. **Analyze the trade-offs** - Will this make the code objectively better or just different?
+3. **Push back immediately** if:
+   - The existing code is already clean and maintainable
+   - The "problem" is subjective preference, not an actual issue
+   - The solution adds complexity without clear benefits
+   - The task is over-engineering a simple problem
+
+**Your job is to provide engineering judgment, not blindly execute tasks.**
+
+If a task doesn't pass critical evaluation, respond with:
+- Clear analysis of why the current approach is adequate
+- Specific trade-offs the proposed change would introduce
+- Recommendation to close/modify the task
+
+**Do NOT waste time implementing unnecessary changes.** Resources are finite.
+
 ## Project Overview
 
 Score-Count is an Android table tennis score tracking application built with Kotlin and Jetpack Compose. It follows Clean Architecture with three layers: UI (Compose), Domain (business logic), and Data (repositories/persistence).
