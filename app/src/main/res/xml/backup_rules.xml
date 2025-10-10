@@ -1,13 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample backup rules file; uncomment and customize as necessary.
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Backup rules for devices with API < 31
    See https://developer.android.com/guide/topics/data/autobackup
    for details.
-   Note: This file is ignored for devices older than API 31
-   See https://developer.android.com/about/versions/12/backup-restore
+
+   By only including specific paths, everything else is automatically excluded.
 -->
 <full-backup-content>
-    <!--
-   <include domain="sharedpref" path="."/>
-   <exclude domain="sharedpref" path="device.xml"/>
--->
+    <!-- Include Room database files -->
+    <include domain="database" path="score-count-database" />
+    <include domain="database" path="score-count-database-shm" />
+    <include domain="database" path="score-count-database-wal" />
+
+    <!-- Include DataStore preferences -->
+    <include domain="file" path="datastore/settings.preferences_pb" />
 </full-backup-content>
