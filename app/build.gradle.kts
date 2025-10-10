@@ -95,6 +95,8 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.57.2")
+    kspAndroidTest("com.google.dagger:hilt-compiler:2.57.2")
 
     // Debug implementation for UI Tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
