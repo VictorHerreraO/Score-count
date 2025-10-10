@@ -38,7 +38,7 @@ class IncrementScoreUseCaseTest {
         fakeScoreRepository.setState(initialState)
 
         // When
-        useCase.execute(playerId = 1)
+        useCase(playerId = 1)
 
         // Then
         val newState = fakeScoreRepository.getGameState().value
@@ -57,7 +57,7 @@ class IncrementScoreUseCaseTest {
         fakeScoreRepository.setState(initialState)
 
         // When
-        useCase.execute(playerId = 2)
+        useCase(playerId = 2)
 
         // Then
         val newState = fakeScoreRepository.getGameState().value
@@ -81,7 +81,7 @@ class IncrementScoreUseCaseTest {
         fakeScoreRepository.setState(initialState)
 
         // When
-        useCase.execute(playerId = 1)
+        useCase(playerId = 1)
 
         // Then
         val newState = fakeScoreRepository.getGameState().value
@@ -102,7 +102,7 @@ class IncrementScoreUseCaseTest {
         fakeScoreRepository.setState(initialState)
 
         // When
-        useCase.execute(playerId = 1)
+        useCase(playerId = 1)
 
         // Then - Verify repository was updated
         val savedState = fakeScoreRepository.lastSavedState

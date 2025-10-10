@@ -12,7 +12,7 @@ import javax.inject.Inject
 class DecrementScoreUseCase @Inject constructor(
     private val scoreRepository: ScoreRepository
 ) {
-    suspend fun execute(playerId: Int) {
+    suspend operator fun invoke(playerId: Int) {
         val currentState = scoreRepository.getGameState().first()
         val newState = ScoreCalculator.decrementScore(currentState, playerId)
         scoreRepository.updateGameState(newState)

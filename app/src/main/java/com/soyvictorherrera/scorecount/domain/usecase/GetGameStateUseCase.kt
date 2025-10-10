@@ -8,7 +8,7 @@ import javax.inject.Inject
 class GetGameStateUseCase @Inject constructor(
     private val scoreRepository: ScoreRepository
 ) {
-    fun execute(): Flow<GameState> {
+    operator fun invoke(): Flow<GameState> {
         return scoreRepository.getGameState()
     }
 }

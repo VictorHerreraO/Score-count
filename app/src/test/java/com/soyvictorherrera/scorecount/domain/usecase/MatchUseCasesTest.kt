@@ -43,7 +43,7 @@ class MatchUseCasesTest {
         )
 
         // When
-        useCase.execute(match)
+        useCase(match)
 
         // Then
         val savedMatch = fakeMatchRepository.lastSavedMatch
@@ -72,8 +72,8 @@ class MatchUseCasesTest {
         )
 
         // When
-        useCase.execute(match1)
-        useCase.execute(match2)
+        useCase(match1)
+        useCase(match2)
 
         // Then
         val matches = fakeMatchRepository.getMatchList().first()
@@ -96,7 +96,7 @@ class MatchUseCasesTest {
         )
 
         // When
-        useCase.execute(match)
+        useCase(match)
 
         // Then
         val savedMatch = fakeMatchRepository.lastSavedMatch
@@ -112,7 +112,7 @@ class MatchUseCasesTest {
         val useCase = GetMatchesUseCase(fakeMatchRepository)
 
         // When
-        val matches = useCase.execute().first()
+        val matches = useCase().first()
 
         // Then
         assertTrue(matches.isEmpty())
@@ -153,7 +153,7 @@ class MatchUseCasesTest {
         val useCase = GetMatchesUseCase(fakeMatchRepository)
 
         // When
-        val matches = useCase.execute().first()
+        val matches = useCase().first()
 
         // Then
         assertEquals(3, matches.size)
@@ -166,7 +166,7 @@ class MatchUseCasesTest {
     fun `GetMatchesUseCase returns Flow that updates when new matches are saved`() = runTest {
         // Given
         val useCase = GetMatchesUseCase(fakeMatchRepository)
-        val matchFlow = useCase.execute()
+        val matchFlow = useCase()
 
         // Initially empty
         assertEquals(0, matchFlow.first().size)

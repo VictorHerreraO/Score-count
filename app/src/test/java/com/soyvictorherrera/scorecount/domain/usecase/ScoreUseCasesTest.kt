@@ -45,7 +45,7 @@ class ScoreUseCasesTest {
         fakeScoreRepository.setState(initialState)
 
         // When
-        useCase.execute(playerId = 1)
+        useCase(playerId = 1)
 
         // Then
         val newState = fakeScoreRepository.getGameState().value
@@ -65,7 +65,7 @@ class ScoreUseCasesTest {
         fakeScoreRepository.setState(initialState)
 
         // When
-        useCase.execute(playerId = 2)
+        useCase(playerId = 2)
 
         // Then
         val newState = fakeScoreRepository.getGameState().value
@@ -85,7 +85,7 @@ class ScoreUseCasesTest {
         fakeScoreRepository.setState(initialState)
 
         // When
-        useCase.execute(playerId = 1)
+        useCase(playerId = 1)
 
         // Then
         val newState = fakeScoreRepository.getGameState().value
@@ -105,7 +105,7 @@ class ScoreUseCasesTest {
         fakeScoreRepository.setState(initialState)
 
         // When
-        useCase.execute(playerId = 2)
+        useCase(playerId = 2)
 
         // Then
         val savedState = fakeScoreRepository.lastSavedState
@@ -127,7 +127,7 @@ class ScoreUseCasesTest {
         fakeScoreRepository.setState(initialState)
 
         // When
-        useCase.execute()
+        useCase()
 
         // Then
         val newState = fakeScoreRepository.getGameState().value
@@ -148,7 +148,7 @@ class ScoreUseCasesTest {
         fakeScoreRepository.setState(initialState)
 
         // When
-        useCase.execute()
+        useCase()
 
         // Then
         val newState = fakeScoreRepository.getGameState().value
@@ -169,7 +169,7 @@ class ScoreUseCasesTest {
         fakeScoreRepository.setState(initialState)
 
         // When
-        useCase.execute()
+        useCase()
 
         // Then
         val savedState = fakeScoreRepository.lastSavedState
@@ -192,7 +192,7 @@ class ScoreUseCasesTest {
         fakeScoreRepository.setState(initialState)
 
         // When
-        useCase.execute()
+        useCase()
 
         // Then
         val newState = fakeScoreRepository.getGameState().value
@@ -215,7 +215,7 @@ class ScoreUseCasesTest {
         fakeScoreRepository.setState(initialState)
 
         // When
-        useCase.execute()
+        useCase()
 
         // Then
         val newState = fakeScoreRepository.getGameState().value
@@ -238,7 +238,7 @@ class ScoreUseCasesTest {
         fakeScoreRepository.setState(initialState)
 
         // When - Player 2 won last game
-        useCase.execute(lastGameWinnerId = 2)
+        useCase(lastGameWinnerId = 2)
 
         // Then
         val newState = fakeScoreRepository.getGameState().value
@@ -260,7 +260,7 @@ class ScoreUseCasesTest {
         fakeScoreRepository.setState(initialState)
 
         // When - Player 2 won last game
-        useCase.execute(lastGameWinnerId = 2)
+        useCase(lastGameWinnerId = 2)
 
         // Then - Server alternates, not based on winner
         val newState = fakeScoreRepository.getGameState().value
@@ -280,7 +280,7 @@ class ScoreUseCasesTest {
         fakeScoreRepository.setState(initialState)
 
         // When
-        useCase.execute()
+        useCase()
 
         // Then
         val savedState = fakeScoreRepository.lastSavedState
