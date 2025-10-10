@@ -33,6 +33,3 @@ com_crashlytics_export_strings.xml
 
 # Profiler
 *.hprof
-
-# Tasks
-/task
