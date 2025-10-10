@@ -38,13 +38,13 @@ The Score-Count application follows a layered architecture pattern, influenced b
     *   **Repositories (`ScoreRepositoryImpl.kt`, `SettingsRepositoryImpl.kt`, `MatchRepositoryImpl.kt`)**: Implement the Repository interfaces. They are simple pass-through layers that coordinate data from different data sources **without containing business logic**.
     *   **Data Sources**:
         *   **Local**: Manage data persistence locally.
-            *   `LocalScoreDataSource`: A simple **state holder** that manages `GameState` in memory using `MutableStateFlow`. Contains no business logic or dependencies on other repositories (42 lines, down from 210).
-            *   `SettingsLocalDataSource`: Persists `GameSettings` using Android's `Preferences DataStore` and converts the DataStore `Flow` to `StateFlow` using `stateIn()`.
+            *   `LocalScoreDataSource`: Persists `GameState` to disk using **Proto DataStore** and exposes it as `StateFlow`. State automatically survives app process death and device restarts. Contains no business logic or dependencies on other repositories.
+            *   `SettingsLocalDataSource`: Persists `GameSettings` using Android's **Preferences DataStore** and converts the DataStore `Flow` to `StateFlow` using `stateIn()`.
             *   `LocalMatchDataSource`: Fetches and saves match data from the Room database.
     *   **Database (`AppDatabase.kt`)**: A Room database that holds application data.
         *   `MatchDao`: Defines the data access methods for match history.
         *   `MatchEntity`: Represents a match record in the database.
-    *   **Mappers (`MatchMapper.kt`)**: Convert data between data layer entities and domain layer models.
+    *   **Mappers (`MatchMapper.kt`, `GameStateMapper.kt`)**: Convert data between data layer entities/protos and domain layer models.
 *   **Responsibilities**: Data retrieval, storage, and management. Abstracts the origin of the data from the Domain layer. **No business logic** resides in this layer.
 
 ## Dependency Injection
@@ -95,12 +95,13 @@ app/
 │   │   │   ├── MainActivity.kt
 │   │   │   └── ScoreCountApplication.kt
 │   │   └── res/
-│   ├── test/java/com/soyvictorherrera/scorecount/    # Unit Tests (91 tests)
+│   ├── test/java/com/soyvictorherrera/scorecount/    # Unit Tests (100 tests)
 │   │   ├── domain/
 │   │   │   ├── calculator/              # ScoreCalculatorTest (27 tests)
 │   │   │   └── usecase/                 # Use Case Tests (22 tests)
 │   │   ├── data/
-│   │   │   └── mapper/                  # MatchMapperTest (10 tests)
+│   │   │   ├── datasource/              # LocalScoreDataSourceTest (14 tests)
+│   │   │   └── mapper/                  # Mapper Tests (25 tests)
 │   │   └── ui/                          # ViewModel Tests (29 tests)
 │   ├── androidTest/java/                # Instrumented Tests (3 tests)
 │   └── AndroidManifest.xml
@@ -232,14 +233,16 @@ Follow this layered approach when adding new functionality:
 
 ### Testing Strategy
 
-The project has **comprehensive test coverage** with **91 tests total**:
+The project has **comprehensive test coverage** with **100 tests total**:
 
-**Unit Tests (88 tests):**
+**Unit Tests (97 tests):**
 - **Domain Layer (49 tests)**:
   - `ScoreCalculatorTest`: 27 tests covering all game rules (pure function tests, no mocking needed)
   - Use Case Tests: 22 tests for orchestration logic using fake repositories
-- **Data Layer (10 tests)**:
-  - `MatchMapperTest`: Bidirectional mapping, edge cases, round-trip conversions
+- **Data Layer (39 tests)**:
+  - `LocalScoreDataSourceTest`: 14 tests for GameState persistence, state restoration across app restarts
+  - `GameStateMapperTest`: 15 tests for bidirectional proto ↔ domain mapping
+  - `MatchMapperTest`: 10 tests for bidirectional entity ↔ domain mapping
 - **UI Layer (29 tests)**:
   - `ScoreViewModelTest`: 9 tests for state exposure, delegation, auto-save
   - `MatchHistoryViewModelTest`: 5 tests for loading, updates, error handling
@@ -264,9 +267,11 @@ The project has **comprehensive test coverage** with **91 tests total**:
 - **Language**: Kotlin
 - **UI Framework**: Jetpack Compose
 - **Dependency Injection**: Hilt
-- **Database**: Room
+- **Database**: Room (match history)
 - **Async Operations**: Kotlin Coroutines & Flow
-- **Persistence**: DataStore (Preferences)
+- **Persistence**:
+  - Proto DataStore (GameState - complex nested objects)
+  - Preferences DataStore (GameSettings - simple key-value pairs)
 
 ### Key Dependencies
 - **Compose BOM**: Manages Compose library versions
@@ -291,10 +296,11 @@ The project has **comprehensive test coverage** with **91 tests total**:
 This architecture provides:
 
 ✅ **Separation of Concerns**: Business logic in domain, persistence in data, presentation in UI
-✅ **Testability**: Pure functions easy to test, comprehensive test coverage (91 tests)
+✅ **Testability**: Pure functions easy to test, comprehensive test coverage (100 tests)
 ✅ **No Circular Dependencies**: Clean dependency flow from UI → Domain → Data
 ✅ **Better Type Safety**: StateFlow for state guarantees non-null values
-✅ **Reduced Complexity**: 80% reduction in data layer code (210 → 42 lines in LocalScoreDataSource)
+✅ **Reduced Complexity**: Clean data layer with focused responsibilities
+✅ **Persistence**: GameState survives app process death via Proto DataStore
 ✅ **Future-Proof**: Easy to add features, change persistence, or refactor
 
 This architecture aims to create a scalable, testable, and maintainable codebase for the Score-Count application following Clean Architecture and Domain-Driven Design principles.
