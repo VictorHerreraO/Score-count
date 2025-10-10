@@ -38,8 +38,8 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideLocalScoreDataSource(settingsRepository: SettingsRepository): LocalScoreDataSource {
-        return LocalScoreDataSource(settingsRepository)
+    fun provideLocalScoreDataSource(): LocalScoreDataSource {
+        return LocalScoreDataSource()
     }
 
     @Provides
