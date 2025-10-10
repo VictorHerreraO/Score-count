@@ -38,7 +38,7 @@ fun GameStateProto.toDomain(): GameState {
 /**
  * Converts domain Player to proto PlayerProto.
  */
-fun Player.toProto(): PlayerProto {
+private fun Player.toProto(): PlayerProto {
     return PlayerProto.newBuilder()
         .setId(id)
         .setName(name)
@@ -49,7 +49,7 @@ fun Player.toProto(): PlayerProto {
 /**
  * Converts proto PlayerProto to domain Player.
  */
-fun PlayerProto.toDomain(): Player {
+private fun PlayerProto.toDomain(): Player {
     return Player(
         id = id,
         name = name,

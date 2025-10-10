@@ -58,7 +58,6 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore)
     implementation(libs.protobuf.javalite)
-    implementation("com.squareup:javapoet:1.13.0")
 
     // Jetpack Compose Dependencies - using BOM
     val composeBom = platform(libs.androidx.compose.bom)
