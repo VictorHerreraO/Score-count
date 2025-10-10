@@ -1,42 +1,51 @@
 package com.soyvictorherrera.scorecount.data.datasource
 
+import androidx.datastore.core.DataStore
+import com.soyvictorherrera.scorecount.GameStateProto
+import com.soyvictorherrera.scorecount.data.mapper.toDomain
+import com.soyvictorherrera.scorecount.data.mapper.toProto
 import com.soyvictorherrera.scorecount.domain.model.GameState
-import com.soyvictorherrera.scorecount.domain.model.Player
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
  * Local data source for game state.
- * This is a "dumb" component responsible only for holding and emitting the current GameState.
- * It contains NO business logic - all game rules are in the domain layer (ScoreCalculator).
+ * Persists GameState to disk using Proto DataStore and exposes it as a StateFlow.
+ * This component contains NO business logic - all game rules are in the domain layer (ScoreCalculator).
  */
 @Singleton
-class LocalScoreDataSource @Inject constructor() {
-
-    // Initial default state
-    private val initialPlayer1 = Player(id = 1, name = "Player 1", score = 0)
-    private val initialPlayer2 = Player(id = 2, name = "Player 2", score = 0)
-    private val initialGameState = GameState(
-        player1 = initialPlayer1,
-        player2 = initialPlayer2,
-        servingPlayerId = initialPlayer1.id,
-        player1SetsWon = 0,
-        player2SetsWon = 0,
-        isDeuce = false,
-        isFinished = false
-    )
-
-    private val _gameState = MutableStateFlow(initialGameState)
-    val gameState: StateFlow<GameState> = _gameState.asStateFlow()
+class LocalScoreDataSource @Inject constructor(
+    private val dataStore: DataStore<GameStateProto>
+) {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     /**
-     * Update the game state with a new state.
+     * GameState loaded from disk and exposed as StateFlow.
+     * Automatically restored on app restart.
+     */
+    val gameState: StateFlow<GameState> = dataStore.data
+        .map { proto -> proto.toDomain() }
+        .stateIn(
+            scope = scope,
+            started = SharingStarted.Eagerly,
+            initialValue = GameStateSerializer.defaultValue.toDomain()
+        )
+
+    /**
+     * Update the game state and persist to disk.
      * This is the only write method - all state mutations go through here.
      */
     fun updateState(newState: GameState) {
-        _gameState.value = newState
+        scope.launch {
+            dataStore.updateData { newState.toProto() }
+        }
     }
 }

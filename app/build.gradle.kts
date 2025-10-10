@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android.plugin)
     alias(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.protobuf)
 }
 
 android {
@@ -55,6 +56,8 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore)
+    implementation(libs.protobuf.javalite)
     implementation("com.squareup:javapoet:1.13.0")
 
     // Jetpack Compose Dependencies - using BOM
@@ -97,4 +100,19 @@ dependencies {
     // Debug implementation for UI Tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:4.28.3"
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }

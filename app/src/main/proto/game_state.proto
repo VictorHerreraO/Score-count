@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option java_package = "com.soyvictorherrera.scorecount";
+option java_multiple_files = true;
+
+// Proto schema for GameState persistence
+message GameStateProto {
+  PlayerProto player1 = 1;
+  PlayerProto player2 = 2;
+  int32 serving_player_id = 3;
+  int32 player1_sets_won = 4;
+  int32 player2_sets_won = 5;
+  bool is_deuce = 6;
+  bool is_finished = 7;
+}
+
+message PlayerProto {
+  int32 id = 1;
+  string name = 2;
+  int32 score = 3;
+}

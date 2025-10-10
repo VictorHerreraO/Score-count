@@ -4,11 +4,11 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
+import com.soyvictorherrera.scorecount.GameStateProto
 import com.soyvictorherrera.scorecount.data.database.AppDatabase
 import com.soyvictorherrera.scorecount.data.database.dao.MatchDao
-import com.soyvictorherrera.scorecount.data.datasource.LocalScoreDataSource
+import com.soyvictorherrera.scorecount.data.datasource.gameStateDataStore
 import com.soyvictorherrera.scorecount.data.datasource.settingsDataStore
-import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,8 +38,8 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideLocalScoreDataSource(): LocalScoreDataSource {
-        return LocalScoreDataSource()
+    fun provideGameStateDataStore(@ApplicationContext context: Context): DataStore<GameStateProto> {
+        return context.gameStateDataStore
     }
 
     @Provides
