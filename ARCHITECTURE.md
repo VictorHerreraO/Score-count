@@ -98,4 +98,71 @@ ARCHITECTURE.md  # This file
                                 (Dependency Injection)
 ```
 
+## State Management Pattern
+
+ViewModels expose state via `StateFlow` using the `stateIn` operator:
+
+```kotlin
+val gameState: StateFlow<GameState> = repository.getGameState()
+    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), GameState())
+```
+
+This ensures:
+- State survives configuration changes
+- Automatic cleanup when no collectors are active
+- Initial state is provided immediately
+
+## Development Workflow
+
+### Adding New Features
+
+Follow this layered approach when adding new functionality:
+
+1. **Define domain models** in `domain/model/` - Plain Kotlin data classes with no Android dependencies
+2. **Create repository interface** in `domain/repository/` - Contract for data operations
+3. **Implement use cases** in `domain/usecase/` - Encapsulate business logic
+4. **Implement repository** in `data/repository/` - Coordinate data sources
+5. **Create/update ViewModel** in `ui/` - Expose state and handle UI actions
+6. **Build UI** with Compose in `ui/` - Stateless composables driven by ViewModel
+7. **Wire dependencies** with Hilt modules in `di/` - Provide implementations
+
+### UI Development
+
+- Use Compose Previews with fake repositories for rapid iteration
+- Screen composables should be stateless and receive state as parameters
+- Handle orientation changes within composable logic (see `ScoreScreen`)
+- ViewModels should never reference Android framework classes except lifecycle-aware components
+
+### Testing Strategy
+
+- **Unit tests**: Test ViewModels with fakes/mocks of dependencies
+- **Integration tests**: Test use cases with real repositories and fake data sources
+- Test files mirror production structure under `app/src/test/`
+- Use `kotlinx-coroutines-test` for testing suspending functions and flows
+
+## Technology Stack
+
+### Core Technologies
+- **Language**: Kotlin
+- **UI Framework**: Jetpack Compose
+- **Dependency Injection**: Hilt
+- **Database**: Room
+- **Async Operations**: Kotlin Coroutines & Flow
+- **Persistence**: DataStore (Preferences)
+
+### Key Dependencies
+- **Compose BOM**: Manages Compose library versions
+- **Navigation Compose**: Type-safe navigation
+- **Hilt Navigation Compose**: Integration between Hilt and Navigation
+- **Material 3**: Material Design components
+- **Lifecycle ViewModel Compose**: ViewModel integration with Compose
+
+### Build Configuration
+- **Min SDK**: 28 (Android 9.0)
+- **Target SDK**: 36
+- **Compile SDK**: 36
+- **JVM Target**: 11
+- **ProGuard**: Enabled for release builds
+- **Version Catalog**: `gradle/libs.versions.toml` for centralized dependency management
+
 This architecture aims to create a scalable, testable, and maintainable codebase for the Score-Count application.
