@@ -3,18 +3,21 @@ package com.soyvictorherrera.scorecount.di
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.soyvictorherrera.scorecount.GameStateProto
 import com.soyvictorherrera.scorecount.data.database.AppDatabase
 import com.soyvictorherrera.scorecount.data.database.dao.MatchDao
 import com.soyvictorherrera.scorecount.data.datasource.gameStateDataStore
-import com.soyvictorherrera.scorecount.data.datasource.settingsDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+
+// DataStore instance for settings (created via delegate)
+private val Context.settingsDataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 @Module
 @InstallIn(SingletonComponent::class)

@@ -1,7 +1,6 @@
 package com.soyvictorherrera.scorecount.ui.matchhistory
 
 import com.soyvictorherrera.scorecount.domain.model.Match
-import com.soyvictorherrera.scorecount.domain.model.Player
 import com.soyvictorherrera.scorecount.domain.repository.MatchRepository
 import com.soyvictorherrera.scorecount.domain.usecase.GetMatchesUseCase
 import kotlinx.coroutines.Dispatchers
@@ -55,14 +54,18 @@ class MatchHistoryViewModelTest {
         // Given
         val match1 = Match(
             id = "1",
-            players = Player(id = 1, name = "Alice") to Player(id = 2, name = "Bob"),
-            score = 3 to 1,
+            playerOneName = "Alice",
+            playerTwoName = "Bob",
+            playerOneScore = 3,
+            playerTwoScore = 1,
             date = 1000L
         )
         val match2 = Match(
             id = "2",
-            players = Player(id = 1, name = "Charlie") to Player(id = 2, name = "Diana"),
-            score = 2 to 3,
+            playerOneName = "Charlie",
+            playerTwoName = "Diana",
+            playerOneScore = 2,
+            playerTwoScore = 3,
             date = 2000L
         )
 
@@ -93,8 +96,10 @@ class MatchHistoryViewModelTest {
         // When - Add a new match
         val match = Match(
             id = "1",
-            players = Player(id = 1, name = "Eve") to Player(id = 2, name = "Frank"),
-            score = 5 to 3,
+            playerOneName = "Eve",
+            playerTwoName = "Frank",
+            playerOneScore = 5,
+            playerTwoScore = 3,
             date = 3000L
         )
         fakeMatchRepository.saveMatch(match)
@@ -135,20 +140,26 @@ class MatchHistoryViewModelTest {
         // Given
         val match1 = Match(
             id = "1",
-            players = Player(id = 1, name = "Alice") to Player(id = 2, name = "Bob"),
-            score = 3 to 1,
+            playerOneName = "Alice",
+            playerTwoName = "Bob",
+            playerOneScore = 3,
+            playerTwoScore = 1,
             date = 1000L
         )
         val match2 = Match(
             id = "2",
-            players = Player(id = 1, name = "Charlie") to Player(id = 2, name = "Diana"),
-            score = 2 to 3,
+            playerOneName = "Charlie",
+            playerTwoName = "Diana",
+            playerOneScore = 2,
+            playerTwoScore = 3,
             date = 2000L
         )
         val match3 = Match(
             id = "3",
-            players = Player(id = 1, name = "Eve") to Player(id = 2, name = "Frank"),
-            score = 5 to 4,
+            playerOneName = "Eve",
+            playerTwoName = "Frank",
+            playerOneScore = 5,
+            playerTwoScore = 4,
             date = 3000L
         )
 

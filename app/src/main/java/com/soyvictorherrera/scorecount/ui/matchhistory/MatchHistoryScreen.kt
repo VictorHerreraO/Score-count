@@ -90,12 +90,12 @@ private fun MatchListItem(
     ListItem(
         headlineContent = {
             Text(
-                text = "${match.players.first.name} vs. ${match.players.second.name}",
+                text = "${match.playerOneName} vs. ${match.playerTwoName}",
                 fontWeight = FontWeight.Bold
             )
         },
         supportingContent = {
-            Text(text = "$date | ${match.score.first} - ${match.score.second}")
+            Text(text = "$date | ${match.playerOneScore} - ${match.playerTwoScore}")
         },
         leadingContent = {
             Icon(imageVector = Icons.Default.DateRange, contentDescription = null)

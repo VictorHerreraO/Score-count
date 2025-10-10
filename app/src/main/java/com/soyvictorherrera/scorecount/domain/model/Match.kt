@@ -2,7 +2,9 @@ package com.soyvictorherrera.scorecount.domain.model
 
 data class Match(
     val id: String,
-    val players: Pair<Player, Player>,
-    val score: Pair<Int, Int>,
+    val playerOneName: String,
+    val playerTwoName: String,
+    val playerOneScore: Int,
+    val playerTwoScore: Int,
     val date: Long
 )

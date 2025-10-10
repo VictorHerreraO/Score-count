@@ -76,8 +76,10 @@ class ScoreViewModel @Inject constructor(
         viewModelScope.launch {
             val match = Match(
                 id = "",
-                players = gameState.player1 to gameState.player2,
-                score = gameState.player1SetsWon to gameState.player2SetsWon,
+                playerOneName = gameState.player1.name,
+                playerTwoName = gameState.player2.name,
+                playerOneScore = gameState.player1SetsWon,
+                playerTwoScore = gameState.player2SetsWon,
                 date = System.currentTimeMillis()
             )
             saveMatchUseCase.execute(match)

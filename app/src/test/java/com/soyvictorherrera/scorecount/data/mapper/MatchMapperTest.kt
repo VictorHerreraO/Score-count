@@ -2,7 +2,6 @@ package com.soyvictorherrera.scorecount.data.mapper
 
 import com.soyvictorherrera.scorecount.data.database.entity.MatchEntity
 import com.soyvictorherrera.scorecount.domain.model.Match
-import com.soyvictorherrera.scorecount.domain.model.Player
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -33,12 +32,10 @@ class MatchMapperTest {
 
         // Then
         assertEquals("42", result.id)
-        assertEquals("Alice", result.players.first.name)
-        assertEquals("Bob", result.players.second.name)
-        assertEquals(0, result.players.first.id) // Player IDs are always 0 in mapping
-        assertEquals(0, result.players.second.id)
-        assertEquals(3, result.score.first)
-        assertEquals(2, result.score.second)
+        assertEquals("Alice", result.playerOneName)
+        assertEquals("Bob", result.playerTwoName)
+        assertEquals(3, result.playerOneScore)
+        assertEquals(2, result.playerTwoScore)
         assertEquals(1609459200000L, result.date)
     }
 
@@ -59,10 +56,10 @@ class MatchMapperTest {
 
         // Then
         assertEquals("0", result.id)
-        assertEquals("Player1", result.players.first.name)
-        assertEquals("Player2", result.players.second.name)
-        assertEquals(0, result.score.first)
-        assertEquals(0, result.score.second)
+        assertEquals("Player1", result.playerOneName)
+        assertEquals("Player2", result.playerTwoName)
+        assertEquals(0, result.playerOneScore)
+        assertEquals(0, result.playerTwoScore)
         assertEquals(0L, result.date)
     }
 
@@ -82,8 +79,8 @@ class MatchMapperTest {
         val result = mapper.mapFromEntity(entity)
 
         // Then
-        assertEquals("", result.players.first.name)
-        assertEquals("", result.players.second.name)
+        assertEquals("", result.playerOneName)
+        assertEquals("", result.playerTwoName)
     }
 
     @Test
@@ -91,8 +88,10 @@ class MatchMapperTest {
         // Given
         val match = Match(
             id = "99",
-            players = Player(id = 1, name = "Charlie") to Player(id = 2, name = "Diana"),
-            score = 5 to 3,
+            playerOneName = "Charlie",
+            playerTwoName = "Diana",
+            playerOneScore = 5,
+            playerTwoScore = 3,
             date = 1640995200000L // 2022-01-01
         )
 
@@ -113,8 +112,10 @@ class MatchMapperTest {
         // Given
         val match = Match(
             id = "0",
-            players = Player(id = 0, name = "Eve") to Player(id = 0, name = "Frank"),
-            score = 0 to 0,
+            playerOneName = "Eve",
+            playerTwoName = "Frank",
+            playerOneScore = 0,
+            playerTwoScore = 0,
             date = 0L
         )
 
@@ -135,8 +136,10 @@ class MatchMapperTest {
         // Given
         val match = Match(
             id = "",
-            players = Player(id = 1, name = "Grace") to Player(id = 2, name = "Henry"),
-            score = 1 to 2,
+            playerOneName = "Grace",
+            playerTwoName = "Henry",
+            playerOneScore = 1,
+            playerTwoScore = 2,
             date = 999999999L
         )
 
@@ -154,8 +157,10 @@ class MatchMapperTest {
         // Given
         val match = Match(
             id = "not-a-number",
-            players = Player(id = 1, name = "Ivy") to Player(id = 2, name = "Jack"),
-            score = 4 to 4,
+            playerOneName = "Ivy",
+            playerTwoName = "Jack",
+            playerOneScore = 4,
+            playerTwoScore = 4,
             date = 111111111L
         )
 
@@ -169,7 +174,7 @@ class MatchMapperTest {
     }
 
     @Test
-    fun `bidirectional mapping from entity preserves data`() {
+    fun `bidirectional mapping from entity preserves all data`() {
         // Given
         val originalEntity = MatchEntity(
             id = 123L,
@@ -194,12 +199,14 @@ class MatchMapperTest {
     }
 
     @Test
-    fun `bidirectional mapping from domain preserves most data`() {
+    fun `bidirectional mapping from domain preserves all data`() {
         // Given
         val originalMatch = Match(
             id = "456",
-            players = Player(id = 10, name = "Mia") to Player(id = 20, name = "Noah"),
-            score = 9 to 8,
+            playerOneName = "Mia",
+            playerTwoName = "Noah",
+            playerOneScore = 9,
+            playerTwoScore = 8,
             date = 9876543210000L
         )
 
@@ -207,15 +214,12 @@ class MatchMapperTest {
         val entity = mapper.mapToEntity(originalMatch)
         val resultMatch = mapper.mapFromEntity(entity)
 
-        // Then - Most fields preserved (except Player IDs which are always 0 in mapping)
+        // Then - All fields preserved
         assertEquals(originalMatch.id, resultMatch.id)
-        assertEquals(originalMatch.players.first.name, resultMatch.players.first.name)
-        assertEquals(originalMatch.players.second.name, resultMatch.players.second.name)
-        assertEquals(originalMatch.score.first, resultMatch.score.first)
-        assertEquals(originalMatch.score.second, resultMatch.score.second)
+        assertEquals(originalMatch.playerOneName, resultMatch.playerOneName)
+        assertEquals(originalMatch.playerTwoName, resultMatch.playerTwoName)
+        assertEquals(originalMatch.playerOneScore, resultMatch.playerOneScore)
+        assertEquals(originalMatch.playerTwoScore, resultMatch.playerTwoScore)
         assertEquals(originalMatch.date, resultMatch.date)
-        // Note: Player IDs are NOT preserved - they become 0 in mapFromEntity
-        assertEquals(0, resultMatch.players.first.id)
-        assertEquals(0, resultMatch.players.second.id)
     }
 }

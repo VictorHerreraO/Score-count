@@ -1,7 +1,6 @@
 package com.soyvictorherrera.scorecount.domain.usecase
 
 import com.soyvictorherrera.scorecount.domain.model.Match
-import com.soyvictorherrera.scorecount.domain.model.Player
 import com.soyvictorherrera.scorecount.domain.repository.MatchRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -36,8 +35,10 @@ class MatchUseCasesTest {
         val useCase = SaveMatchUseCase(fakeMatchRepository)
         val match = Match(
             id = "123",
-            players = Player(id = 1, name = "Alice") to Player(id = 2, name = "Bob"),
-            score = 3 to 2,
+            playerOneName = "Alice",
+            playerTwoName = "Bob",
+            playerOneScore = 3,
+            playerTwoScore = 2,
             date = 1640995200000L
         )
 
@@ -55,14 +56,18 @@ class MatchUseCasesTest {
         val useCase = SaveMatchUseCase(fakeMatchRepository)
         val match1 = Match(
             id = "1",
-            players = Player(id = 1, name = "Alice") to Player(id = 2, name = "Bob"),
-            score = 3 to 1,
+            playerOneName = "Alice",
+            playerTwoName = "Bob",
+            playerOneScore = 3,
+            playerTwoScore = 1,
             date = 1000L
         )
         val match2 = Match(
             id = "2",
-            players = Player(id = 1, name = "Charlie") to Player(id = 2, name = "Diana"),
-            score = 2 to 3,
+            playerOneName = "Charlie",
+            playerTwoName = "Diana",
+            playerOneScore = 2,
+            playerTwoScore = 3,
             date = 2000L
         )
 
@@ -83,8 +88,10 @@ class MatchUseCasesTest {
         val useCase = SaveMatchUseCase(fakeMatchRepository)
         val match = Match(
             id = "",
-            players = Player(id = 1, name = "Eve") to Player(id = 2, name = "Frank"),
-            score = 0 to 0,
+            playerOneName = "Eve",
+            playerTwoName = "Frank",
+            playerOneScore = 0,
+            playerTwoScore = 0,
             date = 3000L
         )
 
@@ -94,7 +101,7 @@ class MatchUseCasesTest {
         // Then
         val savedMatch = fakeMatchRepository.lastSavedMatch
         assertEquals("", savedMatch?.id)
-        assertEquals("Eve", savedMatch?.players?.first?.name)
+        assertEquals("Eve", savedMatch?.playerOneName)
     }
 
     // --- GetMatchesUseCase Tests ---
@@ -116,20 +123,26 @@ class MatchUseCasesTest {
         // Given
         val match1 = Match(
             id = "1",
-            players = Player(id = 1, name = "Alice") to Player(id = 2, name = "Bob"),
-            score = 3 to 1,
+            playerOneName = "Alice",
+            playerTwoName = "Bob",
+            playerOneScore = 3,
+            playerTwoScore = 1,
             date = 1000L
         )
         val match2 = Match(
             id = "2",
-            players = Player(id = 1, name = "Charlie") to Player(id = 2, name = "Diana"),
-            score = 2 to 3,
+            playerOneName = "Charlie",
+            playerTwoName = "Diana",
+            playerOneScore = 2,
+            playerTwoScore = 3,
             date = 2000L
         )
         val match3 = Match(
             id = "3",
-            players = Player(id = 1, name = "Eve") to Player(id = 2, name = "Frank"),
-            score = 5 to 4,
+            playerOneName = "Eve",
+            playerTwoName = "Frank",
+            playerOneScore = 5,
+            playerTwoScore = 4,
             date = 3000L
         )
 
@@ -161,8 +174,10 @@ class MatchUseCasesTest {
         // When - Save a new match
         val match = Match(
             id = "1",
-            players = Player(id = 1, name = "Alice") to Player(id = 2, name = "Bob"),
-            score = 3 to 1,
+            playerOneName = "Alice",
+            playerTwoName = "Bob",
+            playerOneScore = 3,
+            playerTwoScore = 1,
             date = 1000L
         )
         fakeMatchRepository.saveMatch(match)

@@ -217,10 +217,10 @@ class ScoreViewModelTest {
         val savedMatches = fakeMatchRepository.getMatchList().first()
         assertEquals(1, savedMatches.size)
         val savedMatch = savedMatches.first()
-        assertEquals("Alice", savedMatch.players.first.name)
-        assertEquals("Bob", savedMatch.players.second.name)
-        assertEquals(2, savedMatch.score.first)
-        assertEquals(1, savedMatch.score.second)
+        assertEquals("Alice", savedMatch.playerOneName)
+        assertEquals("Bob", savedMatch.playerTwoName)
+        assertEquals(2, savedMatch.playerOneScore)
+        assertEquals(1, savedMatch.playerTwoScore)
     }
 
     @Test
