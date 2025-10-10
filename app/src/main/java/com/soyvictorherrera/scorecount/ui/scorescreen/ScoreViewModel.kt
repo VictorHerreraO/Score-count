@@ -19,9 +19,8 @@ class ScoreViewModel @Inject constructor(
     getGameStateUseCase: GetGameStateUseCase,
     private val incrementScoreUseCase: IncrementScoreUseCase,
     private val decrementScoreUseCase: DecrementScoreUseCase,
-    private val manualSwitchServeUseCase: ManualSwitchServeUseCase, // Updated Usecase name
+    private val manualSwitchServeUseCase: ManualSwitchServeUseCase,
     private val resetGameUseCase: ResetGameUseCase,
-    private val undoLastActionUseCase: UndoLastActionUseCase,
     private val saveMatchUseCase: SaveMatchUseCase,
     settingsRepository: SettingsRepository
 ) : ViewModel() {
@@ -76,12 +75,6 @@ class ScoreViewModel @Inject constructor(
                 _gameState.value?.player2?.id
             }
             resetGameUseCase.execute(winnerId)
-        }
-    }
-
-    fun undoLastAction() {
-        viewModelScope.launch {
-            undoLastActionUseCase.execute()
         }
     }
 

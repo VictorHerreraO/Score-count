@@ -66,7 +66,6 @@ import com.soyvictorherrera.scorecount.domain.usecase.IncrementScoreUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.ManualSwitchServeUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.ResetGameUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.SaveMatchUseCase
-import com.soyvictorherrera.scorecount.domain.usecase.UndoLastActionUseCase
 import com.soyvictorherrera.scorecount.ui.Screen
 import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
 import kotlinx.coroutines.flow.Flow
@@ -635,8 +634,7 @@ private fun createPreviewViewModel(finished: Boolean = false): ScoreViewModel {
         incrementScoreUseCase = IncrementScoreUseCase(fakeScoreRepo, fakeSettingsRepo),
         decrementScoreUseCase = DecrementScoreUseCase(fakeScoreRepo),
         manualSwitchServeUseCase = ManualSwitchServeUseCase(fakeScoreRepo),
-        resetGameUseCase = ResetGameUseCase(fakeScoreRepo),
-        undoLastActionUseCase = UndoLastActionUseCase(fakeScoreRepo),
+        resetGameUseCase = ResetGameUseCase(fakeScoreRepo, fakeSettingsRepo),
         saveMatchUseCase = SaveMatchUseCase(fakeMatchRepo),
         settingsRepository = fakeSettingsRepo
     )
@@ -647,44 +645,7 @@ class FakeScoreRepositoryPreview(initialState: GameState) : ScoreRepository {
 
     override fun getGameState(): Flow<GameState> = _gameState.asStateFlow()
 
-    override suspend fun incrementScore(playerId: Int, isDeuce: Boolean) {
-        val current = _gameState.value
-        if (current.isFinished) return
-        val newP1Score = if (playerId == current.player1.id) current.player1.score + 1 else current.player1.score
-        val newP2Score = if (playerId == current.player2.id) current.player2.score + 1 else current.player2.score
-        _gameState.value = current.copy(
-            player1 = current.player1.copy(score = newP1Score),
-            player2 = current.player2.copy(score = newP2Score),
-            isDeuce = isDeuce
-        )
-    }
-
-    override suspend fun decrementScore(playerId: Int) {
-        val current = _gameState.value
-        if (current.isFinished) return
-        val newP1Score = if (playerId == current.player1.id && current.player1.score > 0) current.player1.score - 1 else current.player1.score
-        val newP2Score = if (playerId == current.player2.id && current.player2.score > 0) current.player2.score - 1 else current.player2.score
-        _gameState.value = current.copy(
-            player1 = current.player1.copy(score = newP1Score),
-            player2 = current.player2.copy(score = newP2Score)
-        )
-    }
-
-    override suspend fun manualSwitchServe() {
-        val current = _gameState.value
-        if (current.isFinished) return
-        _gameState.value = current.copy(servingPlayerId = if (current.servingPlayerId == current.player1.id) current.player2.id else current.player1.id)
-    }
-
-    override suspend fun resetGame(lastGameWinnerId: Int?) {
-        _gameState.value = GameState(
-            player1 = Player(id = 1, name = "P1 Preview", score = 0),
-            player2 = Player(id = 2, name = "P2 Preview", score = 0),
-            servingPlayerId = 1
-        )
-    }
-
-    override suspend fun undoLastAction() {
-        // Not implemented
+    override suspend fun updateGameState(newState: GameState) {
+        _gameState.value = newState
     }
 }
