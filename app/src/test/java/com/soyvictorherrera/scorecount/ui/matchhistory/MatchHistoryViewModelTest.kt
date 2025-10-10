@@ -1,0 +1,186 @@
+package com.soyvictorherrera.scorecount.ui.matchhistory
+
+import com.soyvictorherrera.scorecount.domain.model.Match
+import com.soyvictorherrera.scorecount.domain.model.Player
+import com.soyvictorherrera.scorecount.domain.repository.MatchRepository
+import com.soyvictorherrera.scorecount.domain.usecase.GetMatchesUseCase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+
+@ExperimentalCoroutinesApi
+class MatchHistoryViewModelTest {
+
+    private val testDispatcher = StandardTestDispatcher()
+
+    private lateinit var viewModel: MatchHistoryViewModel
+    private lateinit var fakeMatchRepository: FakeMatchRepository
+
+    @BeforeEach
+    fun setUp() {
+        Dispatchers.setMain(testDispatcher)
+        fakeMatchRepository = FakeMatchRepository()
+        val getMatchesUseCase = GetMatchesUseCase(fakeMatchRepository)
+        viewModel = MatchHistoryViewModel(getMatchesUseCase)
+    }
+
+    @AfterEach
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `initial matches list is empty`() = runTest {
+        // When
+        testDispatcher.scheduler.advanceUntilIdle()
+        val matches = viewModel.matches.first()
+
+        // Then
+        assertTrue(matches.isEmpty())
+    }
+
+    @Test
+    fun `matches are loaded from repository on initialization`() = runTest {
+        // Given
+        val match1 = Match(
+            id = "1",
+            players = Player(id = 1, name = "Alice") to Player(id = 2, name = "Bob"),
+            score = 3 to 1,
+            date = 1000L
+        )
+        val match2 = Match(
+            id = "2",
+            players = Player(id = 1, name = "Charlie") to Player(id = 2, name = "Diana"),
+            score = 2 to 3,
+            date = 2000L
+        )
+
+        fakeMatchRepository.saveMatch(match1)
+        fakeMatchRepository.saveMatch(match2)
+
+        // Re-create ViewModel to trigger init block with pre-populated matches
+        val getMatchesUseCase = GetMatchesUseCase(fakeMatchRepository)
+        viewModel = MatchHistoryViewModel(getMatchesUseCase)
+
+        // When
+        testDispatcher.scheduler.advanceUntilIdle()
+        val matches = viewModel.matches.first()
+
+        // Then
+        assertEquals(2, matches.size)
+        assertEquals(match1, matches[0])
+        assertEquals(match2, matches[1])
+    }
+
+    @Test
+    fun `matches are updated when new match is added to repository`() = runTest {
+        // Given - Initial ViewModel with no matches
+        testDispatcher.scheduler.advanceUntilIdle()
+        var matches = viewModel.matches.first()
+        assertEquals(0, matches.size)
+
+        // When - Add a new match
+        val match = Match(
+            id = "1",
+            players = Player(id = 1, name = "Eve") to Player(id = 2, name = "Frank"),
+            score = 5 to 3,
+            date = 3000L
+        )
+        fakeMatchRepository.saveMatch(match)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Then
+        matches = viewModel.matches.first()
+        assertEquals(1, matches.size)
+        assertEquals(match, matches[0])
+    }
+
+    @Test
+    fun `matches handles errors gracefully by showing empty list`() = runTest {
+        // Given - Repository that throws an error
+        val errorRepository = object : MatchRepository {
+            override fun getMatchList(): Flow<List<Match>> {
+                throw RuntimeException("Database error")
+            }
+
+            override suspend fun saveMatch(match: Match) {
+                // Not used in this test
+            }
+        }
+
+        val getMatchesUseCase = GetMatchesUseCase(errorRepository)
+        viewModel = MatchHistoryViewModel(getMatchesUseCase)
+
+        // When
+        testDispatcher.scheduler.advanceUntilIdle()
+        val matches = viewModel.matches.first()
+
+        // Then - Should show empty list instead of crashing
+        assertTrue(matches.isEmpty())
+    }
+
+    @Test
+    fun `matches preserves order from repository`() = runTest {
+        // Given
+        val match1 = Match(
+            id = "1",
+            players = Player(id = 1, name = "Alice") to Player(id = 2, name = "Bob"),
+            score = 3 to 1,
+            date = 1000L
+        )
+        val match2 = Match(
+            id = "2",
+            players = Player(id = 1, name = "Charlie") to Player(id = 2, name = "Diana"),
+            score = 2 to 3,
+            date = 2000L
+        )
+        val match3 = Match(
+            id = "3",
+            players = Player(id = 1, name = "Eve") to Player(id = 2, name = "Frank"),
+            score = 5 to 4,
+            date = 3000L
+        )
+
+        // Save in specific order
+        fakeMatchRepository.saveMatch(match1)
+        fakeMatchRepository.saveMatch(match2)
+        fakeMatchRepository.saveMatch(match3)
+
+        // Re-create ViewModel
+        val getMatchesUseCase = GetMatchesUseCase(fakeMatchRepository)
+        viewModel = MatchHistoryViewModel(getMatchesUseCase)
+
+        // When
+        testDispatcher.scheduler.advanceUntilIdle()
+        val matches = viewModel.matches.first()
+
+        // Then - Order should be preserved
+        assertEquals(3, matches.size)
+        assertEquals("1", matches[0].id)
+        assertEquals("2", matches[1].id)
+        assertEquals("3", matches[2].id)
+    }
+
+    // --- Fake Repository ---
+
+    class FakeMatchRepository : MatchRepository {
+        private val _matches = MutableStateFlow<List<Match>>(emptyList())
+
+        override fun getMatchList(): Flow<List<Match>> = _matches
+
+        override suspend fun saveMatch(match: Match) {
+            _matches.value = _matches.value + match
+        }
+    }
+}
