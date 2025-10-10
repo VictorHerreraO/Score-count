@@ -6,27 +6,17 @@ import com.soyvictorherrera.scorecount.domain.repository.ScoreRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 
-class ScoreRepositoryImpl @Inject constructor(private val localDataSource: LocalScoreDataSource) : ScoreRepository {
+/**
+ * Implementation of ScoreRepository.
+ * Simple pass-through to LocalScoreDataSource with no business logic.
+ */
+class ScoreRepositoryImpl @Inject constructor(
+    private val localDataSource: LocalScoreDataSource
+) : ScoreRepository {
 
     override fun getGameState(): Flow<GameState> = localDataSource.gameState
 
-    override suspend fun incrementScore(playerId: Int, isDeuce: Boolean) {
-        localDataSource.incrementScore(playerId, isDeuce)
-    }
-
-    override suspend fun decrementScore(playerId: Int) {
-        localDataSource.decrementScore(playerId)
-    }
-
-    override suspend fun manualSwitchServe() { // Renamed from switchServe()
-        localDataSource.manualSwitchServe()
-    }
-
-    override suspend fun resetGame(lastGameWinnerId: Int?) {
-        localDataSource.resetGame(lastGameWinnerId)
-    }
-
-    override suspend fun undoLastAction() {
-        localDataSource.undoLastAction()
+    override suspend fun updateGameState(newState: GameState) {
+        localDataSource.updateState(newState)
     }
 }
