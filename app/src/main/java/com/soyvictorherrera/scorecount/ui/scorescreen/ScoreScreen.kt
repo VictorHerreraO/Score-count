@@ -404,7 +404,16 @@ fun PlayerScoreCard(
         enabled = !isFinished,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isServing) {
+                MaterialTheme.colorScheme.surfaceVariant
+            } else {
+                MaterialTheme.colorScheme.surfaceContainer
+            }
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (isServing) 4.dp else 1.dp
+        )
     ) {
         Box(
             modifier = Modifier
