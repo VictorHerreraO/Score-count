@@ -1,7 +1,6 @@
 package com.soyvictorherrera.scorecount.ui.settings
 
 import android.content.res.Configuration
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -73,8 +72,10 @@ fun SettingsScreen(
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val settings by settingsViewModel.settings.collectAsState()
-    val gameControls = settingsViewModel.getGameControls()
-    val tableTennisRules = settingsViewModel.getTableTennisRules()
+
+    // Recompose these lists whenever settings change
+    val gameControls = settingsViewModel.getGameControls(settings)
+    val tableTennisRules = settingsViewModel.getTableTennisRules(settings)
 
 
     Scaffold(
@@ -149,10 +150,10 @@ fun SettingsGrid(
 @Composable
 fun ToggleSettingCard(item: SettingItemData.ToggleItem) {
     Card(
+        onClick = { item.onToggle(!item.isChecked) },
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp)
-            .clickable { item.onToggle(!item.isChecked) },
+            .height(120.dp),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
@@ -187,10 +188,10 @@ fun ToggleSettingCard(item: SettingItemData.ToggleItem) {
 @Composable
 fun ActionSettingCard(item: SettingItemData.ActionItem) {
     Card(
+        onClick = item.onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp)
-            .clickable { item.onClick() },
+            .height(120.dp),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),

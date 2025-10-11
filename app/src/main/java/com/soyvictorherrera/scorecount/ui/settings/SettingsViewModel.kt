@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -158,8 +157,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun getGameControls(): List<SettingItemData> {
-        val currentSettings = _settings.value
+    fun getGameControls(currentSettings: GameSettings): List<SettingItemData> {
         return listOf(
             SettingItemData.ToggleItem("Show title", Icons.Filled.Title, currentSettings.showTitle) { updateShowTitle(it) },
             SettingItemData.ToggleItem("Show names", Icons.Filled.Badge, currentSettings.showNames) { updateShowNames(it) },
@@ -170,8 +168,7 @@ class SettingsViewModel @Inject constructor(
         )
     }
 
-    fun getTableTennisRules(): List<SettingItemData> {
-        val currentSettings = _settings.value
+    fun getTableTennisRules(currentSettings: GameSettings): List<SettingItemData> {
         return listOf(
             SettingItemData.StepperItem(
                 text = "Set to",
