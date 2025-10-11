@@ -138,8 +138,7 @@ fun SettingsGrid(
             Box(Modifier.weight(1f)) { // Use weight to ensure items take equal space up to maxItemsInEachRow
                 when (item) {
                     is SettingItemData.ToggleItem -> ToggleSettingCard(item)
-                    is SettingItemData.ActionItem -> ActionSettingCard(item)
-                    else -> {} // Should not happen in this grid
+                    else -> {} // Only ToggleItems are used in the grid
                 }
             }
         }
@@ -181,42 +180,6 @@ fun ToggleSettingCard(item: SettingItemData.ToggleItem) {
                     textAlign = TextAlign.Center
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun ActionSettingCard(item: SettingItemData.ActionItem) {
-    Card(
-        onClick = item.onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(120.dp),
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                item.icon,
-                contentDescription = item.text,
-                modifier = Modifier.size(36.dp)
-                // Tint will be inherited from contentColor
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = item.text,
-                style = MaterialTheme.typography.labelMedium,
-                textAlign = TextAlign.Center
-            )
         }
     }
 }

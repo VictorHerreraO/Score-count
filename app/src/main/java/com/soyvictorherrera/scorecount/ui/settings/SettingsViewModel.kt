@@ -32,12 +32,6 @@ sealed class SettingItemData {
         val onToggle: (Boolean) -> Unit
     ) : SettingItemData()
 
-    data class ActionItem(
-        val text: String,
-        val icon: ImageVector,
-        val onClick: () -> Unit
-    ) : SettingItemData()
-
     data class StepperItem(
         val text: String,
         val subtitle: String? = null,
