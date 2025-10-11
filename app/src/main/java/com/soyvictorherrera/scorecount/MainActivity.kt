@@ -11,8 +11,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import com.soyvictorherrera.scorecount.ui.Screen
+import com.soyvictorherrera.scorecount.ui.main.MainViewModel
 import com.soyvictorherrera.scorecount.ui.matchhistory.MatchHistoryScreen
 import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreScreen
 import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreViewModel
@@ -20,21 +20,18 @@ import com.soyvictorherrera.scorecount.ui.settings.SettingsScreen
 import com.soyvictorherrera.scorecount.ui.settings.SettingsViewModel
 import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var settingsRepository: SettingsRepository
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val settings by settingsRepository.getSettings().collectAsState(initial = null)
+            val mainViewModel: MainViewModel = hiltViewModel()
+            val settings by mainViewModel.settings.collectAsState()
 
-            LaunchedEffect(settings?.keepScreenOn) {
-                val keepScreenOn = settings?.keepScreenOn ?: return@LaunchedEffect
+            LaunchedEffect(settings.keepScreenOn) {
+                val keepScreenOn = settings.keepScreenOn
                 if (keepScreenOn) {
                     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 } else {

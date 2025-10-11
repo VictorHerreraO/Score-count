@@ -363,4 +363,52 @@ class ScoreCalculatorTest {
 
         assertEquals(initialState, newState)
     }
+
+    @Test
+    fun `determineWinner returns player 1 id when player 1 has more sets`() {
+        val state = initialState.copy(
+            player1SetsWon = 3,
+            player2SetsWon = 1
+        )
+
+        val winnerId = ScoreCalculator.determineWinner(state)
+
+        assertEquals(player1.id, winnerId)
+    }
+
+    @Test
+    fun `determineWinner returns player 2 id when player 2 has more sets`() {
+        val state = initialState.copy(
+            player1SetsWon = 1,
+            player2SetsWon = 3
+        )
+
+        val winnerId = ScoreCalculator.determineWinner(state)
+
+        assertEquals(player2.id, winnerId)
+    }
+
+    @Test
+    fun `determineWinner returns null when sets are tied`() {
+        val state = initialState.copy(
+            player1SetsWon = 2,
+            player2SetsWon = 2
+        )
+
+        val winnerId = ScoreCalculator.determineWinner(state)
+
+        assertEquals(null, winnerId)
+    }
+
+    @Test
+    fun `determineWinner returns null when both players have zero sets`() {
+        val state = initialState.copy(
+            player1SetsWon = 0,
+            player2SetsWon = 0
+        )
+
+        val winnerId = ScoreCalculator.determineWinner(state)
+
+        assertEquals(null, winnerId)
+    }
 }
