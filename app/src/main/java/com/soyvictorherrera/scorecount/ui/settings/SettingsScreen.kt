@@ -66,39 +66,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-sealed class SettingItemData {
-    data class ToggleItem(
-        val text: String,
-        val icon: ImageVector,
-        val isChecked: Boolean,
-        val onToggle: (Boolean) -> Unit
-    ) : SettingItemData()
-
-    data class ActionItem(
-        val text: String,
-        val icon: ImageVector,
-        val onClick: () -> Unit
-    ) : SettingItemData()
-
-    data class StepperItem(
-        val text: String,
-        val subtitle: String? = null,
-        val icon: ImageVector,
-        val value: Int,
-        val onIncrement: () -> Unit,
-        val onDecrement: () -> Unit,
-        val valueRange: IntRange
-    ) : SettingItemData()
-
-    data class SwitchSetting( // Renamed from Switch to avoid conflict
-        val text: String,
-        val subtitle: String? = null,
-        val icon: ImageVector,
-        val isChecked: Boolean,
-        val onToggle: (Boolean) -> Unit
-    ) : SettingItemData()
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -106,52 +73,8 @@ fun SettingsScreen(
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val settings by settingsViewModel.settings.collectAsState()
-
-    val gameControls = listOf(
-        SettingItemData.ToggleItem("Show title", Icons.Filled.Title, settings.showTitle) { settingsViewModel.updateShowTitle(it) },
-        SettingItemData.ToggleItem("Show names", Icons.Filled.Badge, settings.showNames) { settingsViewModel.updateShowNames(it) },
-        SettingItemData.ToggleItem("Show sets", Icons.Filled.CalendarToday, settings.showSets) { settingsViewModel.updateShowSets(it) },
-        SettingItemData.ToggleItem("Mark serve", Icons.Filled.PersonSearch, settings.markServe) { settingsViewModel.updateMarkServe(it) },
-        SettingItemData.ToggleItem("Mark deuce", Icons.Filled.Info, settings.markDeuce) { settingsViewModel.updateMarkDeuce(it) },
-        SettingItemData.ToggleItem("Keep screen on", Icons.Filled.ScreenLockPortrait, settings.keepScreenOn) { settingsViewModel.updateKeepScreenOn(it) }
-    )
-
-    val tableTennisRules = listOf(
-        SettingItemData.StepperItem(
-            text = "Set to",
-            subtitle = "Win by 2",
-            icon = Icons.Filled.EmojiEvents,
-            value = settings.pointsToWinSet,
-            onIncrement = { settingsViewModel.updatePointsToWinSet(settings.pointsToWinSet + 1) },
-            onDecrement = { settingsViewModel.updatePointsToWinSet(settings.pointsToWinSet - 1) },
-            valueRange = 1..100
-        ),
-        SettingItemData.StepperItem(
-            text = "Match",
-            subtitle = "Best of ${settings.numberOfSets} sets",
-            icon = Icons.Filled.MilitaryTech,
-            value = settings.numberOfSets,
-            onIncrement = { settingsViewModel.updateNumberOfSets(settings.numberOfSets + 2) }, // Usually best of 1, 3, 5, etc.
-            onDecrement = { settingsViewModel.updateNumberOfSets(settings.numberOfSets - 2) },
-            valueRange = 1..20 // Max "best of"
-        ),
-        SettingItemData.StepperItem(
-            text = "Serve rotation after",
-            subtitle = "1 after deuce",
-            icon = Icons.AutoMirrored.Filled.RotateRight,
-            value = settings.serveRotationAfterPoints,
-            onIncrement = { settingsViewModel.updateServeRotationAfterPoints(settings.serveRotationAfterPoints + 1) },
-            onDecrement = { settingsViewModel.updateServeRotationAfterPoints(settings.serveRotationAfterPoints - 1) },
-            valueRange = 1..10
-        ),
-        SettingItemData.SwitchSetting(
-            text = "Winner serves",
-            subtitle = "The winner of a game serves first in the next game",
-            icon = Icons.Filled.Person,
-            isChecked = settings.winnerServesNextGame,
-            onToggle = { settingsViewModel.updateWinnerServesNextGame(it) }
-        )
-    )
+    val gameControls = settingsViewModel.getGameControls()
+    val tableTennisRules = settingsViewModel.getTableTennisRules()
 
 
     Scaffold(
