@@ -18,6 +18,7 @@ import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
     primary = DarkPrimary,
+    secondary = DarkAccentGreen,
     background = DarkBackground,
     surface = DarkBackground,
     surfaceVariant = DarkCardServing,
@@ -30,6 +31,7 @@ private val DarkColorScheme = darkColorScheme(
 
 private val LightColorScheme = lightColorScheme(
     primary = LightPrimary,
+    secondary = LightAccentGreen,
     background = LightBackground,
     surface = LightBackground,
     surfaceVariant = LightCardServing,
@@ -44,7 +46,7 @@ private val LightColorScheme = lightColorScheme(
 fun ScoreCountTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android S+ an higher.
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
