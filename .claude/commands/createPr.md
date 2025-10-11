@@ -1,63 +1,99 @@
-## Task description
+---
+description: Create a pull request with proper structure and documentation
+---
 
-Create a PR using the Github `gh` CLI tool.
+# Create Pull Request
 
-For the PR description identify the type: FIX (bug, typo, chore) or FEATURE (new functionality, enhancement).
+When the user asks you to create a pull request, follow this process:
 
-Select the appropriate template structure.
+## 1. Analyze Current Changes
 
-Fill out every section of the template with clear, concise, and professional content based on the user's input.
-
-Do not include any conversational text, explanations, or surrounding commentary.
-
-### PR Template Structures
-
-Here are simple, clear template structures for "fix" and "feature" PRs.
-
-### "Fix" PR Template Structure
-
-```markdown
-### Fix: [Concise description of the fix]
-
-**Related Issue:** (e.g., Closes #123, Fixes #456)
-
-#### Summary of Changes
-- Briefly explain the problem that was fixed.
-- List the key changes made (e.g., updated function `X` to handle edge case `Y`).
-
-#### Challenges Faced
-- If applicable, describe any challenges encountered during development.
-
-#### Testing Instructions
-- Steps to reproduce the original bug (if applicable).
-- Steps to verify the fix works as expected.
-
-#### Checklist
-- [ ] Code is formatted correctly.
-- [ ] Tests pass (if applicable).
-- [ ] Documentation updated (if necessary).
+Review the current branch to understand all changes since diverging from main:
+```bash
+git log origin/main..HEAD --oneline
+git diff origin/main...HEAD
 ```
 
-### "Feature" PR Template Structure
+## 2. Determine PR Type
+
+Classify as either:
+- **FIX**: Bug fixes, typos, chores, refactoring
+- **FEATURE**: New functionality, enhancements
+
+## 3. Structure the PR
+
+Use the appropriate template below. Fill every section with clear, concise content.
+
+### Fix PR Template
 
 ```markdown
-### Feature: [Concise description of the new feature]
+## Fix: [Brief description]
 
-**Related Issue:** (e.g., Implements #789, Addresses requirement in #101)
+**Related Issue:** Closes #[issue-number]
 
-#### Motivation and Context
-- Why is this change required? What problem does it solve?
-- Provide background context on the feature.
+### Summary
+- Problem: [What was broken/incorrect]
+- Solution: [What was changed]
+- Impact: [What this fixes]
 
-#### Implementation Details
-- Describe how the feature was implemented (e.g., new API endpoints, component structure).
-- List the main files changed or added.
+### Key Changes
+- `file/path.kt:123` - [Key change]
+- `another/file.kt:456` - [Key change]
 
-#### Challenges Faced
-- If applicable, describe any challenges encountered during development.
+### Testing
+Steps to verify:
+1. [Reproduction step or test command]
+2. [Expected result]
 
-#### Checklist
-- [ ] New functionality is fully tested.
-- [ ] Relevant documentation has been added or updated.
-- [ ] Code follows project standards.
+### Notes
+[Any challenges, trade-offs, or important context]
 ```
+
+### Feature PR Template
+
+```markdown
+## Feature: [Brief description]
+
+**Related Issue:** Implements #[issue-number]
+
+### Motivation
+[Why this feature? What problem does it solve?]
+
+### Implementation
+- **Architecture**: [Layer(s) affected: Domain/Data/UI]
+- **Key components**: [New classes/files created]
+- **Integration points**: [How it connects to existing code]
+
+### Changes
+- `domain/model/Foo.kt` - [New domain model]
+- `ui/foo/FooScreen.kt` - [New UI screen]
+- [List other significant files]
+
+### Testing
+```bash
+./gradlew test --tests "com.example.FooTest"
+```
+
+### Notes
+[Any challenges, future improvements, or important context]
+```
+
+## 4. Create the PR
+
+Push changes and create PR:
+```bash
+git push -u origin HEAD
+gh pr create --title "[Fix/Feature]: Title" --body "$(cat <<'EOF'
+[Paste filled template here]
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+EOF
+)"
+```
+
+## Important Notes
+
+- Use file paths with line numbers (e.g., `path/to/file.kt:123`) when referencing code
+- Keep descriptions concise but complete
+- Always include test results or verification steps
+- Sign off with the Claude Code attribution
