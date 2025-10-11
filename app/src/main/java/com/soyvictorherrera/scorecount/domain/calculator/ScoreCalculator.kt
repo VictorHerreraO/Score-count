@@ -193,6 +193,20 @@ object ScoreCalculator {
     }
 
     /**
+     * Determine the winner of the match based on sets won.
+     *
+     * @param gameState The current game state
+     * @return The ID of the winning player, or null if there's a tie or no clear winner
+     */
+    fun determineWinner(gameState: GameState): Int? {
+        return when {
+            gameState.player1SetsWon > gameState.player2SetsWon -> gameState.player1.id
+            gameState.player2SetsWon > gameState.player1SetsWon -> gameState.player2.id
+            else -> null // Tie or no clear winner
+        }
+    }
+
+    /**
      * Determine if the current scores represent a deuce situation.
      *
      * @param p1Score Player 1's score

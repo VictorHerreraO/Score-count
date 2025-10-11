@@ -153,7 +153,7 @@ class ScoreViewModelTest {
     }
 
     @Test
-    fun `resetGame delegates to ResetGameUseCase with winner from state`() = runTest {
+    fun `resetGame delegates to ResetGameUseCase`() = runTest {
         // Given - Player 1 has more sets won
         val initialState = GameState(
             player1 = Player(id = 1, name = "Alice", score = 10),
@@ -168,12 +168,13 @@ class ScoreViewModelTest {
         viewModel.resetGame()
         testDispatcher.scheduler.advanceUntilIdle()
 
-        // Then
+        // Then - Game is reset (UseCase auto-determines winner internally)
         val newState = viewModel.gameState.first()
         assertEquals(0, newState.player1.score)
         assertEquals(0, newState.player2.score)
         assertEquals(0, newState.player1SetsWon)
         assertEquals(0, newState.player2SetsWon)
+        // Winner determination happens in UseCase, not ViewModel
     }
 
     @Test
