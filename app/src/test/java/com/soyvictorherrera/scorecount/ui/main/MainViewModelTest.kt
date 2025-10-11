@@ -4,7 +4,6 @@ import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -33,7 +32,7 @@ class MainViewModelTest {
         fakeSettingsRepository.setSettings(expectedSettings)
 
         // When
-        val actualSettings = viewModel.settings.first()
+        val actualSettings = viewModel.settings.value
 
         // Then
         assertEquals(expectedSettings, actualSettings)
@@ -44,20 +43,20 @@ class MainViewModelTest {
         // Given - Initial settings
         val initialSettings = GameSettings(pointsToWinSet = 11)
         fakeSettingsRepository.setSettings(initialSettings)
-        assertEquals(initialSettings, viewModel.settings.first())
+        assertEquals(initialSettings, viewModel.settings.value)
 
         // When - Repository updates
         val updatedSettings = GameSettings(pointsToWinSet = 21)
         fakeSettingsRepository.setSettings(updatedSettings)
 
         // Then - ViewModel exposes updated settings
-        assertEquals(updatedSettings, viewModel.settings.first())
+        assertEquals(updatedSettings, viewModel.settings.value)
     }
 
     @Test
     fun `viewModel exposes default settings on initialization`() = runTest {
         // When
-        val settings = viewModel.settings.first()
+        val settings = viewModel.settings.value
 
         // Then - Should have default GameSettings values
         assertEquals(GameSettings(), settings)
