@@ -1,7 +1,6 @@
 package com.soyvictorherrera.scorecount.ui.settings
 
 import android.content.res.Configuration
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -66,39 +65,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-sealed class SettingItemData {
-    data class ToggleItem(
-        val text: String,
-        val icon: ImageVector,
-        val isChecked: Boolean,
-        val onToggle: (Boolean) -> Unit
-    ) : SettingItemData()
-
-    data class ActionItem(
-        val text: String,
-        val icon: ImageVector,
-        val onClick: () -> Unit
-    ) : SettingItemData()
-
-    data class StepperItem(
-        val text: String,
-        val subtitle: String? = null,
-        val icon: ImageVector,
-        val value: Int,
-        val onIncrement: () -> Unit,
-        val onDecrement: () -> Unit,
-        val valueRange: IntRange
-    ) : SettingItemData()
-
-    data class SwitchSetting( // Renamed from Switch to avoid conflict
-        val text: String,
-        val subtitle: String? = null,
-        val icon: ImageVector,
-        val isChecked: Boolean,
-        val onToggle: (Boolean) -> Unit
-    ) : SettingItemData()
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -107,51 +73,9 @@ fun SettingsScreen(
 ) {
     val settings by settingsViewModel.settings.collectAsState()
 
-    val gameControls = listOf(
-        SettingItemData.ToggleItem("Show title", Icons.Filled.Title, settings.showTitle) { settingsViewModel.updateShowTitle(it) },
-        SettingItemData.ToggleItem("Show names", Icons.Filled.Badge, settings.showNames) { settingsViewModel.updateShowNames(it) },
-        SettingItemData.ToggleItem("Show sets", Icons.Filled.CalendarToday, settings.showSets) { settingsViewModel.updateShowSets(it) },
-        SettingItemData.ToggleItem("Mark serve", Icons.Filled.PersonSearch, settings.markServe) { settingsViewModel.updateMarkServe(it) },
-        SettingItemData.ToggleItem("Mark deuce", Icons.Filled.Info, settings.markDeuce) { settingsViewModel.updateMarkDeuce(it) },
-        SettingItemData.ToggleItem("Keep screen on", Icons.Filled.ScreenLockPortrait, settings.keepScreenOn) { settingsViewModel.updateKeepScreenOn(it) }
-    )
-
-    val tableTennisRules = listOf(
-        SettingItemData.StepperItem(
-            text = "Set to",
-            subtitle = "Win by 2",
-            icon = Icons.Filled.EmojiEvents,
-            value = settings.pointsToWinSet,
-            onIncrement = { settingsViewModel.updatePointsToWinSet(settings.pointsToWinSet + 1) },
-            onDecrement = { settingsViewModel.updatePointsToWinSet(settings.pointsToWinSet - 1) },
-            valueRange = 1..100
-        ),
-        SettingItemData.StepperItem(
-            text = "Match",
-            subtitle = "Best of ${settings.numberOfSets} sets",
-            icon = Icons.Filled.MilitaryTech,
-            value = settings.numberOfSets,
-            onIncrement = { settingsViewModel.updateNumberOfSets(settings.numberOfSets + 2) }, // Usually best of 1, 3, 5, etc.
-            onDecrement = { settingsViewModel.updateNumberOfSets(settings.numberOfSets - 2) },
-            valueRange = 1..20 // Max "best of"
-        ),
-        SettingItemData.StepperItem(
-            text = "Serve rotation after",
-            subtitle = "1 after deuce",
-            icon = Icons.AutoMirrored.Filled.RotateRight,
-            value = settings.serveRotationAfterPoints,
-            onIncrement = { settingsViewModel.updateServeRotationAfterPoints(settings.serveRotationAfterPoints + 1) },
-            onDecrement = { settingsViewModel.updateServeRotationAfterPoints(settings.serveRotationAfterPoints - 1) },
-            valueRange = 1..10
-        ),
-        SettingItemData.SwitchSetting(
-            text = "Winner serves",
-            subtitle = "The winner of a game serves first in the next game",
-            icon = Icons.Filled.Person,
-            isChecked = settings.winnerServesNextGame,
-            onToggle = { settingsViewModel.updateWinnerServesNextGame(it) }
-        )
-    )
+    // Recompose these lists whenever settings change
+    val gameControls = settingsViewModel.getGameControls(settings)
+    val tableTennisRules = settingsViewModel.getTableTennisRules(settings)
 
 
     Scaffold(
@@ -214,8 +138,7 @@ fun SettingsGrid(
             Box(Modifier.weight(1f)) { // Use weight to ensure items take equal space up to maxItemsInEachRow
                 when (item) {
                     is SettingItemData.ToggleItem -> ToggleSettingCard(item)
-                    is SettingItemData.ActionItem -> ActionSettingCard(item)
-                    else -> {} // Should not happen in this grid
+                    else -> {} // Only ToggleItems are used in the grid
                 }
             }
         }
@@ -226,10 +149,10 @@ fun SettingsGrid(
 @Composable
 fun ToggleSettingCard(item: SettingItemData.ToggleItem) {
     Card(
+        onClick = { item.onToggle(!item.isChecked) },
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp)
-            .clickable { item.onToggle(!item.isChecked) },
+            .height(120.dp),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
@@ -257,42 +180,6 @@ fun ToggleSettingCard(item: SettingItemData.ToggleItem) {
                     textAlign = TextAlign.Center
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun ActionSettingCard(item: SettingItemData.ActionItem) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(120.dp)
-            .clickable { item.onClick() },
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                item.icon,
-                contentDescription = item.text,
-                modifier = Modifier.size(36.dp)
-                // Tint will be inherited from contentColor
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = item.text,
-                style = MaterialTheme.typography.labelMedium,
-                textAlign = TextAlign.Center
-            )
         }
     }
 }
