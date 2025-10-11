@@ -447,7 +447,8 @@ fun PlayerScoreCard(
                     fontSize = 96.sp,
                     fontWeight = FontWeight.Bold,
                     lineHeight = 96.sp,
-                    letterSpacing = (-4).sp
+                    letterSpacing = (-4).sp,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
             Row(
@@ -482,13 +483,13 @@ fun SmallIconButton(
     FilledIconButton(
         onClick = onClick,
         enabled = enabled,
-        modifier = Modifier.size(32.dp),
+        modifier = Modifier.size(36.dp),
         colors = IconButtonDefaults.filledIconButtonColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            contentColor = MaterialTheme.colorScheme.primary
         )
     ) {
-        Icon(icon, contentDescription = description)
+        Icon(icon, contentDescription = description, modifier = Modifier.size(20.dp))
     }
 }
 
@@ -549,17 +550,17 @@ fun DeuceIndicator(
     modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f))
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
     ) {
         Text(
             text = "DEUCE",
             color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
     }
 }
