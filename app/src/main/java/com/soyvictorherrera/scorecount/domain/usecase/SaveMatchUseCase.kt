@@ -7,7 +7,7 @@ import javax.inject.Inject
 class SaveMatchUseCase @Inject constructor(
     private val matchRepository: MatchRepository
 ) {
-    suspend fun execute(match: Match) {
+    suspend operator fun invoke(match: Match) {
         matchRepository.saveMatch(match)
     }
 }

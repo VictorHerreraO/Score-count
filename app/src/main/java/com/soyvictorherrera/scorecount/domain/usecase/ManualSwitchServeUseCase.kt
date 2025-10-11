@@ -12,7 +12,7 @@ import javax.inject.Inject
 class ManualSwitchServeUseCase @Inject constructor(
     private val scoreRepository: ScoreRepository
 ) {
-    suspend fun execute() {
+    suspend operator fun invoke() {
         val currentState = scoreRepository.getGameState().first()
         val newState = ScoreCalculator.switchServe(currentState)
         scoreRepository.updateGameState(newState)

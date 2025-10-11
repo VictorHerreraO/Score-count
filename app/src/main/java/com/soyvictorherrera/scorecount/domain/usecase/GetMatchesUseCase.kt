@@ -8,7 +8,7 @@ import javax.inject.Inject
 class GetMatchesUseCase @Inject constructor(
     private val matchRepository: MatchRepository
 ) {
-    fun execute(): Flow<List<Match>> {
+    operator fun invoke(): Flow<List<Match>> {
         return matchRepository.getMatchList()
     }
 }

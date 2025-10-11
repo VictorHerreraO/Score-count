@@ -21,7 +21,7 @@ class MatchHistoryViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getMatchesUseCase.execute()
+            getMatchesUseCase()
                 .catch { _matches.value = emptyList() }
                 .collect { _matches.value = it }
         }

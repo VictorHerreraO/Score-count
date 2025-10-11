@@ -14,7 +14,7 @@ class ResetGameUseCase @Inject constructor(
     private val scoreRepository: ScoreRepository,
     private val settingsRepository: SettingsRepository
 ) {
-    suspend fun execute(lastGameWinnerId: Int? = null) {
+    suspend operator fun invoke(lastGameWinnerId: Int? = null) {
         val currentState = scoreRepository.getGameState().first()
         val settings = settingsRepository.getSettings().first()
 

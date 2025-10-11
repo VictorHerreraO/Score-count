@@ -44,19 +44,19 @@ class ScoreViewModel @Inject constructor(
 
     fun incrementScore(playerId: Int) {
         viewModelScope.launch {
-            incrementScoreUseCase.execute(playerId)
+            incrementScoreUseCase(playerId)
         }
     }
 
     fun decrementScore(playerId: Int) {
         viewModelScope.launch {
-            decrementScoreUseCase.execute(playerId)
+            decrementScoreUseCase(playerId)
         }
     }
 
     fun manualSwitchServe() {
         viewModelScope.launch {
-            manualSwitchServeUseCase.execute()
+            manualSwitchServeUseCase()
         }
     }
 
@@ -68,7 +68,7 @@ class ScoreViewModel @Inject constructor(
             } else {
                 currentState.player2.id
             }
-            resetGameUseCase.execute(winnerId)
+            resetGameUseCase(winnerId)
         }
     }
 
@@ -82,7 +82,7 @@ class ScoreViewModel @Inject constructor(
                 playerTwoScore = gameState.player2SetsWon,
                 date = System.currentTimeMillis()
             )
-            saveMatchUseCase.execute(match)
+            saveMatchUseCase(match)
         }
     }
 }
