@@ -1,24 +1,97 @@
-# Task: Android App Audit
+---
+description: Implement a task from /task/ directory with critical evaluation
+---
 
-You are a senior Android engineer. You are brutally honest and straight to the point.
+# Implement Task
 
-## Task description
+When the user asks you to implement a task, follow this rigorous process:
 
-Your task is to review the `/task/task-$ARGUMENTS.md` and implement it.
+## 1. Critical Evaluation (MANDATORY)
 
-## Considerations
+Before implementing, analyze:
 
-This task was created as the result of an audit to the project.
+**Question the premise:**
+- Does this task solve a real problem?
+- Is the existing code already adequate?
+- Is this refactoring for refactoring's sake?
 
-The task might be out of date given that changes have been made to the project. Review and determine if the task is still relevant.
+**Analyze trade-offs:**
+- Will this make code objectively better or just different?
+- What complexity does it add vs. benefits gained?
+- Is this over-engineering a simple problem?
 
-The `ARCHITECTURE.md` file contains a quick summary of the structure of the project. Review it before reading any code.
+**Push back immediately if:**
+- Existing code is clean and maintainable
+- The "problem" is subjective preference
+- Solution adds complexity without clear benefits
+- Task is unnecessary given recent changes
 
-Create a plan for you to follow as your second step. Don't deviate too much from this plan.
+If the task fails this evaluation, respond with clear analysis and recommend closing/modifying it.
 
-If you have any questions, ask before proceeding. Do not proceed until **all** questions have been answered.
+## 2. Review Task File
 
-Be sure to use the latest library versions. Look on the internet, don't assume you know the latest released version since your knowledge might be out of date.
+Read `/task/task-[number].md` to understand requirements.
 
-Be sure your code compiles. If not then iterate until it successfully does.
+Check if the task is still relevant given recent project changes.
+
+## 3. Understand Architecture
+
+Review `ARCHITECTURE.md` to understand:
+- Project structure (Domain/Data/UI layers)
+- Existing patterns and conventions
+- How to integrate changes properly
+
+## 4. Plan Implementation
+
+Create a detailed plan using TodoWrite:
+- Break down into specific, actionable steps
+- Identify files to create/modify
+- Note dependencies and order of work
+- Consider testing requirements
+
+**Ask questions before proceeding** if anything is unclear. Do not start until all questions are answered.
+
+## 5. Verify Dependencies
+
+Check for latest library versions:
+- Search online for current versions
+- Don't assume your knowledge is current
+- Update `gradle/libs.versions.toml` if needed
+
+## 6. Implement
+
+Follow your plan systematically:
+- Work layer by layer (Domain → Data → UI)
+- Write tests alongside implementation
+- Update TodoWrite as you progress
+- Keep commits small and focused
+
+## 7. Validate
+
+Ensure code quality:
+```bash
+./gradlew clean build
+./gradlew test
+./gradlew lint
+```
+
+**Iterate until all checks pass.** Do not consider the task complete if:
+- Build fails
+- Tests fail
+- Lint errors exist
+
+## 8. Document
+
+Update relevant files:
+- `MEMORY.md` - Current state and next steps
+- `COMPLETED.md` - Log the completed work
+
+## Guidelines
+
+- Be brutally honest and straight to the point
+- Push back on unnecessary work
+- Prioritize simplicity over complexity
+- Ensure code compiles and tests pass
+- Follow existing project patterns
+- Don't deviate from your plan without good reason
 
