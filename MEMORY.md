@@ -4,7 +4,8 @@ This file tracks the current state of development for the Score-Count applicatio
 
 ## Current Branch
 - `feature/issue-23-ci-cd-pipeline`
-- **Status**: Implementation complete, ready for testing
+- **Status**: DevOps feedback addressed, awaiting CI verification
+- **PR**: #34 (https://github.com/VictorHerreraO/Score-count/pull/34)
 - Previously on: `feature/issue-21-add-ktlint` (Ready for review, PR #29)
 
 ## Recently Completed: Task #23 - Add CI/CD Pipeline for PR Validation Checks
@@ -23,14 +24,16 @@ Implemented a comprehensive GitHub Actions CI/CD pipeline that automatically val
 
 **2. Build Environment Setup**
 - Uses Ubuntu latest runner (fast, cost-effective)
-- JDK 21 (Temurin distribution) matching project requirements
+- JDK 17 (Temurin distribution) - compatible with AGP 8.13
+- Android SDK via android-actions/setup-android@v3
 - Gradle 8.13 with build caching and cleanup
 - Cache strategy: read-only for PR branches, read-write for main
+- Automatic Android SDK license acceptance
 
 **3. Validation Checks (Sequential Execution)**
 1. **Compilation Checks**:
    - `./gradlew assembleDebug` - Verifies all code compiles
-   - `./gradlew testDebugUnitTest --dry-run` - Validates test compilation
+   - `./gradlew compileDebugUnitTestKotlin compileDebugUnitTestJavaWithJavac` - Compiles test classes
 2. **Test Execution**:
    - `./gradlew test` - Runs full unit test suite (97 tests)
    - Test results published to PR interface via EnricoMi/publish-unit-test-result-action@v2
@@ -47,7 +50,7 @@ Implemented a comprehensive GitHub Actions CI/CD pipeline that automatically val
 - Dependency caching via gradle/actions/setup-gradle@v4
 - `--no-daemon` flag for predictable CI behavior
 - `--stacktrace` for better error diagnostics
-- `continue-on-error: false` ensures any failure blocks PR
+- Clean workflow (removed redundant `continue-on-error: false` flags)
 
 **5. Documentation Updates** (`README.md`)
 - Added "Continuous Integration" section under "Code Quality"
@@ -66,16 +69,31 @@ Implemented a comprehensive GitHub Actions CI/CD pipeline that automatically val
 ### Workflow Execution Flow
 ```
 1. Checkout code (fetch-depth: 0 for full history)
-2. Setup JDK 21 + Gradle with caching
-3. Compile debug build → FAIL = Block PR
-4. Compile test classes → FAIL = Block PR
-5. Run unit tests → FAIL = Block PR
-6. Run lint → FAIL = Block PR
-7. Run ktlintCheck → FAIL = Block PR
-8. Run detekt → FAIL = Block PR
-9. Upload reports (always runs)
-10. Generate summary (always runs)
+2. Setup JDK 17 (AGP 8.13 compatible)
+3. Setup Android SDK + accept licenses
+4. Setup Gradle with caching
+5. Compile debug build → FAIL = Block PR
+6. Compile test classes → FAIL = Block PR
+7. Run unit tests → FAIL = Block PR
+8. Run lint → FAIL = Block PR
+9. Run ktlintCheck → FAIL = Block PR
+10. Run detekt → FAIL = Block PR
+11. Upload reports (always runs)
+12. Generate summary (always runs)
 ```
+
+### DevOps Feedback Addressed (Commit: 5a5e0ac)
+
+**Critical Fixes:**
+1. ✅ **Android SDK Setup** - Added `android-actions/setup-android@v3` with automatic license acceptance
+2. ✅ **JDK Compatibility** - Switched from JDK 21 to JDK 17 (AGP 8.13 compatible)
+3. ✅ **Test Compilation** - Replaced `--dry-run` with actual compilation: `compileDebugUnitTestKotlin compileDebugUnitTestJavaWithJavac`
+4. ✅ **Clean Workflow** - Removed redundant `continue-on-error: false` flags
+
+**Confirmed Intentional:**
+- Gradle cache strategy (read-only for PRs) prevents cache pollution
+- Permissions block is minimal and sufficient for current actions
+- Sequential execution provides clear failure isolation (better DX than parallelization)
 
 ### Acceptance Criteria Met
 - ✅ GitHub Actions workflow created (`.github/workflows/pr-checks.yml`)
