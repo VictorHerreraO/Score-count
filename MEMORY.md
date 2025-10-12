@@ -4,7 +4,8 @@ This file tracks the current state of development for the Score-Count applicatio
 
 ## Current Branch
 - `feature/issue-21-add-ktlint`
-- **Status**: Implementation in progress (detekt integration completed)
+- **Status**: Ready for review
+- **PR**: #29
 - Previously on: `feature/issue-24-enhanced-serve-indicator` (Ready for review, PR #25)
 
 ## Recently Completed: Task #22 - Add detekt for Kotlin Static Code Analysis
@@ -54,7 +55,10 @@ Integrated detekt (v1.23.8) into the project to provide static code analysis for
   - `detekt.yml` (configuration)
   - `detekt-baseline.xml` (baseline for existing violations)
 - **Build Status**: All checks passing (build, test, lint, ktlint, detekt)
-- **Commits**: To be created after implementation complete
+- **Commits**:
+  - `625c7df` - feat: Add ktlint for Kotlin code formatting
+  - `be54663` - docs: Add pre-commit hook setup instructions to README
+  - `69805c9` - feat: Add detekt for Kotlin static code analysis
 
 ### Configuration Highlights
 - **Tool Version**: detekt 1.23.8 (latest stable)
@@ -72,8 +76,14 @@ Integrated detekt (v1.23.8) into the project to provide static code analysis for
 - ✅ Pre-commit hook configured to run detekt and block on violations
 - ✅ Baseline file created for existing violations (`detekt-baseline.xml`)
 - ✅ Documentation updated with usage instructions and report interpretation
-- ⏳ IDE integration plan (recommend detekt IntelliJ plugin in PR comments)
-- ⏳ CI/CD integration plan (document in PR)
+- ✅ IDE integration plan documented in PR #29
+- ✅ CI/CD integration plan documented in PR #29
+
+### Pull Request
+- **PR #29**: Feature: Add code quality tools (ktlint + detekt)
+- **Status**: Open, ready for review
+- **URL**: https://github.com/VictorHerreraO/Score-count/pull/29
+- Comprehensive PR combining both ktlint (#21) and detekt (#22) implementations
 
 ## Previously Completed: Task #24 - Enhanced Serve Indicator + UI Overhaul
 
