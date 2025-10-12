@@ -55,15 +55,69 @@ Follow these instructions to get a copy of the project up and running on your lo
     ```
     *(Replace `yourusername` with the actual GitHub username/organization if applicable)*
 
-2.  **Open in Android Studio:**
+2.  **Set up pre-commit hook (optional but recommended):**
+
+    This project uses ktlint for code formatting. The pre-commit hook automatically formats Kotlin files before each commit.
+
+    ```bash
+    cat > .git/hooks/pre-commit << 'EOF'
+    #!/bin/bash
+    # ktlint pre-commit hook
+    # Auto-formats Kotlin files before commit
+
+    echo "Running ktlint format on staged files..."
+
+    # Get list of staged Kotlin files
+    STAGED_KOTLIN_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.kt$|\.kts$' || true)
+
+    if [ -z "$STAGED_KOTLIN_FILES" ]; then
+        echo "No Kotlin files to format"
+        exit 0
+    fi
+
+    # Run ktlint format on all files
+    ./gradlew ktlintFormat --quiet
+
+    # Check ktlint status
+    if [ $? -ne 0 ]; then
+        echo "❌ ktlint format failed. Please fix the issues and try again."
+        exit 1
+    fi
+
+    # Re-add formatted files to staging
+    for file in $STAGED_KOTLIN_FILES; do
+        if [ -f "$file" ]; then
+            git add "$file"
+        fi
+    done
+
+    echo "✅ ktlint format completed successfully"
+    exit 0
+    EOF
+
+    chmod +x .git/hooks/pre-commit
+    ```
+
+3.  **Open in Android Studio:**
     *   Open Android Studio.
     *   Click on "Open" or "Open an Existing Project".
     *   Navigate to the cloned `score-count` directory and select it.
 
-3.  **Build and Run:**
+4.  **Build and Run:**
     *   Let Android Studio sync the project and download dependencies.
     *   Click the "Run" button (green play icon) or select "Run" > "Run 'app'" from the menu.
     *   Choose an available emulator or a connected physical device.
+
+### Code Quality
+
+This project uses ktlint for Kotlin code formatting. Available commands:
+
+```bash
+./gradlew ktlintCheck    # Check code formatting
+./gradlew ktlintFormat   # Auto-fix formatting issues
+```
+
+The `.editorconfig` file contains project-wide style rules that are automatically applied by most IDEs.
 
 ## Contributing
 
