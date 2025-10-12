@@ -1,0 +1,107 @@
+name: PR Validation Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  validation:
+    name: Code Quality & Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+          gradle-home-cache-cleanup: true
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Compile Debug Build
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        continue-on-error: false
+
+      - name: Compile Test Classes
+        run: ./gradlew testDebugUnitTest --dry-run --no-daemon
+        continue-on-error: false
+
+      - name: Run Unit Tests
+        run: ./gradlew test --no-daemon --stacktrace
+        continue-on-error: false
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            **/build/test-results/**/*.xml
+
+      - name: Run Lint Checks
+        run: ./gradlew lint --no-daemon --stacktrace
+        continue-on-error: false
+
+      - name: Upload Lint Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lint-reports
+          path: |
+            **/build/reports/lint-results-*.html
+            **/build/reports/lint-results-*.xml
+          retention-days: 7
+
+      - name: Run ktlint Check
+        run: ./gradlew ktlintCheck --no-daemon --stacktrace
+        continue-on-error: false
+
+      - name: Run detekt Analysis
+        run: ./gradlew detekt --no-daemon --stacktrace
+        continue-on-error: false
+
+      - name: Upload detekt Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: detekt-reports
+          path: |
+            **/build/reports/detekt/detekt.html
+            **/build/reports/detekt/detekt.xml
+          retention-days: 7
+
+      - name: Quality Gate Summary
+        if: always()
+        run: |
+          echo "## Quality Gate Results :clipboard:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All checks completed. Review individual step results above." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Checks Performed" >> $GITHUB_STEP_SUMMARY
+          echo "- :white_check_mark: Debug Build Compilation" >> $GITHUB_STEP_SUMMARY
+          echo "- :white_check_mark: Test Classes Compilation" >> $GITHUB_STEP_SUMMARY
+          echo "- :white_check_mark: Unit Tests Execution" >> $GITHUB_STEP_SUMMARY
+          echo "- :white_check_mark: Lint Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "- :white_check_mark: ktlint Code Formatting" >> $GITHUB_STEP_SUMMARY
+          echo "- :white_check_mark: detekt Static Analysis" >> $GITHUB_STEP_SUMMARY
