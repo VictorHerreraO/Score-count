@@ -6,7 +6,13 @@ description: Implement a task from /task/ directory with critical evaluation
 
 When the user asks you to implement a task, follow this rigorous process:
 
-## 1. Critical Evaluation (MANDATORY)
+## 1. Review Task File
+
+Using `gh` CLI tool read the Github issue #$ARGUMENTS to understand requirements.
+
+Check if the task is still relevant given recent project changes.
+
+## 2. Critical Evaluation (MANDATORY)
 
 Before implementing, analyze:
 
@@ -28,15 +34,9 @@ Before implementing, analyze:
 
 If the task fails this evaluation, respond with clear analysis and recommend closing/modifying it.
 
-## 2. Review Task File
-
-Read `/task/task-[number].md` to understand requirements.
-
-Check if the task is still relevant given recent project changes.
-
 ## 3. Understand Architecture
 
-Review `ARCHITECTURE.md` to understand:
+Use codebase-analyzer subagent to review `ARCHITECTURE.md` to understand:
 - Project structure (Domain/Data/UI layers)
 - Existing patterns and conventions
 - How to integrate changes properly
@@ -45,7 +45,7 @@ Review `ARCHITECTURE.md` to understand:
 
 Create a detailed plan using TodoWrite:
 - Break down into specific, actionable steps
-- Identify files to create/modify
+- Using your codebase-analyzer subagent identify files to create/modify 
 - Note dependencies and order of work
 - Consider testing requirements
 
@@ -84,7 +84,7 @@ Ensure code quality:
 
 Update relevant files:
 - `MEMORY.md` - Current state and next steps
-- `COMPLETED.md` - Log the completed work
+- `ARCHITECTURE.md` - Updated architecture
 
 ## Guidelines
 
@@ -94,4 +94,5 @@ Update relevant files:
 - Ensure code compiles and tests pass
 - Follow existing project patterns
 - Don't deviate from your plan without good reason
+- Use codebase-analyzer to review architecture and files
 

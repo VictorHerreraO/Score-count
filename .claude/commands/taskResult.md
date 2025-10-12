@@ -4,14 +4,14 @@ description: Document task completion with detailed results and learnings
 
 # Document Task Result
 
-When the user asks you to document a completed task, create a file at `/task/task-[number]-result.md`.
+When the user asks you to document a completed task, using the `gh` CLI tool add a comment to the issue number #$ARGUMENTS.
 
 ## File Structure
 
 Use this template:
 
 ```markdown
-# Task [Number] Completion Report
+# Task $ARGUMENTS Completion Report
 
 **Title:** [Brief task title]
 **Date:** [YYYY-MM-DD]
@@ -73,9 +73,7 @@ Use this template:
 
 ## References
 
-- Original task: `/task/task-[number].md`
 - Related PR: #[pr-number]
-- Related issues: #[issue-numbers]
 ```
 
 ## Guidelines
