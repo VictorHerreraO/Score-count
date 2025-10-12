@@ -15,13 +15,14 @@ import kotlinx.coroutines.flow.StateFlow
  * - [setState] helper method for test setup
  */
 class FakeScoreRepository : ScoreRepository {
-    private val _gameState = MutableStateFlow(
-        GameState(
-            player1 = Player(id = 1, name = "Player 1", score = 0),
-            player2 = Player(id = 2, name = "Player 2", score = 0),
-            servingPlayerId = 1
+    private val _gameState =
+        MutableStateFlow(
+            GameState(
+                player1 = Player(id = 1, name = "Player 1", score = 0),
+                player2 = Player(id = 2, name = "Player 2", score = 0),
+                servingPlayerId = 1
+            )
         )
-    )
 
     /**
      * Tracks the last state saved via [updateGameState].

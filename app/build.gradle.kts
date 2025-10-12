@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.hilt.android.plugin)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.protobuf)
+    alias(libs.plugins.ktlint)
 }
 
 android {
@@ -44,7 +45,9 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
+        kotlinCompilerExtensionVersion =
+            libs.versions.compose.compiler
+                .get()
     }
     packaging {
         resources {
@@ -115,5 +118,19 @@ protobuf {
                 }
             }
         }
+    }
+}
+
+ktlint {
+    version.set("1.5.0")
+    android.set(true)
+    ignoreFailures.set(false)
+    reporters {
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.PLAIN)
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)
+    }
+    filter {
+        exclude("**/generated/**")
+        exclude("**/build/**")
     }
 }

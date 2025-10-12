@@ -61,9 +61,7 @@ fun MatchHistoryScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MatchHistoryTopBar(
-    onNavigateBack: () -> Unit
-) {
+private fun MatchHistoryTopBar(onNavigateBack: () -> Unit) {
     CenterAlignedTopAppBar(
         title = { Text(text = stringResource(R.string.match_history_title)) },
         navigationIcon = {
@@ -74,16 +72,15 @@ private fun MatchHistoryTopBar(
                 )
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-        )
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+            )
     )
 }
 
 @Composable
-private fun MatchListItem(
-    match: Match
-) {
+private fun MatchListItem(match: Match) {
     val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
     val date = dateFormat.format(Date(match.date))
 

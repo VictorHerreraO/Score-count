@@ -11,19 +11,19 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class GameStateMapperTest {
-
     @Test
     fun `toProto converts GameState to GameStateProto correctly`() {
         // Given
-        val gameState = GameState(
-            player1 = Player(id = 1, name = "Alice", score = 10),
-            player2 = Player(id = 2, name = "Bob", score = 8),
-            servingPlayerId = 1,
-            player1SetsWon = 2,
-            player2SetsWon = 1,
-            isDeuce = true,
-            isFinished = false
-        )
+        val gameState =
+            GameState(
+                player1 = Player(id = 1, name = "Alice", score = 10),
+                player2 = Player(id = 2, name = "Bob", score = 8),
+                servingPlayerId = 1,
+                player1SetsWon = 2,
+                player2SetsWon = 1,
+                isDeuce = true,
+                isFinished = false
+            )
 
         // When
         val result = gameState.toProto()
@@ -45,15 +45,16 @@ class GameStateMapperTest {
     @Test
     fun `toProto handles null servingPlayerId`() {
         // Given
-        val gameState = GameState(
-            player1 = Player(id = 1, name = "Player 1", score = 0),
-            player2 = Player(id = 2, name = "Player 2", score = 0),
-            servingPlayerId = null,
-            player1SetsWon = 0,
-            player2SetsWon = 0,
-            isDeuce = false,
-            isFinished = false
-        )
+        val gameState =
+            GameState(
+                player1 = Player(id = 1, name = "Player 1", score = 0),
+                player2 = Player(id = 2, name = "Player 2", score = 0),
+                servingPlayerId = null,
+                player1SetsWon = 0,
+                player2SetsWon = 0,
+                isDeuce = false,
+                isFinished = false
+            )
 
         // When
         val result = gameState.toProto()
@@ -65,15 +66,16 @@ class GameStateMapperTest {
     @Test
     fun `toProto handles initial default state`() {
         // Given
-        val gameState = GameState(
-            player1 = Player(id = 1, name = "Player 1", score = 0),
-            player2 = Player(id = 2, name = "Player 2", score = 0),
-            servingPlayerId = 1,
-            player1SetsWon = 0,
-            player2SetsWon = 0,
-            isDeuce = false,
-            isFinished = false
-        )
+        val gameState =
+            GameState(
+                player1 = Player(id = 1, name = "Player 1", score = 0),
+                player2 = Player(id = 2, name = "Player 2", score = 0),
+                servingPlayerId = 1,
+                player1SetsWon = 0,
+                player2SetsWon = 0,
+                isDeuce = false,
+                isFinished = false
+            )
 
         // When
         val result = gameState.toProto()
@@ -90,15 +92,16 @@ class GameStateMapperTest {
     @Test
     fun `toProto handles finished game state`() {
         // Given
-        val gameState = GameState(
-            player1 = Player(id = 1, name = "Winner", score = 11),
-            player2 = Player(id = 2, name = "Loser", score = 9),
-            servingPlayerId = 1,
-            player1SetsWon = 3,
-            player2SetsWon = 0,
-            isDeuce = false,
-            isFinished = true
-        )
+        val gameState =
+            GameState(
+                player1 = Player(id = 1, name = "Winner", score = 11),
+                player2 = Player(id = 2, name = "Loser", score = 9),
+                servingPlayerId = 1,
+                player1SetsWon = 3,
+                player2SetsWon = 0,
+                isDeuce = false,
+                isFinished = true
+            )
 
         // When
         val result = gameState.toProto()
@@ -112,27 +115,29 @@ class GameStateMapperTest {
     @Test
     fun `toDomain converts GameStateProto to GameState correctly`() {
         // Given
-        val proto = GameStateProto.newBuilder()
-            .setPlayer1(
-                PlayerProto.newBuilder()
-                    .setId(1)
-                    .setName("Charlie")
-                    .setScore(7)
-                    .build()
-            )
-            .setPlayer2(
-                PlayerProto.newBuilder()
-                    .setId(2)
-                    .setName("Diana")
-                    .setScore(5)
-                    .build()
-            )
-            .setServingPlayerId(2)
-            .setPlayer1SetsWon(1)
-            .setPlayer2SetsWon(2)
-            .setIsDeuce(false)
-            .setIsFinished(false)
-            .build()
+        val proto =
+            GameStateProto
+                .newBuilder()
+                .setPlayer1(
+                    PlayerProto
+                        .newBuilder()
+                        .setId(1)
+                        .setName("Charlie")
+                        .setScore(7)
+                        .build()
+                ).setPlayer2(
+                    PlayerProto
+                        .newBuilder()
+                        .setId(2)
+                        .setName("Diana")
+                        .setScore(5)
+                        .build()
+                ).setServingPlayerId(2)
+                .setPlayer1SetsWon(1)
+                .setPlayer2SetsWon(2)
+                .setIsDeuce(false)
+                .setIsFinished(false)
+                .build()
 
         // When
         val result = proto.toDomain()
@@ -154,27 +159,29 @@ class GameStateMapperTest {
     @Test
     fun `toDomain handles servingPlayerId zero as null`() {
         // Given
-        val proto = GameStateProto.newBuilder()
-            .setPlayer1(
-                PlayerProto.newBuilder()
-                    .setId(1)
-                    .setName("Eve")
-                    .setScore(0)
-                    .build()
-            )
-            .setPlayer2(
-                PlayerProto.newBuilder()
-                    .setId(2)
-                    .setName("Frank")
-                    .setScore(0)
-                    .build()
-            )
-            .setServingPlayerId(0) // 0 should convert to null
-            .setPlayer1SetsWon(0)
-            .setPlayer2SetsWon(0)
-            .setIsDeuce(false)
-            .setIsFinished(false)
-            .build()
+        val proto =
+            GameStateProto
+                .newBuilder()
+                .setPlayer1(
+                    PlayerProto
+                        .newBuilder()
+                        .setId(1)
+                        .setName("Eve")
+                        .setScore(0)
+                        .build()
+                ).setPlayer2(
+                    PlayerProto
+                        .newBuilder()
+                        .setId(2)
+                        .setName("Frank")
+                        .setScore(0)
+                        .build()
+                ).setServingPlayerId(0) // 0 should convert to null
+                .setPlayer1SetsWon(0)
+                .setPlayer2SetsWon(0)
+                .setIsDeuce(false)
+                .setIsFinished(false)
+                .build()
 
         // When
         val result = proto.toDomain()
@@ -186,27 +193,29 @@ class GameStateMapperTest {
     @Test
     fun `toDomain handles deuce state`() {
         // Given
-        val proto = GameStateProto.newBuilder()
-            .setPlayer1(
-                PlayerProto.newBuilder()
-                    .setId(1)
-                    .setName("Grace")
-                    .setScore(10)
-                    .build()
-            )
-            .setPlayer2(
-                PlayerProto.newBuilder()
-                    .setId(2)
-                    .setName("Henry")
-                    .setScore(10)
-                    .build()
-            )
-            .setServingPlayerId(1)
-            .setPlayer1SetsWon(0)
-            .setPlayer2SetsWon(0)
-            .setIsDeuce(true)
-            .setIsFinished(false)
-            .build()
+        val proto =
+            GameStateProto
+                .newBuilder()
+                .setPlayer1(
+                    PlayerProto
+                        .newBuilder()
+                        .setId(1)
+                        .setName("Grace")
+                        .setScore(10)
+                        .build()
+                ).setPlayer2(
+                    PlayerProto
+                        .newBuilder()
+                        .setId(2)
+                        .setName("Henry")
+                        .setScore(10)
+                        .build()
+                ).setServingPlayerId(1)
+                .setPlayer1SetsWon(0)
+                .setPlayer2SetsWon(0)
+                .setIsDeuce(true)
+                .setIsFinished(false)
+                .build()
 
         // When
         val result = proto.toDomain()
@@ -220,15 +229,16 @@ class GameStateMapperTest {
     @Test
     fun `bidirectional mapping preserves all GameState data`() {
         // Given
-        val originalGameState = GameState(
-            player1 = Player(id = 1, name = "Ivy", score = 15),
-            player2 = Player(id = 2, name = "Jack", score = 13),
-            servingPlayerId = 2,
-            player1SetsWon = 3,
-            player2SetsWon = 2,
-            isDeuce = false,
-            isFinished = true
-        )
+        val originalGameState =
+            GameState(
+                player1 = Player(id = 1, name = "Ivy", score = 15),
+                player2 = Player(id = 2, name = "Jack", score = 13),
+                servingPlayerId = 2,
+                player1SetsWon = 3,
+                player2SetsWon = 2,
+                isDeuce = false,
+                isFinished = true
+            )
 
         // When - Convert domain → proto → domain
         val proto = originalGameState.toProto()
@@ -251,15 +261,16 @@ class GameStateMapperTest {
     @Test
     fun `bidirectional mapping with null servingPlayerId preserves null`() {
         // Given
-        val originalGameState = GameState(
-            player1 = Player(id = 1, name = "Kate", score = 0),
-            player2 = Player(id = 2, name = "Leo", score = 0),
-            servingPlayerId = null,
-            player1SetsWon = 0,
-            player2SetsWon = 0,
-            isDeuce = false,
-            isFinished = false
-        )
+        val originalGameState =
+            GameState(
+                player1 = Player(id = 1, name = "Kate", score = 0),
+                player2 = Player(id = 2, name = "Leo", score = 0),
+                servingPlayerId = null,
+                player1SetsWon = 0,
+                player2SetsWon = 0,
+                isDeuce = false,
+                isFinished = false
+            )
 
         // When - Convert domain → proto → domain
         val proto = originalGameState.toProto()
@@ -272,27 +283,29 @@ class GameStateMapperTest {
     @Test
     fun `bidirectional mapping from proto preserves all data`() {
         // Given
-        val originalProto = GameStateProto.newBuilder()
-            .setPlayer1(
-                PlayerProto.newBuilder()
-                    .setId(1)
-                    .setName("Mia")
-                    .setScore(20)
-                    .build()
-            )
-            .setPlayer2(
-                PlayerProto.newBuilder()
-                    .setId(2)
-                    .setName("Noah")
-                    .setScore(18)
-                    .build()
-            )
-            .setServingPlayerId(1)
-            .setPlayer1SetsWon(4)
-            .setPlayer2SetsWon(3)
-            .setIsDeuce(true)
-            .setIsFinished(false)
-            .build()
+        val originalProto =
+            GameStateProto
+                .newBuilder()
+                .setPlayer1(
+                    PlayerProto
+                        .newBuilder()
+                        .setId(1)
+                        .setName("Mia")
+                        .setScore(20)
+                        .build()
+                ).setPlayer2(
+                    PlayerProto
+                        .newBuilder()
+                        .setId(2)
+                        .setName("Noah")
+                        .setScore(18)
+                        .build()
+                ).setServingPlayerId(1)
+                .setPlayer1SetsWon(4)
+                .setPlayer2SetsWon(3)
+                .setIsDeuce(true)
+                .setIsFinished(false)
+                .build()
 
         // When - Convert proto → domain → proto
         val domain = originalProto.toDomain()
@@ -315,15 +328,16 @@ class GameStateMapperTest {
     @Test
     fun `handles empty player names`() {
         // Given
-        val gameState = GameState(
-            player1 = Player(id = 1, name = "", score = 0),
-            player2 = Player(id = 2, name = "", score = 0),
-            servingPlayerId = 1,
-            player1SetsWon = 0,
-            player2SetsWon = 0,
-            isDeuce = false,
-            isFinished = false
-        )
+        val gameState =
+            GameState(
+                player1 = Player(id = 1, name = "", score = 0),
+                player2 = Player(id = 2, name = "", score = 0),
+                servingPlayerId = 1,
+                player1SetsWon = 0,
+                player2SetsWon = 0,
+                isDeuce = false,
+                isFinished = false
+            )
 
         // When
         val proto = gameState.toProto()
@@ -337,15 +351,16 @@ class GameStateMapperTest {
     @Test
     fun `handles high score values`() {
         // Given
-        val gameState = GameState(
-            player1 = Player(id = 1, name = "Player 1", score = 999),
-            player2 = Player(id = 2, name = "Player 2", score = 888),
-            servingPlayerId = 1,
-            player1SetsWon = 50,
-            player2SetsWon = 49,
-            isDeuce = false,
-            isFinished = false
-        )
+        val gameState =
+            GameState(
+                player1 = Player(id = 1, name = "Player 1", score = 999),
+                player2 = Player(id = 2, name = "Player 2", score = 888),
+                servingPlayerId = 1,
+                player1SetsWon = 50,
+                player2SetsWon = 49,
+                isDeuce = false,
+                isFinished = false
+            )
 
         // When
         val proto = gameState.toProto()

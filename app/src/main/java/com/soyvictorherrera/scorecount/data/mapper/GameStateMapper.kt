@@ -8,8 +8,9 @@ import com.soyvictorherrera.scorecount.domain.model.Player
 /**
  * Converts domain GameState to proto GameStateProto for persistence.
  */
-fun GameState.toProto(): GameStateProto {
-    return GameStateProto.newBuilder()
+fun GameState.toProto(): GameStateProto =
+    GameStateProto
+        .newBuilder()
         .setPlayer1(player1.toProto())
         .setPlayer2(player2.toProto())
         .setServingPlayerId(servingPlayerId ?: 0)
@@ -18,13 +19,12 @@ fun GameState.toProto(): GameStateProto {
         .setIsDeuce(isDeuce)
         .setIsFinished(isFinished)
         .build()
-}
 
 /**
  * Converts proto GameStateProto to domain GameState.
  */
-fun GameStateProto.toDomain(): GameState {
-    return GameState(
+fun GameStateProto.toDomain(): GameState =
+    GameState(
         player1 = player1.toDomain(),
         player2 = player2.toDomain(),
         servingPlayerId = if (servingPlayerId == 0) null else servingPlayerId,
@@ -33,26 +33,24 @@ fun GameStateProto.toDomain(): GameState {
         isDeuce = isDeuce,
         isFinished = isFinished
     )
-}
 
 /**
  * Converts domain Player to proto PlayerProto.
  */
-private fun Player.toProto(): PlayerProto {
-    return PlayerProto.newBuilder()
+private fun Player.toProto(): PlayerProto =
+    PlayerProto
+        .newBuilder()
         .setId(id)
         .setName(name)
         .setScore(score)
         .build()
-}
 
 /**
  * Converts proto PlayerProto to domain Player.
  */
-private fun PlayerProto.toDomain(): Player {
-    return Player(
+private fun PlayerProto.toDomain(): Player =
+    Player(
         id = id,
         name = name,
         score = score
     )
-}

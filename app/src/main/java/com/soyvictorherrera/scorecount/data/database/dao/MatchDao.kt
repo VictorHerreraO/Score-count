@@ -9,11 +9,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MatchDao {
-
     @Query("SELECT * FROM matches ORDER BY date DESC")
     fun getMatchList(): Flow<List<MatchEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(match: MatchEntity)
-
 }

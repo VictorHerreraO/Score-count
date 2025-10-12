@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test
 
 @ExperimentalCoroutinesApi
 class SettingsViewModelTest {
-
     private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var viewModel: SettingsViewModel
@@ -38,199 +37,209 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `initial settings are loaded from repository`() = runTest {
-        val initialRepoSettings = GameSettings(pointsToWinSet = 21, showTitle = false)
-        fakeSettingsRepository.emitSettings(initialRepoSettings)
+    fun `initial settings are loaded from repository`() =
+        runTest {
+            val initialRepoSettings = GameSettings(pointsToWinSet = 21, showTitle = false)
+            fakeSettingsRepository.emitSettings(initialRepoSettings)
 
-        // Re-initialize ViewModel to trigger load with new emitted settings
-        viewModel = SettingsViewModel(fakeSettingsRepository)
-        testDispatcher.scheduler.advanceUntilIdle() // Ensure coroutines complete
+            // Re-initialize ViewModel to trigger load with new emitted settings
+            viewModel = SettingsViewModel(fakeSettingsRepository)
+            testDispatcher.scheduler.advanceUntilIdle() // Ensure coroutines complete
 
-        assertEquals(initialRepoSettings, viewModel.settings.first())
-    }
-
-    @Test
-    fun `updateShowTitle updates settings and saves`() = runTest {
-        val initialSettings = viewModel.settings.first()
-        val newValue = !initialSettings.showTitle
-
-        viewModel.updateShowTitle(newValue)
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        val updatedSettings = viewModel.settings.first()
-        assertEquals(newValue, updatedSettings.showTitle)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
-    }
+            assertEquals(initialRepoSettings, viewModel.settings.first())
+        }
 
     @Test
-    fun `updateShowNames updates settings and saves`() = runTest {
-        val initialSettings = viewModel.settings.first()
-        val newValue = !initialSettings.showNames
+    fun `updateShowTitle updates settings and saves`() =
+        runTest {
+            val initialSettings = viewModel.settings.first()
+            val newValue = !initialSettings.showTitle
 
-        viewModel.updateShowNames(newValue)
-        testDispatcher.scheduler.advanceUntilIdle()
+            viewModel.updateShowTitle(newValue)
+            testDispatcher.scheduler.advanceUntilIdle()
 
-
-        val updatedSettings = viewModel.settings.first()
-        assertEquals(newValue, updatedSettings.showNames)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
-    }
-
-    @Test
-    fun `updateShowSets updates settings and saves`() = runTest {
-        val initialSettings = viewModel.settings.first()
-        val newValue = !initialSettings.showSets
-
-        viewModel.updateShowSets(newValue)
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        val updatedSettings = viewModel.settings.first()
-        assertEquals(newValue, updatedSettings.showSets)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
-    }
+            val updatedSettings = viewModel.settings.first()
+            assertEquals(newValue, updatedSettings.showTitle)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+        }
 
     @Test
-    fun `updateMarkServe updates settings and saves`() = runTest {
-        val initialSettings = viewModel.settings.first()
-        val newValue = !initialSettings.markServe
+    fun `updateShowNames updates settings and saves`() =
+        runTest {
+            val initialSettings = viewModel.settings.first()
+            val newValue = !initialSettings.showNames
 
-        viewModel.updateMarkServe(newValue)
-        testDispatcher.scheduler.advanceUntilIdle()
+            viewModel.updateShowNames(newValue)
+            testDispatcher.scheduler.advanceUntilIdle()
 
-        val updatedSettings = viewModel.settings.first()
-        assertEquals(newValue, updatedSettings.markServe)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
-    }
-
-    @Test
-    fun `updateMarkDeuce updates settings and saves`() = runTest {
-        val initialSettings = viewModel.settings.first()
-        val newValue = !initialSettings.markDeuce
-
-        viewModel.updateMarkDeuce(newValue)
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        val updatedSettings = viewModel.settings.first()
-        assertEquals(newValue, updatedSettings.markDeuce)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
-    }
+            val updatedSettings = viewModel.settings.first()
+            assertEquals(newValue, updatedSettings.showNames)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+        }
 
     @Test
-    fun `updatePointsToWinSet updates settings, coerces value, and saves`() = runTest {
-        viewModel.updatePointsToWinSet(50)
-        testDispatcher.scheduler.advanceUntilIdle()
-        var updatedSettings = viewModel.settings.first()
-        assertEquals(50, updatedSettings.pointsToWinSet)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+    fun `updateShowSets updates settings and saves`() =
+        runTest {
+            val initialSettings = viewModel.settings.first()
+            val newValue = !initialSettings.showSets
 
-        // Test coercion (min)
-        viewModel.updatePointsToWinSet(0)
-        testDispatcher.scheduler.advanceUntilIdle()
-        updatedSettings = viewModel.settings.first()
-        assertEquals(1, updatedSettings.pointsToWinSet)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+            viewModel.updateShowSets(newValue)
+            testDispatcher.scheduler.advanceUntilIdle()
 
-        // Test coercion (max - 99 as per ViewModel logic)
-        viewModel.updatePointsToWinSet(150)
-        testDispatcher.scheduler.advanceUntilIdle()
-        updatedSettings = viewModel.settings.first()
-        assertEquals(99, updatedSettings.pointsToWinSet)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
-    }
+            val updatedSettings = viewModel.settings.first()
+            assertEquals(newValue, updatedSettings.showSets)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+        }
 
     @Test
-    fun `updateWinByTwo updates settings and saves`() = runTest {
-        val initialSettings = viewModel.settings.first()
-        val newValue = !initialSettings.winByTwo
+    fun `updateMarkServe updates settings and saves`() =
+        runTest {
+            val initialSettings = viewModel.settings.first()
+            val newValue = !initialSettings.markServe
 
-        viewModel.updateWinByTwo(newValue)
-        testDispatcher.scheduler.advanceUntilIdle()
+            viewModel.updateMarkServe(newValue)
+            testDispatcher.scheduler.advanceUntilIdle()
 
-        val updatedSettings = viewModel.settings.first()
-        assertEquals(newValue, updatedSettings.winByTwo)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
-    }
-
-
-    @Test
-    fun `updateNumberOfSets updates settings, coerces value, and saves`() = runTest {
-        viewModel.updateNumberOfSets(5)
-        testDispatcher.scheduler.advanceUntilIdle()
-        var updatedSettings = viewModel.settings.first()
-        assertEquals(5, updatedSettings.numberOfSets)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
-
-        // Test coercion (min)
-        viewModel.updateNumberOfSets(0)
-        testDispatcher.scheduler.advanceUntilIdle()
-        updatedSettings = viewModel.settings.first()
-        assertEquals(1, updatedSettings.numberOfSets)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
-
-        // Test coercion (max - 99 as per ViewModel logic)
-        viewModel.updateNumberOfSets(150)
-        testDispatcher.scheduler.advanceUntilIdle()
-        updatedSettings = viewModel.settings.first()
-        assertEquals(99, updatedSettings.numberOfSets)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
-    }
+            val updatedSettings = viewModel.settings.first()
+            assertEquals(newValue, updatedSettings.markServe)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+        }
 
     @Test
-    fun `updateServeRotationAfterPoints updates settings, coerces value, and saves`() = runTest {
-        viewModel.updateServeRotationAfterPoints(5)
-        testDispatcher.scheduler.advanceUntilIdle()
-        var updatedSettings = viewModel.settings.first()
-        assertEquals(5, updatedSettings.serveRotationAfterPoints)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+    fun `updateMarkDeuce updates settings and saves`() =
+        runTest {
+            val initialSettings = viewModel.settings.first()
+            val newValue = !initialSettings.markDeuce
 
-        // Test coercion (min)
-        viewModel.updateServeRotationAfterPoints(0)
-        testDispatcher.scheduler.advanceUntilIdle()
-        updatedSettings = viewModel.settings.first()
-        assertEquals(1, updatedSettings.serveRotationAfterPoints)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+            viewModel.updateMarkDeuce(newValue)
+            testDispatcher.scheduler.advanceUntilIdle()
 
-        // Test coercion (max - 99)
-        viewModel.updateServeRotationAfterPoints(150)
-        testDispatcher.scheduler.advanceUntilIdle()
-        updatedSettings = viewModel.settings.first()
-        assertEquals(99, updatedSettings.serveRotationAfterPoints)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
-    }
+            val updatedSettings = viewModel.settings.first()
+            assertEquals(newValue, updatedSettings.markDeuce)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+        }
 
     @Test
-    fun `updateServeChangeAfterDeuce updates settings, coerces value, and saves`() = runTest {
-        viewModel.updateServeChangeAfterDeuce(3)
-        testDispatcher.scheduler.advanceUntilIdle()
-        var updatedSettings = viewModel.settings.first()
-        assertEquals(3, updatedSettings.serveChangeAfterDeuce)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+    fun `updatePointsToWinSet updates settings, coerces value, and saves`() =
+        runTest {
+            viewModel.updatePointsToWinSet(50)
+            testDispatcher.scheduler.advanceUntilIdle()
+            var updatedSettings = viewModel.settings.first()
+            assertEquals(50, updatedSettings.pointsToWinSet)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
 
-        // Test coercion (min - 0 is allowed)
-        viewModel.updateServeChangeAfterDeuce(-5)
-        testDispatcher.scheduler.advanceUntilIdle()
-        updatedSettings = viewModel.settings.first()
-        assertEquals(0, updatedSettings.serveChangeAfterDeuce)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+            // Test coercion (min)
+            viewModel.updatePointsToWinSet(0)
+            testDispatcher.scheduler.advanceUntilIdle()
+            updatedSettings = viewModel.settings.first()
+            assertEquals(1, updatedSettings.pointsToWinSet)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
 
-        // Test coercion (max - 99)
-        viewModel.updateServeChangeAfterDeuce(150)
-        testDispatcher.scheduler.advanceUntilIdle()
-        updatedSettings = viewModel.settings.first()
-        assertEquals(99, updatedSettings.serveChangeAfterDeuce)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
-    }
+            // Test coercion (max - 99 as per ViewModel logic)
+            viewModel.updatePointsToWinSet(150)
+            testDispatcher.scheduler.advanceUntilIdle()
+            updatedSettings = viewModel.settings.first()
+            assertEquals(99, updatedSettings.pointsToWinSet)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+        }
 
     @Test
-    fun `updateWinnerServesNextGame updates settings and saves`() = runTest {
-        val initialSettings = viewModel.settings.first()
-        val newValue = !initialSettings.winnerServesNextGame
+    fun `updateWinByTwo updates settings and saves`() =
+        runTest {
+            val initialSettings = viewModel.settings.first()
+            val newValue = !initialSettings.winByTwo
 
-        viewModel.updateWinnerServesNextGame(newValue)
-        testDispatcher.scheduler.advanceUntilIdle()
+            viewModel.updateWinByTwo(newValue)
+            testDispatcher.scheduler.advanceUntilIdle()
 
-        val updatedSettings = viewModel.settings.first()
-        assertEquals(newValue, updatedSettings.winnerServesNextGame)
-        assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
-    }
+            val updatedSettings = viewModel.settings.first()
+            assertEquals(newValue, updatedSettings.winByTwo)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+        }
+
+    @Test
+    fun `updateNumberOfSets updates settings, coerces value, and saves`() =
+        runTest {
+            viewModel.updateNumberOfSets(5)
+            testDispatcher.scheduler.advanceUntilIdle()
+            var updatedSettings = viewModel.settings.first()
+            assertEquals(5, updatedSettings.numberOfSets)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+
+            // Test coercion (min)
+            viewModel.updateNumberOfSets(0)
+            testDispatcher.scheduler.advanceUntilIdle()
+            updatedSettings = viewModel.settings.first()
+            assertEquals(1, updatedSettings.numberOfSets)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+
+            // Test coercion (max - 99 as per ViewModel logic)
+            viewModel.updateNumberOfSets(150)
+            testDispatcher.scheduler.advanceUntilIdle()
+            updatedSettings = viewModel.settings.first()
+            assertEquals(99, updatedSettings.numberOfSets)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+        }
+
+    @Test
+    fun `updateServeRotationAfterPoints updates settings, coerces value, and saves`() =
+        runTest {
+            viewModel.updateServeRotationAfterPoints(5)
+            testDispatcher.scheduler.advanceUntilIdle()
+            var updatedSettings = viewModel.settings.first()
+            assertEquals(5, updatedSettings.serveRotationAfterPoints)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+
+            // Test coercion (min)
+            viewModel.updateServeRotationAfterPoints(0)
+            testDispatcher.scheduler.advanceUntilIdle()
+            updatedSettings = viewModel.settings.first()
+            assertEquals(1, updatedSettings.serveRotationAfterPoints)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+
+            // Test coercion (max - 99)
+            viewModel.updateServeRotationAfterPoints(150)
+            testDispatcher.scheduler.advanceUntilIdle()
+            updatedSettings = viewModel.settings.first()
+            assertEquals(99, updatedSettings.serveRotationAfterPoints)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+        }
+
+    @Test
+    fun `updateServeChangeAfterDeuce updates settings, coerces value, and saves`() =
+        runTest {
+            viewModel.updateServeChangeAfterDeuce(3)
+            testDispatcher.scheduler.advanceUntilIdle()
+            var updatedSettings = viewModel.settings.first()
+            assertEquals(3, updatedSettings.serveChangeAfterDeuce)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+
+            // Test coercion (min - 0 is allowed)
+            viewModel.updateServeChangeAfterDeuce(-5)
+            testDispatcher.scheduler.advanceUntilIdle()
+            updatedSettings = viewModel.settings.first()
+            assertEquals(0, updatedSettings.serveChangeAfterDeuce)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+
+            // Test coercion (max - 99)
+            viewModel.updateServeChangeAfterDeuce(150)
+            testDispatcher.scheduler.advanceUntilIdle()
+            updatedSettings = viewModel.settings.first()
+            assertEquals(99, updatedSettings.serveChangeAfterDeuce)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+        }
+
+    @Test
+    fun `updateWinnerServesNextGame updates settings and saves`() =
+        runTest {
+            val initialSettings = viewModel.settings.first()
+            val newValue = !initialSettings.winnerServesNextGame
+
+            viewModel.updateWinnerServesNextGame(newValue)
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            val updatedSettings = viewModel.settings.first()
+            assertEquals(newValue, updatedSettings.winnerServesNextGame)
+            assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+        }
 }

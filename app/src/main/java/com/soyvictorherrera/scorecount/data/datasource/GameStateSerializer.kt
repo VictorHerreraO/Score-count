@@ -13,28 +13,29 @@ import java.io.OutputStream
  * Handles reading and writing GameState to disk.
  */
 object GameStateSerializer : Serializer<GameStateProto> {
-
-    override val defaultValue: GameStateProto = GameStateProto.newBuilder()
-        .setPlayer1(
-            PlayerProto.newBuilder()
-                .setId(1)
-                .setName("Player 1")
-                .setScore(0)
-                .build()
-        )
-        .setPlayer2(
-            PlayerProto.newBuilder()
-                .setId(2)
-                .setName("Player 2")
-                .setScore(0)
-                .build()
-        )
-        .setServingPlayerId(1)
-        .setPlayer1SetsWon(0)
-        .setPlayer2SetsWon(0)
-        .setIsDeuce(false)
-        .setIsFinished(false)
-        .build()
+    override val defaultValue: GameStateProto =
+        GameStateProto
+            .newBuilder()
+            .setPlayer1(
+                PlayerProto
+                    .newBuilder()
+                    .setId(1)
+                    .setName("Player 1")
+                    .setScore(0)
+                    .build()
+            ).setPlayer2(
+                PlayerProto
+                    .newBuilder()
+                    .setId(2)
+                    .setName("Player 2")
+                    .setScore(0)
+                    .build()
+            ).setServingPlayerId(1)
+            .setPlayer1SetsWon(0)
+            .setPlayer2SetsWon(0)
+            .setIsDeuce(false)
+            .setIsFinished(false)
+            .build()
 
     override suspend fun readFrom(input: InputStream): GameStateProto {
         try {
@@ -44,7 +45,10 @@ object GameStateSerializer : Serializer<GameStateProto> {
         }
     }
 
-    override suspend fun writeTo(t: GameStateProto, output: OutputStream) {
+    override suspend fun writeTo(
+        t: GameStateProto,
+        output: OutputStream
+    ) {
         t.writeTo(output)
     }
 }

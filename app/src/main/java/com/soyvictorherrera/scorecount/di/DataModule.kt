@@ -28,32 +28,31 @@ private val Context.gameStateDataStore: DataStore<GameStateProto> by dataStore(
 @Module
 @InstallIn(SingletonComponent::class)
 object DataModule {
+    @Provides
+    @Singleton
+    fun provideAppDatabase(
+        @ApplicationContext context: Context
+    ): AppDatabase =
+        Room
+            .databaseBuilder(
+                context,
+                AppDatabase::class.java,
+                "score-count-database"
+            ).build()
 
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "score-count-database"
-        ).build()
-    }
+    fun provideMatchDao(database: AppDatabase): MatchDao = database.matchDao()
 
     @Provides
     @Singleton
-    fun provideMatchDao(database: AppDatabase): MatchDao {
-        return database.matchDao()
-    }
+    fun provideGameStateDataStore(
+        @ApplicationContext context: Context
+    ): DataStore<GameStateProto> = context.gameStateDataStore
 
     @Provides
     @Singleton
-    fun provideGameStateDataStore(@ApplicationContext context: Context): DataStore<GameStateProto> {
-        return context.gameStateDataStore
-    }
-
-    @Provides
-    @Singleton
-    fun provideSettingsDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
-        return context.settingsDataStore
-    }
+    fun provideSettingsDataStore(
+        @ApplicationContext context: Context
+    ): DataStore<Preferences> = context.settingsDataStore
 }

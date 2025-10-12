@@ -45,21 +45,25 @@ fun PlayerScoreCard(
         enabled = !isFinished,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isServing) {
-                MaterialTheme.colorScheme.surfaceVariant
-            } else {
-                MaterialTheme.colorScheme.surfaceContainer
-            }
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isServing) 4.dp else 1.dp
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    if (isServing) {
+                        MaterialTheme.colorScheme.surfaceVariant
+                    } else {
+                        MaterialTheme.colorScheme.surfaceContainer
+                    }
+            ),
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = if (isServing) 4.dp else 1.dp
+            )
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
         ) {
             Column(
                 modifier = Modifier.align(Alignment.Center),
@@ -93,8 +97,9 @@ fun PlayerScoreCard(
                 )
             }
             Row(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd),
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomEnd),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 SmallIconButton(

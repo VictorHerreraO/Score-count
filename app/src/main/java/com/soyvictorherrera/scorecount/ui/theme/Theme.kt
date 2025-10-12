@@ -11,36 +11,37 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = DarkPrimary,
-    secondary = DarkAccentGreen,
-    background = DarkBackground,
-    surface = DarkBackground,
-    surfaceVariant = DarkCardServing,
-    surfaceContainer = DarkCardNormal,
-    onSurface = DarkOnSurface,
-    onSurfaceVariant = DarkOnSurfaceVariant,
-    onPrimary = Color.White,
-    surfaceContainerHighest = DarkButtonBg
-)
+private val DarkColorScheme =
+    darkColorScheme(
+        primary = DarkPrimary,
+        secondary = DarkAccentGreen,
+        background = DarkBackground,
+        surface = DarkBackground,
+        surfaceVariant = DarkCardServing,
+        surfaceContainer = DarkCardNormal,
+        onSurface = DarkOnSurface,
+        onSurfaceVariant = DarkOnSurfaceVariant,
+        onPrimary = Color.White,
+        surfaceContainerHighest = DarkButtonBg
+    )
 
-private val LightColorScheme = lightColorScheme(
-    primary = LightPrimary,
-    secondary = LightAccentGreen,
-    background = LightBackground,
-    surface = LightBackground,
-    surfaceVariant = LightCardServing,
-    surfaceContainer = LightCardNormal,
-    onSurface = LightOnSurface,
-    onSurfaceVariant = LightOnSurfaceVariant,
-    onPrimary = Color.White,
-    surfaceContainerHighest = LightButtonBg
-)
+private val LightColorScheme =
+    lightColorScheme(
+        primary = LightPrimary,
+        secondary = LightAccentGreen,
+        background = LightBackground,
+        surface = LightBackground,
+        surfaceVariant = LightCardServing,
+        surfaceContainer = LightCardNormal,
+        onSurface = LightOnSurface,
+        onSurfaceVariant = LightOnSurfaceVariant,
+        onPrimary = Color.White,
+        surfaceContainerHighest = LightButtonBg
+    )
 
 @Composable
 fun ScoreCountTheme(
@@ -49,15 +50,16 @@ fun ScoreCountTheme(
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+    val colorScheme =
+        when {
+            dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+                val context = LocalContext.current
+                if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+            darkTheme -> DarkColorScheme
+            else -> LightColorScheme
+        }
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -66,7 +68,8 @@ fun ScoreCountTheme(
             // WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme // Removed
             // Modern approach: Control system bar appearance (light/dark icons)
             val insetsController = WindowCompat.getInsetsController(window, view)
-            insetsController.isAppearanceLightStatusBars = !darkTheme // Light icons for dark theme, Dark icons for light theme
+            // Light icons for dark theme, Dark icons for light theme
+            insetsController.isAppearanceLightStatusBars = !darkTheme
             // For coloring, typically done by setting window.statusBarColor = Color.Transparent.toArgb()
             // and then using WindowCompat.setDecorFitsSystemWindows(window, false) and drawing behind.
             // Or, rely on the XML theme's statusBarColor (e.g. via colorSurface).

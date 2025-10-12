@@ -21,10 +21,11 @@ fun SmallIconButton(
         onClick = onClick,
         enabled = enabled,
         modifier = Modifier.size(32.dp),
-        colors = IconButtonDefaults.filledIconButtonColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        colors =
+            IconButtonDefaults.filledIconButtonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
     ) {
         Icon(icon, contentDescription = description)
     }
