@@ -3,11 +3,89 @@
 This file tracks the current state of development for the Score-Count application.
 
 ## Current Branch
-- `feature/issue-24-enhanced-serve-indicator`
+- `feature/issue-21-add-ktlint`
 - **Status**: Ready for review
-- **PR**: #25
+- **PR**: #29
+- Previously on: `feature/issue-24-enhanced-serve-indicator` (Ready for review, PR #25)
 
-## Recently Completed: Task #24 - Enhanced Serve Indicator + UI Overhaul
+## Recently Completed: Task #22 - Add detekt for Kotlin Static Code Analysis
+
+### What Was Accomplished
+Integrated detekt (v1.23.8) into the project to provide static code analysis for Kotlin code, complementing the existing ktlint formatting tool.
+
+### Key Changes
+
+**1. Gradle Configuration**
+- Added detekt plugin (v1.23.8) to version catalog (`gradle/libs.versions.toml:17,81`)
+- Applied plugin in root `build.gradle.kts:9` and app `build.gradle.kts:9`
+- Configured detekt with parallel execution, baseline support, and HTML/XML reports
+
+**2. detekt Configuration File** (`detekt.yml`)
+- Created comprehensive configuration extending default rules
+- Customized for Android/Compose projects:
+  - Ignores `@Composable` functions for naming conventions
+  - Adjusted complexity thresholds (methods: 15, classes: 600, long method: 60 lines)
+  - Configured parameter limits (functions: 6, constructors: 7)
+  - Enabled coroutine-specific rules
+  - Set max line length to 120 (matching EditorConfig)
+- Baseline created with 31 existing violations (will be addressed incrementally)
+
+**3. Pre-commit Hook Enhancement** (`.git/hooks/pre-commit`)
+- Updated to run both ktlint and detekt before commits
+- Two-step process:
+  1. ktlint auto-formats code
+  2. detekt validates code quality
+- Blocks commits if either check fails
+- Provides clear feedback with report locations
+
+**4. Documentation Updates** (`README.md`)
+- Added detekt section to "Code Quality"
+- Documented available commands (`detekt`, `detektBaseline`)
+- Explained report locations and common findings
+- Updated pre-commit hook setup instructions
+
+### Technical Details
+- **Files Modified**:
+  - `gradle/libs.versions.toml` (version catalog)
+  - `build.gradle.kts` (root plugin declaration)
+  - `app/build.gradle.kts` (plugin application + configuration)
+  - `.git/hooks/pre-commit` (quality checks)
+  - `README.md` (documentation)
+- **Files Created**:
+  - `detekt.yml` (configuration)
+  - `detekt-baseline.xml` (baseline for existing violations)
+- **Build Status**: All checks passing (build, test, lint, ktlint, detekt)
+- **Commits**:
+  - `625c7df` - feat: Add ktlint for Kotlin code formatting
+  - `be54663` - docs: Add pre-commit hook setup instructions to README
+  - `69805c9` - feat: Add detekt for Kotlin static code analysis
+
+### Configuration Highlights
+- **Tool Version**: detekt 1.23.8 (latest stable)
+- **Build Upon Default**: Yes (extends default rules)
+- **Parallel Execution**: Enabled for faster analysis
+- **Ignore Failures**: No (blocks build on violations)
+- **Baseline**: Created with 31 existing issues
+- **Reports**: HTML and XML (in `app/build/reports/detekt/`)
+- **Exclusions**: Generated code, build artifacts
+
+### Acceptance Criteria Met
+- ✅ detekt Gradle plugin configured for all project modules
+- ✅ Default detekt rules applied (extended with custom config)
+- ✅ Gradle tasks available: `./gradlew detekt`, reports generated
+- ✅ Pre-commit hook configured to run detekt and block on violations
+- ✅ Baseline file created for existing violations (`detekt-baseline.xml`)
+- ✅ Documentation updated with usage instructions and report interpretation
+- ✅ IDE integration plan documented in PR #29
+- ✅ CI/CD integration plan documented in PR #29
+
+### Pull Request
+- **PR #29**: Feature: Add code quality tools (ktlint + detekt)
+- **Status**: Open, ready for review
+- **URL**: https://github.com/VictorHerreraO/Score-count/pull/29
+- Comprehensive PR combining both ktlint (#21) and detekt (#22) implementations
+
+## Previously Completed: Task #24 - Enhanced Serve Indicator + UI Overhaul
 
 ### What Was Accomplished
 Implemented enhanced visual feedback for the serve indicator with a comprehensive UI redesign to match design specifications provided in screenshots.
