@@ -161,10 +161,10 @@ class SettingsViewModelTest {
     @Test
     fun `updateNumberOfSets updates settings, coerces value, and saves`() =
         runTest {
-            viewModel.updateNumberOfSets(5)
+            viewModel.updateNumberOfSets(7)
             testDispatcher.scheduler.advanceUntilIdle()
             var updatedSettings = viewModel.settings.first()
-            assertEquals(5, updatedSettings.numberOfSets)
+            assertEquals(7, updatedSettings.numberOfSets)
             assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
 
             // Test coercion (min)
