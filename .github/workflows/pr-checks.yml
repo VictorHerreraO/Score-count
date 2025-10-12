@@ -59,8 +59,11 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
+          check_name: Test Results
           files: |
             **/build/test-results/**/*.xml
+          report_individual_runs: true
+          deduplicate_classes_by_file_name: false
 
       - name: Run Lint Checks
         run: ./gradlew lint --no-daemon --stacktrace
