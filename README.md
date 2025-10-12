@@ -57,25 +57,26 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 2.  **Set up pre-commit hook (optional but recommended):**
 
-    This project uses ktlint for code formatting. The pre-commit hook automatically formats Kotlin files before each commit.
+    This project uses ktlint for code formatting and detekt for static code analysis. The pre-commit hook automatically runs these checks before each commit.
 
     ```bash
     cat > .git/hooks/pre-commit << 'EOF'
     #!/bin/bash
-    # ktlint pre-commit hook
-    # Auto-formats Kotlin files before commit
+    # Code quality pre-commit hook
+    # Runs ktlint formatting and detekt static analysis before commit
 
-    echo "Running ktlint format on staged files..."
+    echo "Running code quality checks on staged files..."
 
     # Get list of staged Kotlin files
     STAGED_KOTLIN_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.kt$|\.kts$' || true)
 
     if [ -z "$STAGED_KOTLIN_FILES" ]; then
-        echo "No Kotlin files to format"
+        echo "No Kotlin files to check"
         exit 0
     fi
 
-    # Run ktlint format on all files
+    # Step 1: Run ktlint format on all files
+    echo "1/2 Running ktlint format..."
     ./gradlew ktlintFormat --quiet
 
     # Check ktlint status
@@ -92,6 +93,21 @@ Follow these instructions to get a copy of the project up and running on your lo
     done
 
     echo "✅ ktlint format completed successfully"
+
+    # Step 2: Run detekt static analysis
+    echo "2/2 Running detekt static analysis..."
+    ./gradlew detekt --quiet
+
+    # Check detekt status
+    if [ $? -ne 0 ]; then
+        echo "❌ detekt found code quality issues. Please review the report at:"
+        echo "   app/build/reports/detekt/detekt.html"
+        echo "   Fix the issues or update the baseline if appropriate."
+        exit 1
+    fi
+
+    echo "✅ detekt analysis passed"
+    echo "✅ All code quality checks passed successfully"
     exit 0
     EOF
 
@@ -110,14 +126,42 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 ### Code Quality
 
-This project uses ktlint for Kotlin code formatting. Available commands:
+This project uses multiple code quality tools to ensure clean, maintainable code:
+
+#### ktlint (Code Formatting)
+Automatically formats Kotlin code according to the official Kotlin coding conventions.
 
 ```bash
 ./gradlew ktlintCheck    # Check code formatting
 ./gradlew ktlintFormat   # Auto-fix formatting issues
 ```
 
+#### detekt (Static Code Analysis)
+Analyzes Kotlin code for code smells, complexity issues, and potential bugs.
+
+```bash
+./gradlew detekt              # Run static code analysis
+./gradlew detektBaseline      # Update baseline for existing violations
+```
+
+**Understanding detekt Reports:**
+- Reports are generated in `app/build/reports/detekt/`
+- `detekt.html` - Detailed HTML report with findings and suggestions
+- `detekt.xml` - XML report for CI/CD integration
+- The baseline file (`detekt-baseline.xml`) tracks known violations to focus on new code quality
+
+**Common detekt Findings:**
+- **Complexity**: Functions or classes that are too complex
+- **Code Smells**: Patterns that may indicate deeper problems
+- **Style**: Kotlin idiom and best practice violations
+- **Performance**: Potential performance improvements
+
 The `.editorconfig` file contains project-wide style rules that are automatically applied by most IDEs.
+
+#### Configuration Files
+- `.editorconfig` - IDE code style settings
+- `detekt.yml` - detekt static analysis rules
+- `detekt-baseline.xml` - Baseline of known violations (auto-generated)
 
 ## Contributing
 

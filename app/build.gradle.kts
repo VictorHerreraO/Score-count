@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.protobuf)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
 }
 
 android {
@@ -133,4 +134,25 @@ ktlint {
         exclude("**/generated/**")
         exclude("**/build/**")
     }
+}
+
+detekt {
+    toolVersion = "1.23.8"
+    config.setFrom(files("$rootDir/detekt.yml"))
+    buildUponDefaultConfig = true
+    allRules = false
+    baseline = file("$rootDir/detekt-baseline.xml")
+    ignoreFailures = false
+    parallel = true
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        txt.required.set(false)
+        sarif.required.set(false)
+        md.required.set(false)
+    }
+    exclude("**/generated/**", "**/build/**")
 }
