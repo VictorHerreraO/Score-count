@@ -2,12 +2,14 @@ package com.soyvictorherrera.scorecount.ui.scorescreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.soyvictorherrera.scorecount.di.DefaultDispatcher
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.domain.model.Match
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import com.soyvictorherrera.scorecount.domain.usecase.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,7 +24,8 @@ class ScoreViewModel
         private val manualSwitchServeUseCase: ManualSwitchServeUseCase,
         private val resetGameUseCase: ResetGameUseCase,
         private val saveMatchUseCase: SaveMatchUseCase,
-        settingsRepository: SettingsRepository
+        settingsRepository: SettingsRepository,
+        @DefaultDispatcher private val dispatcher: CoroutineDispatcher
     ) : ViewModel() {
         // Directly expose StateFlows from repositories - no need for intermediate copying
         val gameState: StateFlow<GameState> = scoreRepository.getGameState()
@@ -30,7 +33,7 @@ class ScoreViewModel
 
         init {
             // Monitor game state changes to auto-save matches
-            viewModelScope.launch {
+            viewModelScope.launch(dispatcher) {
                 var previousState: GameState? = null
                 gameState.collect { currentGameState ->
                     if (currentGameState.isFinished && previousState?.isFinished == false) {

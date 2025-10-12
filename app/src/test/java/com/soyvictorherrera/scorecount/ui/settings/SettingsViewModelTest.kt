@@ -28,7 +28,7 @@ class SettingsViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         fakeSettingsRepository = FakeSettingsRepository()
-        viewModel = SettingsViewModel(fakeSettingsRepository)
+        viewModel = SettingsViewModel(fakeSettingsRepository, testDispatcher)
     }
 
     @AfterEach
@@ -43,7 +43,7 @@ class SettingsViewModelTest {
             fakeSettingsRepository.emitSettings(initialRepoSettings)
 
             // Re-initialize ViewModel to trigger load with new emitted settings
-            viewModel = SettingsViewModel(fakeSettingsRepository)
+            viewModel = SettingsViewModel(fakeSettingsRepository, testDispatcher)
             testDispatcher.scheduler.advanceUntilIdle() // Ensure coroutines complete
 
             assertEquals(initialRepoSettings, viewModel.settings.first())

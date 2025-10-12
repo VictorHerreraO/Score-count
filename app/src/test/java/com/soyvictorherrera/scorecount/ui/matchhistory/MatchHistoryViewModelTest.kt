@@ -30,7 +30,7 @@ class MatchHistoryViewModelTest {
         Dispatchers.setMain(testDispatcher)
         fakeMatchRepository = FakeMatchRepository()
         val getMatchesUseCase = GetMatchesUseCase(fakeMatchRepository)
-        viewModel = MatchHistoryViewModel(getMatchesUseCase)
+        viewModel = MatchHistoryViewModel(getMatchesUseCase, testDispatcher)
     }
 
     @AfterEach
@@ -77,7 +77,7 @@ class MatchHistoryViewModelTest {
 
             // Re-create ViewModel to trigger init block with pre-populated matches
             val getMatchesUseCase = GetMatchesUseCase(fakeMatchRepository)
-            viewModel = MatchHistoryViewModel(getMatchesUseCase)
+            viewModel = MatchHistoryViewModel(getMatchesUseCase, testDispatcher)
 
             // When
             testDispatcher.scheduler.advanceUntilIdle()
@@ -130,7 +130,7 @@ class MatchHistoryViewModelTest {
                 }
 
             val getMatchesUseCase = GetMatchesUseCase(errorRepository)
-            viewModel = MatchHistoryViewModel(getMatchesUseCase)
+            viewModel = MatchHistoryViewModel(getMatchesUseCase, testDispatcher)
 
             // When
             testDispatcher.scheduler.advanceUntilIdle()
@@ -179,7 +179,7 @@ class MatchHistoryViewModelTest {
 
             // Re-create ViewModel
             val getMatchesUseCase = GetMatchesUseCase(fakeMatchRepository)
-            viewModel = MatchHistoryViewModel(getMatchesUseCase)
+            viewModel = MatchHistoryViewModel(getMatchesUseCase, testDispatcher)
 
             // When
             testDispatcher.scheduler.advanceUntilIdle()

@@ -49,7 +49,8 @@ class ScoreViewModelTest {
                 manualSwitchServeUseCase = manualSwitchServeUseCase,
                 resetGameUseCase = resetGameUseCase,
                 saveMatchUseCase = saveMatchUseCase,
-                settingsRepository = fakeSettingsRepository
+                settingsRepository = fakeSettingsRepository,
+                dispatcher = testDispatcher
             )
     }
 
@@ -218,7 +219,8 @@ class ScoreViewModelTest {
                     manualSwitchServeUseCase = manualSwitchServeUseCase,
                     resetGameUseCase = resetGameUseCase,
                     saveMatchUseCase = newSaveMatchUseCase,
-                    settingsRepository = fakeSettingsRepository
+                    settingsRepository = fakeSettingsRepository,
+                    dispatcher = testDispatcher
                 )
 
             testDispatcher.scheduler.advanceUntilIdle()
@@ -268,9 +270,9 @@ class ScoreViewModelTest {
                     manualSwitchServeUseCase = manualSwitchServeUseCase,
                     resetGameUseCase = resetGameUseCase,
                     saveMatchUseCase = newSaveMatchUseCase,
-                    settingsRepository = fakeSettingsRepository
+                    settingsRepository = fakeSettingsRepository,
+                    dispatcher = testDispatcher
                 )
-
             testDispatcher.scheduler.advanceUntilIdle()
 
             // When - State remains finished (no transition from false to true)
