@@ -128,6 +128,24 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 This project uses multiple code quality tools to ensure clean, maintainable code:
 
+#### Continuous Integration
+
+All pull requests are automatically validated using GitHub Actions. The CI pipeline runs the following checks:
+
+1. **Build Compilation** - Verifies code compiles without errors
+2. **Test Compilation** - Ensures test code compiles correctly
+3. **Unit Tests** - Runs the full test suite
+4. **Lint Checks** - Android lint analysis
+5. **Code Formatting** - ktlint validation
+6. **Static Analysis** - detekt code quality checks
+
+Pull requests must pass all checks before merging. You can run these checks locally to catch issues early:
+
+```bash
+# Run all checks (same as CI)
+./gradlew clean build test lint ktlintCheck detekt
+```
+
 #### ktlint (Code Formatting)
 Automatically formats Kotlin code according to the official Kotlin coding conventions.
 
@@ -162,6 +180,7 @@ The `.editorconfig` file contains project-wide style rules that are automaticall
 - `.editorconfig` - IDE code style settings
 - `detekt.yml` - detekt static analysis rules
 - `detekt-baseline.xml` - Baseline of known violations (auto-generated)
+- `.github/workflows/pr-checks.yml` - CI/CD pipeline configuration
 
 ## Contributing
 
