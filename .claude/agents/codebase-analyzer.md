@@ -1,6 +1,37 @@
 ---
 name: codebase-analyzer
-description: Use this agent when you need to understand how a feature is implemented, explore relationships between components, or get a comprehensive overview of code structure without polluting the main conversation context. Specifically use this agent when:\n\n- A user asks "How does [feature] work?" or "Can you explain the implementation of [component]?"\n- You need to trace dependencies or relationships between classes/modules before proposing changes\n- Initial planning requires understanding multiple interconnected files\n- You need to map out the architecture of a specific feature area\n- A user requests "Give me an overview of [file/module/feature]"\n- Before refactoring, when you need to understand the full scope of affected code\n\nExamples:\n\n<example>\nContext: User wants to understand how match persistence works before adding a new feature.\nuser: "I want to add a feature to export match history. Can you first explain how matches are currently saved and loaded?"\nassistant: "I'll use the codebase-analyzer agent to investigate the match persistence implementation and provide you with a comprehensive overview."\n<Task tool call to codebase-analyzer with context about match persistence>\n</example>\n\n<example>\nContext: User asks about a specific file's purpose and relationships.\nuser: "What does MatchRepository.kt do and what other components does it interact with?"\nassistant: "Let me use the codebase-analyzer agent to examine MatchRepository.kt and map out its relationships with other components."\n<Task tool call to codebase-analyzer with focus on MatchRepository.kt>\n</example>\n\n<example>\nContext: Planning a feature requires understanding current implementation.\nuser: "I want to add undo functionality to the score tracking"\nassistant: "Before we implement undo functionality, I should analyze how score changes are currently handled. Let me use the codebase-analyzer agent to investigate the score management flow."\n<Task tool call to codebase-analyzer to examine score tracking implementation>\n</example>
+description: |
+  Use this agent when you need to understand how a feature is implemented, explore relationships between components, or get a comprehensive overview of code structure without polluting the main conversation context. Specifically use this agent when:
+
+  - A user asks "How does [feature] work?" or "Can you explain the implementation of [component]?"
+  - You need to trace dependencies or relationships between classes/modules before proposing changes
+  - Initial planning requires understanding multiple interconnected files
+  - You need to map out the architecture of a specific feature area
+  - A user requests "Give me an overview of [file/module/feature]"
+  - Before refactoring, when you need to understand the full scope of affected code
+
+  Examples:
+
+  <example>
+  Context: User wants to understand how match persistence works before adding a new feature.
+  user: "I want to add a feature to export match history. Can you first explain how matches are currently saved and loaded?"
+  assistant: "I'll use the codebase-analyzer agent to investigate the match persistence implementation and provide you with a comprehensive overview."
+  <Task tool call to codebase-analyzer with context about match persistence>
+  </example>
+
+  <example>
+  Context: User asks about a specific file's purpose and relationships.
+  user: "What does MatchRepository.kt do and what other components does it interact with?"
+  assistant: "Let me use the codebase-analyzer agent to examine MatchRepository.kt and map out its relationships with other components."
+  <Task tool call to codebase-analyzer with focus on MatchRepository.kt>
+  </example>
+
+  <example>
+  Context: Planning a feature requires understanding current implementation.
+  user: "I want to add undo functionality to the score tracking"
+  assistant: "Before we implement undo functionality, I should analyze how score changes are currently handled. Let me use the codebase-analyzer agent to investigate the score management flow."
+  <Task tool call to codebase-analyzer to examine score tracking implementation>
+  </example>
 tools: Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell
 model: sonnet
 ---
