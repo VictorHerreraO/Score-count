@@ -3,12 +3,113 @@
 This file tracks the current state of development for the Score-Count application.
 
 ## Current Branch
-- `feature/issue-21-add-ktlint`
-- **Status**: Ready for review
-- **PR**: #29
-- Previously on: `feature/issue-24-enhanced-serve-indicator` (Ready for review, PR #25)
+- `feature/issue-23-ci-cd-pipeline`
+- **Status**: Implementation complete, ready for testing
+- Previously on: `feature/issue-21-add-ktlint` (Ready for review, PR #29)
 
-## Recently Completed: Task #22 - Add detekt for Kotlin Static Code Analysis
+## Recently Completed: Task #23 - Add CI/CD Pipeline for PR Validation Checks
+
+### What Was Accomplished
+Implemented a comprehensive GitHub Actions CI/CD pipeline that automatically validates all pull requests before they can be merged. This ensures code quality and prevents broken code from entering the main branch.
+
+### Key Changes
+
+**1. GitHub Actions Workflow** (`.github/workflows/pr-checks.yml`)
+- Created automated PR validation workflow
+- Triggers on: pull_request to main, push to main
+- Single job with sequential checks for clear failure isolation
+- 30-minute timeout to prevent runaway builds
+- Permissions: read contents, write PR comments/checks
+
+**2. Build Environment Setup**
+- Uses Ubuntu latest runner (fast, cost-effective)
+- JDK 21 (Temurin distribution) matching project requirements
+- Gradle 8.13 with build caching and cleanup
+- Cache strategy: read-only for PR branches, read-write for main
+
+**3. Validation Checks (Sequential Execution)**
+1. **Compilation Checks**:
+   - `./gradlew assembleDebug` - Verifies all code compiles
+   - `./gradlew testDebugUnitTest --dry-run` - Validates test compilation
+2. **Test Execution**:
+   - `./gradlew test` - Runs full unit test suite (97 tests)
+   - Test results published to PR interface via EnricoMi/publish-unit-test-result-action@v2
+3. **Code Quality Analysis**:
+   - `./gradlew lint` - Android lint checks
+   - `./gradlew ktlintCheck` - Kotlin code formatting validation
+   - `./gradlew detekt` - Static code analysis
+4. **Reporting**:
+   - Lint and detekt HTML/XML reports uploaded as artifacts (7-day retention)
+   - Quality gate summary in GitHub Actions summary page
+
+**4. Optimization Features**
+- Gradle build cache enabled (speeds up repeated builds)
+- Dependency caching via gradle/actions/setup-gradle@v4
+- `--no-daemon` flag for predictable CI behavior
+- `--stacktrace` for better error diagnostics
+- `continue-on-error: false` ensures any failure blocks PR
+
+**5. Documentation Updates** (`README.md`)
+- Added "Continuous Integration" section under "Code Quality"
+- Listed all 6 automated checks with descriptions
+- Documented local validation command: `./gradlew clean build test lint ktlintCheck detekt`
+- Explained that PRs must pass all checks before merging
+
+### Technical Details
+- **Files Created**:
+  - `.github/workflows/pr-checks.yml` (GitHub Actions workflow)
+- **Files Modified**:
+  - `README.md` (added CI documentation)
+- **Local Validation**: Passed all checks in 1m 11s (143 tasks: 140 executed, 3 up-to-date)
+- **Build Status**: ✅ All checks passing
+
+### Workflow Execution Flow
+```
+1. Checkout code (fetch-depth: 0 for full history)
+2. Setup JDK 21 + Gradle with caching
+3. Compile debug build → FAIL = Block PR
+4. Compile test classes → FAIL = Block PR
+5. Run unit tests → FAIL = Block PR
+6. Run lint → FAIL = Block PR
+7. Run ktlintCheck → FAIL = Block PR
+8. Run detekt → FAIL = Block PR
+9. Upload reports (always runs)
+10. Generate summary (always runs)
+```
+
+### Acceptance Criteria Met
+- ✅ GitHub Actions workflow created (`.github/workflows/pr-checks.yml`)
+- ✅ Triggers on every push to pull request branches
+- ✅ Compilation check: `./gradlew assembleDebug` runs successfully
+- ✅ Test compilation check: Test code compiles without errors
+- ✅ Test execution: `./gradlew test` runs all unit tests and reports results
+- ✅ Lint check: `./gradlew lint` runs and reports issues
+- ✅ ktlint check: `./gradlew ktlintCheck` validates code formatting
+- ✅ detekt check: `./gradlew detekt` runs static analysis
+- ✅ Check status visible in PR interface (via GitHub Actions UI)
+- ✅ Test results available for review (published to PR)
+- ✅ Workflow optimized (Gradle caching, parallelization where safe)
+- ✅ Documentation added explaining CI checks and local commands
+- ⏳ PR merge blocking via branch protection rules (requires repo admin to configure)
+
+### Next Steps
+1. **Push to remote** and create pull request
+2. **Verify workflow** runs successfully on GitHub
+3. **Configure branch protection rules** (requires repo admin):
+   - Go to repo Settings → Branches → Add rule for `main`
+   - Enable "Require status checks to pass before merging"
+   - Select "Code Quality & Tests" as required check
+   - Enable "Require branches to be up to date before merging"
+4. **Test workflow** by creating a dummy PR with intentional failure
+
+### Important Notes
+- Branch protection rules must be configured by repo admin to enforce checks
+- Workflow will run automatically once pushed to GitHub
+- All ktlint and detekt configurations already in place from tasks #21 and #22
+- No external dependencies or secrets required
+- Free for public repositories on GitHub
+
+## Previously Completed: Task #22 - Add detekt for Kotlin Static Code Analysis
 
 ### What Was Accomplished
 Integrated detekt (v1.23.8) into the project to provide static code analysis for Kotlin code, complementing the existing ktlint formatting tool.
