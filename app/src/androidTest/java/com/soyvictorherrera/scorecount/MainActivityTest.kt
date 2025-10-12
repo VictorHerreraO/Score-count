@@ -18,7 +18,6 @@ import org.junit.runner.RunWith
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
-
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -53,9 +52,10 @@ class MainActivityTest {
         composeTestRule.waitForIdle()
 
         // Check for the menu icon (typically "More options" or similar)
-        composeTestRule.onNodeWithContentDescription(
-            "More options",
-            useUnmergedTree = true
-        ).assertExists()
+        composeTestRule
+            .onNodeWithContentDescription(
+                "More options",
+                useUnmergedTree = true
+            ).assertExists()
     }
 }

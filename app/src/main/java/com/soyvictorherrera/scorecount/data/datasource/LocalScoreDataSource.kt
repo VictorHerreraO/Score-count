@@ -22,30 +22,33 @@ import javax.inject.Singleton
  * This component contains NO business logic - all game rules are in the domain layer (ScoreCalculator).
  */
 @Singleton
-class LocalScoreDataSource @Inject constructor(
-    private val dataStore: DataStore<GameStateProto>
-) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+class LocalScoreDataSource
+    @Inject
+    constructor(
+        private val dataStore: DataStore<GameStateProto>
+    ) {
+        private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    /**
-     * GameState loaded from disk and exposed as StateFlow.
-     * Automatically restored on app restart.
-     */
-    val gameState: StateFlow<GameState> = dataStore.data
-        .map { proto -> proto.toDomain() }
-        .stateIn(
-            scope = scope,
-            started = SharingStarted.Eagerly,
-            initialValue = GameStateSerializer.defaultValue.toDomain()
-        )
+        /**
+         * GameState loaded from disk and exposed as StateFlow.
+         * Automatically restored on app restart.
+         */
+        val gameState: StateFlow<GameState> =
+            dataStore.data
+                .map { proto -> proto.toDomain() }
+                .stateIn(
+                    scope = scope,
+                    started = SharingStarted.Eagerly,
+                    initialValue = GameStateSerializer.defaultValue.toDomain()
+                )
 
-    /**
-     * Update the game state and persist to disk.
-     * This is the only write method - all state mutations go through here.
-     */
-    fun updateState(newState: GameState) {
-        scope.launch {
-            dataStore.updateData { newState.toProto() }
+        /**
+         * Update the game state and persist to disk.
+         * This is the only write method - all state mutations go through here.
+         */
+        fun updateState(newState: GameState) {
+            scope.launch {
+                dataStore.updateData { newState.toProto() }
+            }
         }
     }
-}

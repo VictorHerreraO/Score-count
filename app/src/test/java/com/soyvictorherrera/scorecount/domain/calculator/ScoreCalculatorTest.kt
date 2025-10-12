@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class ScoreCalculatorTest {
-
     private lateinit var player1: Player
     private lateinit var player2: Player
     private lateinit var defaultSettings: GameSettings
@@ -21,24 +20,26 @@ class ScoreCalculatorTest {
         player1 = Player(id = 1, name = "Player 1", score = 0)
         player2 = Player(id = 2, name = "Player 2", score = 0)
 
-        defaultSettings = GameSettings(
-            pointsToWinSet = 11,
-            winByTwo = true,
-            numberOfSets = 5,
-            serveRotationAfterPoints = 2,
-            serveChangeAfterDeuce = 1,
-            winnerServesNextGame = true
-        )
+        defaultSettings =
+            GameSettings(
+                pointsToWinSet = 11,
+                winByTwo = true,
+                numberOfSets = 5,
+                serveRotationAfterPoints = 2,
+                serveChangeAfterDeuce = 1,
+                winnerServesNextGame = true
+            )
 
-        initialState = GameState(
-            player1 = player1,
-            player2 = player2,
-            servingPlayerId = player1.id,
-            player1SetsWon = 0,
-            player2SetsWon = 0,
-            isDeuce = false,
-            isFinished = false
-        )
+        initialState =
+            GameState(
+                player1 = player1,
+                player2 = player2,
+                servingPlayerId = player1.id,
+                player1SetsWon = 0,
+                player2SetsWon = 0,
+                isDeuce = false,
+                isFinished = false
+            )
     }
 
     @Test
@@ -59,10 +60,11 @@ class ScoreCalculatorTest {
 
     @Test
     fun `incrementScore detects deuce at 10-10`() {
-        val state = initialState.copy(
-            player1 = player1.copy(score = 10),
-            player2 = player2.copy(score = 9)
-        )
+        val state =
+            initialState.copy(
+                player1 = player1.copy(score = 10),
+                player2 = player2.copy(score = 9)
+            )
 
         val newState = ScoreCalculator.incrementScore(state, defaultSettings, player2.id)
 
@@ -73,10 +75,11 @@ class ScoreCalculatorTest {
 
     @Test
     fun `incrementScore wins set at 11-9 without deuce`() {
-        val state = initialState.copy(
-            player1 = player1.copy(score = 10),
-            player2 = player2.copy(score = 9)
-        )
+        val state =
+            initialState.copy(
+                player1 = player1.copy(score = 10),
+                player2 = player2.copy(score = 9)
+            )
 
         val newState = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
 
@@ -89,11 +92,12 @@ class ScoreCalculatorTest {
 
     @Test
     fun `incrementScore requires win by 2 in deuce`() {
-        val state = initialState.copy(
-            player1 = player1.copy(score = 10),
-            player2 = player2.copy(score = 10),
-            isDeuce = true
-        )
+        val state =
+            initialState.copy(
+                player1 = player1.copy(score = 10),
+                player2 = player2.copy(score = 10),
+                isDeuce = true
+            )
 
         // Score 11-10, should not win yet
         val afterP1Scores = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
@@ -110,12 +114,13 @@ class ScoreCalculatorTest {
 
     @Test
     fun `incrementScore finishes match when player wins 3 sets in best of 5`() {
-        val state = initialState.copy(
-            player1 = player1.copy(score = 10),
-            player2 = player2.copy(score = 5),
-            player1SetsWon = 2,
-            player2SetsWon = 1
-        )
+        val state =
+            initialState.copy(
+                player1 = player1.copy(score = 10),
+                player2 = player2.copy(score = 5),
+                player1SetsWon = 2,
+                player2SetsWon = 1
+            )
 
         val newState = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
 
@@ -150,12 +155,13 @@ class ScoreCalculatorTest {
 
     @Test
     fun `server rotates every point in deuce`() {
-        val state = initialState.copy(
-            player1 = player1.copy(score = 10),
-            player2 = player2.copy(score = 10),
-            isDeuce = true,
-            servingPlayerId = player1.id
-        )
+        val state =
+            initialState.copy(
+                player1 = player1.copy(score = 10),
+                player2 = player2.copy(score = 10),
+                isDeuce = true,
+                servingPlayerId = player1.id
+            )
 
         // First point in deuce: P2 serves (rotation after every point)
         val afterFirst = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
@@ -168,11 +174,12 @@ class ScoreCalculatorTest {
 
     @Test
     fun `winner serves next set when winnerServesNextGame is true`() {
-        val state = initialState.copy(
-            player1 = player1.copy(score = 10),
-            player2 = player2.copy(score = 5),
-            servingPlayerId = player1.id
-        )
+        val state =
+            initialState.copy(
+                player1 = player1.copy(score = 10),
+                player2 = player2.copy(score = 5),
+                servingPlayerId = player1.id
+            )
 
         val newState = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
 
@@ -183,11 +190,12 @@ class ScoreCalculatorTest {
     @Test
     fun `loser serves next set when winnerServesNextGame is false`() {
         val settings = defaultSettings.copy(winnerServesNextGame = false)
-        val state = initialState.copy(
-            player1 = player1.copy(score = 10),
-            player2 = player2.copy(score = 5),
-            servingPlayerId = player1.id
-        )
+        val state =
+            initialState.copy(
+                player1 = player1.copy(score = 10),
+                player2 = player2.copy(score = 5),
+                servingPlayerId = player1.id
+            )
 
         val newState = ScoreCalculator.incrementScore(state, settings, player1.id)
 
@@ -197,10 +205,11 @@ class ScoreCalculatorTest {
 
     @Test
     fun `decrementScore reduces player score`() {
-        val state = initialState.copy(
-            player1 = player1.copy(score = 5),
-            player2 = player2.copy(score = 3)
-        )
+        val state =
+            initialState.copy(
+                player1 = player1.copy(score = 5),
+                player2 = player2.copy(score = 3)
+            )
 
         val newState = ScoreCalculator.decrementScore(state, player1.id)
 
@@ -210,10 +219,11 @@ class ScoreCalculatorTest {
 
     @Test
     fun `decrementScore does not go below zero`() {
-        val state = initialState.copy(
-            player1 = player1.copy(score = 0),
-            player2 = player2.copy(score = 3)
-        )
+        val state =
+            initialState.copy(
+                player1 = player1.copy(score = 0),
+                player2 = player2.copy(score = 3)
+            )
 
         val newState = ScoreCalculator.decrementScore(state, player1.id)
 
@@ -222,10 +232,11 @@ class ScoreCalculatorTest {
 
     @Test
     fun `decrementScore does not change state if game is finished`() {
-        val finishedState = initialState.copy(
-            isFinished = true,
-            player1 = player1.copy(score = 5)
-        )
+        val finishedState =
+            initialState.copy(
+                isFinished = true,
+                player1 = player1.copy(score = 5)
+            )
 
         val newState = ScoreCalculator.decrementScore(finishedState, player1.id)
 
@@ -245,10 +256,11 @@ class ScoreCalculatorTest {
 
     @Test
     fun `switchServe does not change state if game is finished`() {
-        val finishedState = initialState.copy(
-            isFinished = true,
-            servingPlayerId = player1.id
-        )
+        val finishedState =
+            initialState.copy(
+                isFinished = true,
+                servingPlayerId = player1.id
+            )
 
         val newState = ScoreCalculator.switchServe(finishedState)
 
@@ -257,13 +269,14 @@ class ScoreCalculatorTest {
 
     @Test
     fun `resetGame creates initial state with player 1 serving by default`() {
-        val newState = ScoreCalculator.resetGame(
-            player1Id = 1,
-            player2Id = 2,
-            player1Name = "Alice",
-            player2Name = "Bob",
-            settings = defaultSettings
-        )
+        val newState =
+            ScoreCalculator.resetGame(
+                player1Id = 1,
+                player2Id = 2,
+                player1Name = "Alice",
+                player2Name = "Bob",
+                settings = defaultSettings
+            )
 
         assertEquals(1, newState.player1.id)
         assertEquals("Alice", newState.player1.name)
@@ -282,14 +295,15 @@ class ScoreCalculatorTest {
 
     @Test
     fun `resetGame respects lastGameWinnerId when winnerServesNextGame is true`() {
-        val newState = ScoreCalculator.resetGame(
-            player1Id = 1,
-            player2Id = 2,
-            player1Name = "Alice",
-            player2Name = "Bob",
-            settings = defaultSettings,
-            lastGameWinnerId = 2
-        )
+        val newState =
+            ScoreCalculator.resetGame(
+                player1Id = 1,
+                player2Id = 2,
+                player1Name = "Alice",
+                player2Name = "Bob",
+                settings = defaultSettings,
+                lastGameWinnerId = 2
+            )
 
         assertEquals(2, newState.servingPlayerId)
     }
@@ -298,14 +312,15 @@ class ScoreCalculatorTest {
     fun `resetGame ignores lastGameWinnerId when winnerServesNextGame is false`() {
         val settings = defaultSettings.copy(winnerServesNextGame = false)
 
-        val newState = ScoreCalculator.resetGame(
-            player1Id = 1,
-            player2Id = 2,
-            player1Name = "Alice",
-            player2Name = "Bob",
-            settings = settings,
-            lastGameWinnerId = 2
-        )
+        val newState =
+            ScoreCalculator.resetGame(
+                player1Id = 1,
+                player2Id = 2,
+                player1Name = "Alice",
+                player2Name = "Bob",
+                settings = settings,
+                lastGameWinnerId = 2
+            )
 
         assertEquals(1, newState.servingPlayerId) // Defaults to player 1
     }
@@ -313,11 +328,12 @@ class ScoreCalculatorTest {
     @Test
     fun `best of 3 sets match finishes at 2 sets won`() {
         val settings = defaultSettings.copy(numberOfSets = 3)
-        val state = initialState.copy(
-            player1 = player1.copy(score = 10),
-            player1SetsWon = 1,
-            player2SetsWon = 0
-        )
+        val state =
+            initialState.copy(
+                player1 = player1.copy(score = 10),
+                player1SetsWon = 1,
+                player2SetsWon = 0
+            )
 
         val newState = ScoreCalculator.incrementScore(state, settings, player1.id)
 
@@ -344,10 +360,11 @@ class ScoreCalculatorTest {
     @Test
     fun `win by two disabled allows win at exact points to win`() {
         val settings = defaultSettings.copy(winByTwo = false)
-        val state = initialState.copy(
-            player1 = player1.copy(score = 10),
-            player2 = player2.copy(score = 10)
-        )
+        val state =
+            initialState.copy(
+                player1 = player1.copy(score = 10),
+                player2 = player2.copy(score = 10)
+            )
 
         val newState = ScoreCalculator.incrementScore(state, settings, player1.id)
 
@@ -366,10 +383,11 @@ class ScoreCalculatorTest {
 
     @Test
     fun `determineWinner returns player 1 id when player 1 has more sets`() {
-        val state = initialState.copy(
-            player1SetsWon = 3,
-            player2SetsWon = 1
-        )
+        val state =
+            initialState.copy(
+                player1SetsWon = 3,
+                player2SetsWon = 1
+            )
 
         val winnerId = ScoreCalculator.determineWinner(state)
 
@@ -378,10 +396,11 @@ class ScoreCalculatorTest {
 
     @Test
     fun `determineWinner returns player 2 id when player 2 has more sets`() {
-        val state = initialState.copy(
-            player1SetsWon = 1,
-            player2SetsWon = 3
-        )
+        val state =
+            initialState.copy(
+                player1SetsWon = 1,
+                player2SetsWon = 3
+            )
 
         val winnerId = ScoreCalculator.determineWinner(state)
 
@@ -390,10 +409,11 @@ class ScoreCalculatorTest {
 
     @Test
     fun `determineWinner returns null when sets are tied`() {
-        val state = initialState.copy(
-            player1SetsWon = 2,
-            player2SetsWon = 2
-        )
+        val state =
+            initialState.copy(
+                player1SetsWon = 2,
+                player2SetsWon = 2
+            )
 
         val winnerId = ScoreCalculator.determineWinner(state)
 
@@ -402,10 +422,11 @@ class ScoreCalculatorTest {
 
     @Test
     fun `determineWinner returns null when both players have zero sets`() {
-        val state = initialState.copy(
-            player1SetsWon = 0,
-            player2SetsWon = 0
-        )
+        val state =
+            initialState.copy(
+                player1SetsWon = 0,
+                player2SetsWon = 0
+            )
 
         val winnerId = ScoreCalculator.determineWinner(state)
 

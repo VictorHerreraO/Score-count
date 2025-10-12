@@ -14,7 +14,9 @@ import kotlinx.coroutines.flow.flowOf
 
 class FakeSettingsRepository : SettingsRepository {
     private val _settings = MutableStateFlow(GameSettings())
+
     override fun getSettings(): StateFlow<GameSettings> = _settings.asStateFlow()
+
     override suspend fun saveSettings(settings: GameSettings) {
         _settings.value = settings
     }
@@ -22,13 +24,17 @@ class FakeSettingsRepository : SettingsRepository {
 
 class FakeMatchRepository : MatchRepository {
     private val matches = mutableListOf<Match>()
+
     override fun getMatchList(): Flow<List<Match>> = flowOf(matches)
+
     override suspend fun saveMatch(match: Match) {
         matches.add(match)
     }
 }
 
-class FakeScoreRepository(initialState: GameState) : ScoreRepository {
+class FakeScoreRepository(
+    initialState: GameState
+) : ScoreRepository {
     private val _gameState = MutableStateFlow(initialState)
 
     override fun getGameState(): StateFlow<GameState> = _gameState.asStateFlow()

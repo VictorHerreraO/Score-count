@@ -5,5 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface MatchRepository {
     fun getMatchList(): Flow<List<Match>>
+
     suspend fun saveMatch(match: Match)
 }

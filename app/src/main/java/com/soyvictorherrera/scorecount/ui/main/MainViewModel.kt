@@ -12,10 +12,11 @@ import javax.inject.Inject
  * Exposes application-wide settings to the UI layer.
  */
 @HiltViewModel
-class MainViewModel @Inject constructor(
-    settingsRepository: SettingsRepository
-) : ViewModel() {
-
-    // Directly expose StateFlow from repository - no need for intermediate copying
-    val settings: StateFlow<GameSettings> = settingsRepository.getSettings()
-}
+class MainViewModel
+    @Inject
+    constructor(
+        settingsRepository: SettingsRepository
+    ) : ViewModel() {
+        // Directly expose StateFlow from repository - no need for intermediate copying
+        val settings: StateFlow<GameSettings> = settingsRepository.getSettings()
+    }

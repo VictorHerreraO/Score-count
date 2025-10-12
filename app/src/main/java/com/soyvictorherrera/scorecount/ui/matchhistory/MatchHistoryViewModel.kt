@@ -12,19 +12,19 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MatchHistoryViewModel @Inject constructor(
-    private val getMatchesUseCase: GetMatchesUseCase
-) : ViewModel() {
+class MatchHistoryViewModel
+    @Inject
+    constructor(
+        private val getMatchesUseCase: GetMatchesUseCase
+    ) : ViewModel() {
+        private val _matches = MutableStateFlow<List<Match>>(emptyList())
+        val matches: StateFlow<List<Match>> = _matches
 
-    private val _matches = MutableStateFlow<List<Match>>(emptyList())
-    val matches: StateFlow<List<Match>> = _matches
-
-    init {
-        viewModelScope.launch {
-            getMatchesUseCase()
-                .catch { _matches.value = emptyList() }
-                .collect { _matches.value = it }
+        init {
+            viewModelScope.launch {
+                getMatchesUseCase()
+                    .catch { _matches.value = emptyList() }
+                    .collect { _matches.value = it }
+            }
         }
     }
-
-}

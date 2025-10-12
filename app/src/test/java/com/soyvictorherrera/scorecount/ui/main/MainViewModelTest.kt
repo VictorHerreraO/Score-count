@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class MainViewModelTest {
-
     private lateinit var viewModel: MainViewModel
     private lateinit var fakeSettingsRepository: FakeSettingsRepository
 
@@ -21,46 +20,50 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `viewModel exposes settings from repository`() = runTest {
-        // Given
-        val expectedSettings = GameSettings(
-            pointsToWinSet = 21,
-            numberOfSets = 3,
-            showTitle = false,
-            keepScreenOn = true
-        )
-        fakeSettingsRepository.setSettings(expectedSettings)
+    fun `viewModel exposes settings from repository`() =
+        runTest {
+            // Given
+            val expectedSettings =
+                GameSettings(
+                    pointsToWinSet = 21,
+                    numberOfSets = 3,
+                    showTitle = false,
+                    keepScreenOn = true
+                )
+            fakeSettingsRepository.setSettings(expectedSettings)
 
-        // When
-        val actualSettings = viewModel.settings.value
+            // When
+            val actualSettings = viewModel.settings.value
 
-        // Then
-        assertEquals(expectedSettings, actualSettings)
-    }
-
-    @Test
-    fun `viewModel settings updates when repository updates`() = runTest {
-        // Given - Initial settings
-        val initialSettings = GameSettings(pointsToWinSet = 11)
-        fakeSettingsRepository.setSettings(initialSettings)
-        assertEquals(initialSettings, viewModel.settings.value)
-
-        // When - Repository updates
-        val updatedSettings = GameSettings(pointsToWinSet = 21)
-        fakeSettingsRepository.setSettings(updatedSettings)
-
-        // Then - ViewModel exposes updated settings
-        assertEquals(updatedSettings, viewModel.settings.value)
-    }
+            // Then
+            assertEquals(expectedSettings, actualSettings)
+        }
 
     @Test
-    fun `viewModel exposes default settings on initialization`() = runTest {
-        // When
-        val settings = viewModel.settings.value
+    fun `viewModel settings updates when repository updates`() =
+        runTest {
+            // Given - Initial settings
+            val initialSettings = GameSettings(pointsToWinSet = 11)
+            fakeSettingsRepository.setSettings(initialSettings)
+            assertEquals(initialSettings, viewModel.settings.value)
 
-        // Then - Should have default GameSettings values
-        assertEquals(GameSettings(), settings)
-    }
+            // When - Repository updates
+            val updatedSettings = GameSettings(pointsToWinSet = 21)
+            fakeSettingsRepository.setSettings(updatedSettings)
+
+            // Then - ViewModel exposes updated settings
+            assertEquals(updatedSettings, viewModel.settings.value)
+        }
+
+    @Test
+    fun `viewModel exposes default settings on initialization`() =
+        runTest {
+            // When
+            val settings = viewModel.settings.value
+
+            // Then - Should have default GameSettings values
+            assertEquals(GameSettings(), settings)
+        }
 
     // --- Fake Repository ---
 

@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test
 
 @ExperimentalCoroutinesApi
 class MatchHistoryViewModelTest {
-
     private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var viewModel: MatchHistoryViewModel
@@ -40,146 +39,156 @@ class MatchHistoryViewModelTest {
     }
 
     @Test
-    fun `initial matches list is empty`() = runTest {
-        // When
-        testDispatcher.scheduler.advanceUntilIdle()
-        val matches = viewModel.matches.first()
+    fun `initial matches list is empty`() =
+        runTest {
+            // When
+            testDispatcher.scheduler.advanceUntilIdle()
+            val matches = viewModel.matches.first()
 
-        // Then
-        assertTrue(matches.isEmpty())
-    }
-
-    @Test
-    fun `matches are loaded from repository on initialization`() = runTest {
-        // Given
-        val match1 = Match(
-            id = "1",
-            playerOneName = "Alice",
-            playerTwoName = "Bob",
-            playerOneScore = 3,
-            playerTwoScore = 1,
-            date = 1000L
-        )
-        val match2 = Match(
-            id = "2",
-            playerOneName = "Charlie",
-            playerTwoName = "Diana",
-            playerOneScore = 2,
-            playerTwoScore = 3,
-            date = 2000L
-        )
-
-        fakeMatchRepository.saveMatch(match1)
-        fakeMatchRepository.saveMatch(match2)
-
-        // Re-create ViewModel to trigger init block with pre-populated matches
-        val getMatchesUseCase = GetMatchesUseCase(fakeMatchRepository)
-        viewModel = MatchHistoryViewModel(getMatchesUseCase)
-
-        // When
-        testDispatcher.scheduler.advanceUntilIdle()
-        val matches = viewModel.matches.first()
-
-        // Then
-        assertEquals(2, matches.size)
-        assertEquals(match1, matches[0])
-        assertEquals(match2, matches[1])
-    }
-
-    @Test
-    fun `matches are updated when new match is added to repository`() = runTest {
-        // Given - Initial ViewModel with no matches
-        testDispatcher.scheduler.advanceUntilIdle()
-        var matches = viewModel.matches.first()
-        assertEquals(0, matches.size)
-
-        // When - Add a new match
-        val match = Match(
-            id = "1",
-            playerOneName = "Eve",
-            playerTwoName = "Frank",
-            playerOneScore = 5,
-            playerTwoScore = 3,
-            date = 3000L
-        )
-        fakeMatchRepository.saveMatch(match)
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        // Then
-        matches = viewModel.matches.first()
-        assertEquals(1, matches.size)
-        assertEquals(match, matches[0])
-    }
-
-    @Test
-    fun `matches handles errors gracefully by showing empty list`() = runTest {
-        // Given - Repository that throws an error
-        val errorRepository = object : MatchRepository {
-            override fun getMatchList(): Flow<List<Match>> {
-                throw RuntimeException("Database error")
-            }
-
-            override suspend fun saveMatch(match: Match) {
-                // Not used in this test
-            }
+            // Then
+            assertTrue(matches.isEmpty())
         }
 
-        val getMatchesUseCase = GetMatchesUseCase(errorRepository)
-        viewModel = MatchHistoryViewModel(getMatchesUseCase)
+    @Test
+    fun `matches are loaded from repository on initialization`() =
+        runTest {
+            // Given
+            val match1 =
+                Match(
+                    id = "1",
+                    playerOneName = "Alice",
+                    playerTwoName = "Bob",
+                    playerOneScore = 3,
+                    playerTwoScore = 1,
+                    date = 1000L
+                )
+            val match2 =
+                Match(
+                    id = "2",
+                    playerOneName = "Charlie",
+                    playerTwoName = "Diana",
+                    playerOneScore = 2,
+                    playerTwoScore = 3,
+                    date = 2000L
+                )
 
-        // When
-        testDispatcher.scheduler.advanceUntilIdle()
-        val matches = viewModel.matches.first()
+            fakeMatchRepository.saveMatch(match1)
+            fakeMatchRepository.saveMatch(match2)
 
-        // Then - Should show empty list instead of crashing
-        assertTrue(matches.isEmpty())
-    }
+            // Re-create ViewModel to trigger init block with pre-populated matches
+            val getMatchesUseCase = GetMatchesUseCase(fakeMatchRepository)
+            viewModel = MatchHistoryViewModel(getMatchesUseCase)
+
+            // When
+            testDispatcher.scheduler.advanceUntilIdle()
+            val matches = viewModel.matches.first()
+
+            // Then
+            assertEquals(2, matches.size)
+            assertEquals(match1, matches[0])
+            assertEquals(match2, matches[1])
+        }
 
     @Test
-    fun `matches preserves order from repository`() = runTest {
-        // Given
-        val match1 = Match(
-            id = "1",
-            playerOneName = "Alice",
-            playerTwoName = "Bob",
-            playerOneScore = 3,
-            playerTwoScore = 1,
-            date = 1000L
-        )
-        val match2 = Match(
-            id = "2",
-            playerOneName = "Charlie",
-            playerTwoName = "Diana",
-            playerOneScore = 2,
-            playerTwoScore = 3,
-            date = 2000L
-        )
-        val match3 = Match(
-            id = "3",
-            playerOneName = "Eve",
-            playerTwoName = "Frank",
-            playerOneScore = 5,
-            playerTwoScore = 4,
-            date = 3000L
-        )
+    fun `matches are updated when new match is added to repository`() =
+        runTest {
+            // Given - Initial ViewModel with no matches
+            testDispatcher.scheduler.advanceUntilIdle()
+            var matches = viewModel.matches.first()
+            assertEquals(0, matches.size)
 
-        // Save in specific order
-        fakeMatchRepository.saveMatch(match1)
-        fakeMatchRepository.saveMatch(match2)
-        fakeMatchRepository.saveMatch(match3)
+            // When - Add a new match
+            val match =
+                Match(
+                    id = "1",
+                    playerOneName = "Eve",
+                    playerTwoName = "Frank",
+                    playerOneScore = 5,
+                    playerTwoScore = 3,
+                    date = 3000L
+                )
+            fakeMatchRepository.saveMatch(match)
+            testDispatcher.scheduler.advanceUntilIdle()
 
-        // Re-create ViewModel
-        val getMatchesUseCase = GetMatchesUseCase(fakeMatchRepository)
-        viewModel = MatchHistoryViewModel(getMatchesUseCase)
+            // Then
+            matches = viewModel.matches.first()
+            assertEquals(1, matches.size)
+            assertEquals(match, matches[0])
+        }
 
-        // When
-        testDispatcher.scheduler.advanceUntilIdle()
-        val matches = viewModel.matches.first()
+    @Test
+    fun `matches handles errors gracefully by showing empty list`() =
+        runTest {
+            // Given - Repository that throws an error
+            val errorRepository =
+                object : MatchRepository {
+                    override fun getMatchList(): Flow<List<Match>> = throw RuntimeException("Database error")
 
-        // Then - Order should be preserved
-        assertEquals(3, matches.size)
-        assertEquals("1", matches[0].id)
-        assertEquals("2", matches[1].id)
-        assertEquals("3", matches[2].id)
-    }
+                    override suspend fun saveMatch(match: Match) {
+                        // Not used in this test
+                    }
+                }
+
+            val getMatchesUseCase = GetMatchesUseCase(errorRepository)
+            viewModel = MatchHistoryViewModel(getMatchesUseCase)
+
+            // When
+            testDispatcher.scheduler.advanceUntilIdle()
+            val matches = viewModel.matches.first()
+
+            // Then - Should show empty list instead of crashing
+            assertTrue(matches.isEmpty())
+        }
+
+    @Test
+    fun `matches preserves order from repository`() =
+        runTest {
+            // Given
+            val match1 =
+                Match(
+                    id = "1",
+                    playerOneName = "Alice",
+                    playerTwoName = "Bob",
+                    playerOneScore = 3,
+                    playerTwoScore = 1,
+                    date = 1000L
+                )
+            val match2 =
+                Match(
+                    id = "2",
+                    playerOneName = "Charlie",
+                    playerTwoName = "Diana",
+                    playerOneScore = 2,
+                    playerTwoScore = 3,
+                    date = 2000L
+                )
+            val match3 =
+                Match(
+                    id = "3",
+                    playerOneName = "Eve",
+                    playerTwoName = "Frank",
+                    playerOneScore = 5,
+                    playerTwoScore = 4,
+                    date = 3000L
+                )
+
+            // Save in specific order
+            fakeMatchRepository.saveMatch(match1)
+            fakeMatchRepository.saveMatch(match2)
+            fakeMatchRepository.saveMatch(match3)
+
+            // Re-create ViewModel
+            val getMatchesUseCase = GetMatchesUseCase(fakeMatchRepository)
+            viewModel = MatchHistoryViewModel(getMatchesUseCase)
+
+            // When
+            testDispatcher.scheduler.advanceUntilIdle()
+            val matches = viewModel.matches.first()
+
+            // Then - Order should be preserved
+            assertEquals(3, matches.size)
+            assertEquals("1", matches[0].id)
+            assertEquals("2", matches[1].id)
+            assertEquals("3", matches[2].id)
+        }
 }

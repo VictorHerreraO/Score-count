@@ -20,18 +20,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.RotateRight
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Badge
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.MilitaryTech
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.filled.ScreenLockPortrait
-import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -51,7 +41,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -77,7 +66,6 @@ fun SettingsScreen(
     val gameControls = settingsViewModel.getGameControls(settings)
     val tableTennisRules = settingsViewModel.getTableTennisRules(settings)
 
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -87,19 +75,21 @@ fun SettingsScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Navigate back")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+                    )
             )
         },
         contentWindowInsets = WindowInsets.safeDrawing
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState())
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState())
         ) {
             SectionHeader("Game Controls & Actions")
             SettingsGrid(items = gameControls, modifier = Modifier.padding(bottom = 16.dp))
@@ -135,7 +125,8 @@ fun SettingsGrid(
         maxItemsInEachRow = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else 2
     ) {
         items.forEach { item ->
-            Box(Modifier.weight(1f)) { // Use weight to ensure items take equal space up to maxItemsInEachRow
+            Box(Modifier.weight(1f)) {
+                // Use weight to ensure items take equal space up to maxItemsInEachRow
                 when (item) {
                     is SettingItemData.ToggleItem -> ToggleSettingCard(item)
                     else -> {} // Only ToggleItems are used in the grid
@@ -145,25 +136,35 @@ fun SettingsGrid(
     }
 }
 
-
 @Composable
 fun ToggleSettingCard(item: SettingItemData.ToggleItem) {
     Card(
         onClick = { item.onToggle(!item.isChecked) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(120.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(120.dp),
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-            contentColor = if (item.isChecked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+                contentColor =
+                    if (item.isChecked) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                            .copy(
+                                alpha = 0.7f
+                            )
+                    }
+            )
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -171,7 +172,15 @@ fun ToggleSettingCard(item: SettingItemData.ToggleItem) {
                     item.icon,
                     contentDescription = item.text,
                     modifier = Modifier.size(36.dp),
-                    tint = if (item.isChecked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    tint =
+                        if (item.isChecked) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                                .copy(
+                                    alpha = 0.7f
+                                )
+                        }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -250,15 +259,19 @@ fun SettingsScreenPreview() {
         Surface {
             SettingsScreen(
                 onNavigateBack = {},
-                settingsViewModel = SettingsViewModel(
-                    settingsRepository = object : SettingsRepository {
-                        private val settingsFlow = MutableStateFlow(GameSettings())
-                        override fun getSettings(): StateFlow<GameSettings> = settingsFlow.asStateFlow()
-                        override suspend fun saveSettings(settings: GameSettings) {
-                            settingsFlow.value = settings
-                        }
-                    }
-                )
+                settingsViewModel =
+                    SettingsViewModel(
+                        settingsRepository =
+                            object : SettingsRepository {
+                                private val settingsFlow = MutableStateFlow(GameSettings())
+
+                                override fun getSettings(): StateFlow<GameSettings> = settingsFlow.asStateFlow()
+
+                                override suspend fun saveSettings(settings: GameSettings) {
+                                    settingsFlow.value = settings
+                                }
+                            }
+                    )
             )
         }
     }

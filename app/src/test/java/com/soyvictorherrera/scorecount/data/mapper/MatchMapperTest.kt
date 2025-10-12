@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class MatchMapperTest {
-
     private lateinit var mapper: MatchMapper
 
     @BeforeEach
@@ -18,14 +17,15 @@ class MatchMapperTest {
     @Test
     fun `mapFromEntity converts MatchEntity to Match correctly`() {
         // Given
-        val entity = MatchEntity(
-            id = 42L,
-            playerOneName = "Alice",
-            playerTwoName = "Bob",
-            playerOneScore = 3,
-            playerTwoScore = 2,
-            date = 1609459200000L // 2021-01-01
-        )
+        val entity =
+            MatchEntity(
+                id = 42L,
+                playerOneName = "Alice",
+                playerTwoName = "Bob",
+                playerOneScore = 3,
+                playerTwoScore = 2,
+                date = 1609459200000L // 2021-01-01
+            )
 
         // When
         val result = mapper.mapFromEntity(entity)
@@ -42,14 +42,15 @@ class MatchMapperTest {
     @Test
     fun `mapFromEntity handles entity with id 0`() {
         // Given
-        val entity = MatchEntity(
-            id = 0L,
-            playerOneName = "Player1",
-            playerTwoName = "Player2",
-            playerOneScore = 0,
-            playerTwoScore = 0,
-            date = 0L
-        )
+        val entity =
+            MatchEntity(
+                id = 0L,
+                playerOneName = "Player1",
+                playerTwoName = "Player2",
+                playerOneScore = 0,
+                playerTwoScore = 0,
+                date = 0L
+            )
 
         // When
         val result = mapper.mapFromEntity(entity)
@@ -66,14 +67,15 @@ class MatchMapperTest {
     @Test
     fun `mapFromEntity handles empty player names`() {
         // Given
-        val entity = MatchEntity(
-            id = 1L,
-            playerOneName = "",
-            playerTwoName = "",
-            playerOneScore = 5,
-            playerTwoScore = 7,
-            date = 123456789L
-        )
+        val entity =
+            MatchEntity(
+                id = 1L,
+                playerOneName = "",
+                playerTwoName = "",
+                playerOneScore = 5,
+                playerTwoScore = 7,
+                date = 123456789L
+            )
 
         // When
         val result = mapper.mapFromEntity(entity)
@@ -86,14 +88,15 @@ class MatchMapperTest {
     @Test
     fun `mapToEntity converts Match to MatchEntity correctly`() {
         // Given
-        val match = Match(
-            id = "99",
-            playerOneName = "Charlie",
-            playerTwoName = "Diana",
-            playerOneScore = 5,
-            playerTwoScore = 3,
-            date = 1640995200000L // 2022-01-01
-        )
+        val match =
+            Match(
+                id = "99",
+                playerOneName = "Charlie",
+                playerTwoName = "Diana",
+                playerOneScore = 5,
+                playerTwoScore = 3,
+                date = 1640995200000L // 2022-01-01
+            )
 
         // When
         val result = mapper.mapToEntity(match)
@@ -110,14 +113,15 @@ class MatchMapperTest {
     @Test
     fun `mapToEntity handles Match with id "0"`() {
         // Given
-        val match = Match(
-            id = "0",
-            playerOneName = "Eve",
-            playerTwoName = "Frank",
-            playerOneScore = 0,
-            playerTwoScore = 0,
-            date = 0L
-        )
+        val match =
+            Match(
+                id = "0",
+                playerOneName = "Eve",
+                playerTwoName = "Frank",
+                playerOneScore = 0,
+                playerTwoScore = 0,
+                date = 0L
+            )
 
         // When
         val result = mapper.mapToEntity(match)
@@ -134,14 +138,15 @@ class MatchMapperTest {
     @Test
     fun `mapToEntity handles Match with empty string id`() {
         // Given
-        val match = Match(
-            id = "",
-            playerOneName = "Grace",
-            playerTwoName = "Henry",
-            playerOneScore = 1,
-            playerTwoScore = 2,
-            date = 999999999L
-        )
+        val match =
+            Match(
+                id = "",
+                playerOneName = "Grace",
+                playerTwoName = "Henry",
+                playerOneScore = 1,
+                playerTwoScore = 2,
+                date = 999999999L
+            )
 
         // When
         val result = mapper.mapToEntity(match)
@@ -155,14 +160,15 @@ class MatchMapperTest {
     @Test
     fun `mapToEntity handles Match with non-numeric id`() {
         // Given
-        val match = Match(
-            id = "not-a-number",
-            playerOneName = "Ivy",
-            playerTwoName = "Jack",
-            playerOneScore = 4,
-            playerTwoScore = 4,
-            date = 111111111L
-        )
+        val match =
+            Match(
+                id = "not-a-number",
+                playerOneName = "Ivy",
+                playerTwoName = "Jack",
+                playerOneScore = 4,
+                playerTwoScore = 4,
+                date = 111111111L
+            )
 
         // When
         val result = mapper.mapToEntity(match)
@@ -176,14 +182,15 @@ class MatchMapperTest {
     @Test
     fun `bidirectional mapping from entity preserves all data`() {
         // Given
-        val originalEntity = MatchEntity(
-            id = 123L,
-            playerOneName = "Kate",
-            playerTwoName = "Leo",
-            playerOneScore = 7,
-            playerTwoScore = 5,
-            date = 1234567890000L
-        )
+        val originalEntity =
+            MatchEntity(
+                id = 123L,
+                playerOneName = "Kate",
+                playerTwoName = "Leo",
+                playerOneScore = 7,
+                playerTwoScore = 5,
+                date = 1234567890000L
+            )
 
         // When - Convert entity → domain → entity
         val domain = mapper.mapFromEntity(originalEntity)
@@ -201,14 +208,15 @@ class MatchMapperTest {
     @Test
     fun `bidirectional mapping from domain preserves all data`() {
         // Given
-        val originalMatch = Match(
-            id = "456",
-            playerOneName = "Mia",
-            playerTwoName = "Noah",
-            playerOneScore = 9,
-            playerTwoScore = 8,
-            date = 9876543210000L
-        )
+        val originalMatch =
+            Match(
+                id = "456",
+                playerOneName = "Mia",
+                playerTwoName = "Noah",
+                playerOneScore = 9,
+                playerTwoScore = 8,
+                date = 9876543210000L
+            )
 
         // When - Convert domain → entity → domain
         val entity = mapper.mapToEntity(originalMatch)

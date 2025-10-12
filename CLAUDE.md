@@ -62,6 +62,8 @@ When working on this project, update these files to maintain continuity across s
 ```bash
 ./gradlew lint                   # Run lint checks
 ./gradlew lintDebug              # Generate lint report
+./gradlew ktlintCheck            # Check Kotlin code formatting
+./gradlew ktlintFormat           # Auto-fix Kotlin code formatting
 ```
 
 ## Quick Reference
@@ -87,6 +89,7 @@ com.soyvictorherrera.scorecount/
 - **Min SDK**: 28 | **Target SDK**: 36 | **JVM**: 11
 - **Dependencies**: Managed via `gradle/libs.versions.toml`
 - **ProGuard**: Enabled for release builds
+- **Code Style**: Enforced by ktlint (see `.editorconfig` for rules)
 
 ## Development Workflow
 
@@ -103,6 +106,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the complete workflow. Quick summary:
 - **UI**: Stateless Compose screens driven by ViewModel state
 - **Testing**: Unit tests with fakes/mocks under `app/src/test/`
 - **Orientation**: Handle in composable logic (see `ScoreScreen.kt`)
+- **Code Formatting**: Pre-commit hook automatically formats Kotlin files with ktlint
 
 ### Version Catalog
 Add dependencies to `gradle/libs.versions.toml` before using them in build files.

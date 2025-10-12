@@ -9,12 +9,14 @@ import javax.inject.Inject
  * Use case for manually switching the serving player.
  * Orchestrates: fetch current state → calculate new state → save new state.
  */
-class ManualSwitchServeUseCase @Inject constructor(
-    private val scoreRepository: ScoreRepository
-) {
-    suspend operator fun invoke() {
-        val currentState = scoreRepository.getGameState().first()
-        val newState = ScoreCalculator.switchServe(currentState)
-        scoreRepository.updateGameState(newState)
+class ManualSwitchServeUseCase
+    @Inject
+    constructor(
+        private val scoreRepository: ScoreRepository
+    ) {
+        suspend operator fun invoke() {
+            val currentState = scoreRepository.getGameState().first()
+            val newState = ScoreCalculator.switchServe(currentState)
+            scoreRepository.updateGameState(newState)
+        }
     }
-}

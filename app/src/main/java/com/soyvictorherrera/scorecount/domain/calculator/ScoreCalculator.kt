@@ -10,7 +10,6 @@ import kotlin.math.abs
  * This class has no dependencies and is fully testable.
  */
 object ScoreCalculator {
-
     /**
      * Calculate the new game state after a player scores a point.
      *
@@ -76,14 +75,15 @@ object ScoreCalculator {
         val gameIsFinished = newP1Sets >= setsToWinMatch || newP2Sets >= setsToWinMatch
 
         // Determine next server
-        val newServingPlayerId = determineNextServer(
-            currentScores = Pair(newP1Score, newP2Score),
-            currentServingPlayerId = currentState.servingPlayerId ?: currentState.player1.id,
-            playerIds = Pair(currentState.player1.id, currentState.player2.id),
-            settings = settings,
-            setEnded = setJustEnded,
-            lastSetWinnerId = lastSetWinnerId
-        )
+        val newServingPlayerId =
+            determineNextServer(
+                currentScores = Pair(newP1Score, newP2Score),
+                currentServingPlayerId = currentState.servingPlayerId ?: currentState.player1.id,
+                playerIds = Pair(currentState.player1.id, currentState.player2.id),
+                settings = settings,
+                setEnded = setJustEnded,
+                lastSetWinnerId = lastSetWinnerId
+            )
 
         return currentState.copy(
             player1 = currentState.player1.copy(score = newP1Score),
@@ -111,17 +111,19 @@ object ScoreCalculator {
         // Cannot decrement if game is finished
         if (currentState.isFinished) return currentState
 
-        val newPlayer1 = if (playerId == currentState.player1.id && currentState.player1.score > 0) {
-            currentState.player1.copy(score = currentState.player1.score - 1)
-        } else {
-            currentState.player1
-        }
+        val newPlayer1 =
+            if (playerId == currentState.player1.id && currentState.player1.score > 0) {
+                currentState.player1.copy(score = currentState.player1.score - 1)
+            } else {
+                currentState.player1
+            }
 
-        val newPlayer2 = if (playerId == currentState.player2.id && currentState.player2.score > 0) {
-            currentState.player2.copy(score = currentState.player2.score - 1)
-        } else {
-            currentState.player2
-        }
+        val newPlayer2 =
+            if (playerId == currentState.player2.id && currentState.player2.score > 0) {
+                currentState.player2.copy(score = currentState.player2.score - 1)
+            } else {
+                currentState.player2
+            }
 
         return currentState.copy(
             player1 = newPlayer1,
@@ -139,11 +141,12 @@ object ScoreCalculator {
         // Cannot switch if game is finished
         if (currentState.isFinished) return currentState
 
-        val nextServer = if (currentState.servingPlayerId == currentState.player1.id) {
-            currentState.player2.id
-        } else {
-            currentState.player1.id
-        }
+        val nextServer =
+            if (currentState.servingPlayerId == currentState.player1.id) {
+                currentState.player2.id
+            } else {
+                currentState.player1.id
+            }
 
         return currentState.copy(servingPlayerId = nextServer)
     }
@@ -167,23 +170,26 @@ object ScoreCalculator {
         settings: GameSettings,
         lastGameWinnerId: Int? = null
     ): GameState {
-        val firstServer = if (settings.winnerServesNextGame && lastGameWinnerId != null) {
-            lastGameWinnerId
-        } else {
-            player1Id
-        }
+        val firstServer =
+            if (settings.winnerServesNextGame && lastGameWinnerId != null) {
+                lastGameWinnerId
+            } else {
+                player1Id
+            }
 
         return GameState(
-            player1 = com.soyvictorherrera.scorecount.domain.model.Player(
-                id = player1Id,
-                name = player1Name,
-                score = 0
-            ),
-            player2 = com.soyvictorherrera.scorecount.domain.model.Player(
-                id = player2Id,
-                name = player2Name,
-                score = 0
-            ),
+            player1 =
+                com.soyvictorherrera.scorecount.domain.model.Player(
+                    id = player1Id,
+                    name = player1Name,
+                    score = 0
+                ),
+            player2 =
+                com.soyvictorherrera.scorecount.domain.model.Player(
+                    id = player2Id,
+                    name = player2Name,
+                    score = 0
+                ),
             servingPlayerId = firstServer,
             player1SetsWon = 0,
             player2SetsWon = 0,
@@ -198,13 +204,12 @@ object ScoreCalculator {
      * @param gameState The current game state
      * @return The ID of the winning player, or null if there's a tie or no clear winner
      */
-    fun determineWinner(gameState: GameState): Int? {
-        return when {
+    fun determineWinner(gameState: GameState): Int? =
+        when {
             gameState.player1SetsWon > gameState.player2SetsWon -> gameState.player1.id
             gameState.player2SetsWon > gameState.player1SetsWon -> gameState.player2.id
             else -> null // Tie or no clear winner
         }
-    }
 
     /**
      * Determine if the current scores represent a deuce situation.
@@ -222,7 +227,7 @@ object ScoreCalculator {
         if (!settings.winByTwo) return false
 
         return p1Score >= settings.pointsToWinSet - 1 &&
-                p2Score >= settings.pointsToWinSet - 1
+            p2Score >= settings.pointsToWinSet - 1
     }
 
     /**
@@ -257,19 +262,22 @@ object ScoreCalculator {
         }
 
         // Determine if we're in deuce (at or above pointsToWinSet - 1)
-        val atDeuce = currentScores.first >= settings.pointsToWinSet - 1 &&
+        val atDeuce =
+            currentScores.first >= settings.pointsToWinSet - 1 &&
                 currentScores.second >= settings.pointsToWinSet - 1
 
         // Determine serve rotation interval
-        val serveInterval = if (atDeuce && settings.serveChangeAfterDeuce > 0) {
-            settings.serveChangeAfterDeuce
-        } else {
-            settings.serveRotationAfterPoints
-        }
+        val serveInterval =
+            if (atDeuce && settings.serveChangeAfterDeuce > 0) {
+                settings.serveChangeAfterDeuce
+            } else {
+                settings.serveRotationAfterPoints
+            }
 
         // Check if it's time to rotate server
         val totalPointsInCurrentSet = currentScores.first + currentScores.second
-        val shouldRotate = serveInterval > 0 &&
+        val shouldRotate =
+            serveInterval > 0 &&
                 totalPointsInCurrentSet % serveInterval == 0 &&
                 totalPointsInCurrentSet > 0
 

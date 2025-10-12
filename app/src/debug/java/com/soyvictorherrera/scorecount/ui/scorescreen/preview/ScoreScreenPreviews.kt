@@ -58,15 +58,16 @@ fun ScoreScreenFinishedPreview() {
 private fun createPreviewViewModel(finished: Boolean = false): ScoreViewModel {
     val dummyP1 = Player(id = 1, name = "Player 1", score = if (finished) 0 else 10)
     val dummyP2 = Player(id = 2, name = "Player 2", score = if (finished) 0 else 10)
-    val previewGameState = GameState(
-        player1 = dummyP1,
-        player2 = dummyP2,
-        servingPlayerId = 1,
-        player1SetsWon = 3,
-        player2SetsWon = 1,
-        isDeuce = !finished,
-        isFinished = finished
-    )
+    val previewGameState =
+        GameState(
+            player1 = dummyP1,
+            player2 = dummyP2,
+            servingPlayerId = 1,
+            player1SetsWon = 3,
+            player2SetsWon = 1,
+            isDeuce = !finished,
+            isFinished = finished
+        )
     val fakeScoreRepo = FakeScoreRepository(initialState = previewGameState)
     val fakeSettingsRepo = FakeSettingsRepository()
     val fakeMatchRepo = FakeMatchRepository()
