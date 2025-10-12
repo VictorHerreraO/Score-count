@@ -168,12 +168,18 @@ object ScoreCalculator {
         player1Name: String,
         player2Name: String,
         settings: GameSettings,
-        lastGameWinnerId: Int? = null
+        lastGameWinnerId: Int? = null,
+        currentServerId: Int? = null
     ): GameState {
         val firstServer =
             if (settings.winnerServesNextGame && lastGameWinnerId != null) {
+                // Winner serves next game
                 lastGameWinnerId
+            } else if (!settings.winnerServesNextGame && currentServerId != null) {
+                // Alternate server from current server
+                if (currentServerId == player1Id) player2Id else player1Id
             } else {
+                // Default to player 1
                 player1Id
             }
 

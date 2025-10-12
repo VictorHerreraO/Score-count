@@ -21,21 +21,8 @@ class ResetGameUseCase
             val currentState = scoreRepository.getGameState().first()
             val settings = settingsRepository.getSettings().first()
 
-            // Determine who should serve based on settings
-            val winnerId =
-                if (settings.winnerServesNextGame) {
-                    // Winner serves: use provided winner or determine from state
-                    lastGameWinnerId ?: ScoreCalculator.determineWinner(currentState)
-                } else {
-                    // Winner doesn't serve: alternate from current server
-                    // If current server is player 1, next server is player 2, and vice versa
-                    val currentServerId = currentState.servingPlayerId ?: currentState.player1.id
-                    if (currentServerId == currentState.player1.id) {
-                        currentState.player2.id
-                    } else {
-                        currentState.player1.id
-                    }
-                }
+            // Determine who should serve: use provided winner or auto-determine
+            val winnerId = lastGameWinnerId ?: ScoreCalculator.determineWinner(currentState)
 
             val newState =
                 ScoreCalculator.resetGame(
@@ -44,7 +31,8 @@ class ResetGameUseCase
                     player1Name = currentState.player1.name,
                     player2Name = currentState.player2.name,
                     settings = settings,
-                    lastGameWinnerId = winnerId
+                    lastGameWinnerId = winnerId,
+                    currentServerId = currentState.servingPlayerId
                 )
 
             scoreRepository.updateGameState(newState)
