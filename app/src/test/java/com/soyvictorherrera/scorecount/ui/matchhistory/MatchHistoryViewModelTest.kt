@@ -123,7 +123,10 @@ class MatchHistoryViewModelTest {
             // Given - Repository that throws an error
             val errorRepository =
                 object : MatchRepository {
-                    override fun getMatchList(): Flow<List<Match>> = throw RuntimeException("Database error")
+                    override fun getMatchList(): Flow<List<Match>> =
+                        kotlinx.coroutines.flow.flow {
+                            throw RuntimeException("Database error")
+                        }
 
                     override suspend fun saveMatch(match: Match) {
                         // Not used in this test
