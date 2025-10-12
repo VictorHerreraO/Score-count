@@ -31,6 +31,7 @@ class MatchHistoryViewModelTest {
         fakeMatchRepository = FakeMatchRepository()
         val getMatchesUseCase = GetMatchesUseCase(fakeMatchRepository)
         viewModel = MatchHistoryViewModel(getMatchesUseCase, testDispatcher)
+        testDispatcher.scheduler.advanceUntilIdle() // Let init block complete
     }
 
     @AfterEach

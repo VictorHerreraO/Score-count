@@ -29,6 +29,7 @@ class SettingsViewModelTest {
         Dispatchers.setMain(testDispatcher)
         fakeSettingsRepository = FakeSettingsRepository()
         viewModel = SettingsViewModel(fakeSettingsRepository, testDispatcher)
+        testDispatcher.scheduler.advanceUntilIdle() // Let init block complete
     }
 
     @AfterEach

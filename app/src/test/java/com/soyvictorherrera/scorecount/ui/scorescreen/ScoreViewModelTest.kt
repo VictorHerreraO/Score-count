@@ -52,6 +52,7 @@ class ScoreViewModelTest {
                 settingsRepository = fakeSettingsRepository,
                 dispatcher = testDispatcher
             )
+        testDispatcher.scheduler.advanceUntilIdle() // Let init block complete
     }
 
     @AfterEach
