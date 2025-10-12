@@ -45,7 +45,16 @@ fun PlayerScoreCard(
         enabled = !isFinished,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isServing) {
+                MaterialTheme.colorScheme.surfaceVariant
+            } else {
+                MaterialTheme.colorScheme.surfaceContainer
+            }
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (isServing) 4.dp else 1.dp
+        )
     ) {
         Box(
             modifier = Modifier
@@ -69,7 +78,7 @@ fun PlayerScoreCard(
                         Icon(
                             Icons.Default.SportsTennis,
                             contentDescription = "Serving",
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -79,7 +88,8 @@ fun PlayerScoreCard(
                     fontSize = 96.sp,
                     fontWeight = FontWeight.Bold,
                     lineHeight = 96.sp,
-                    letterSpacing = (-4).sp
+                    letterSpacing = (-4).sp,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
             Row(

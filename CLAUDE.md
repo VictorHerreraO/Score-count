@@ -121,7 +121,9 @@ Before starting work, always reference ARCHITECTURE.md to understand the layered
 
 ## Branching strategy
 
-Create a new feature branch for you to work called `feature/task-xx-short-task-description`
+Always update the repository with the latest changes.
+
+Create a new feature branch for you to work called `[issue-type]/task-xx-short-task-description`
 
 Make small meaningful commits to your feature branch so your work is easy to review.
 

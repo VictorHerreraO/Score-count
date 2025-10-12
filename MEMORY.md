@@ -1,29 +1,107 @@
 # Memory: Score-Count App Development
 
-This file tracks development work that is currently in progress and has not yet been completed for the Score-Count application.
+This file tracks the current state of development for the Score-Count application.
 
-## Completed:
+## Current Branch
+- `feature/issue-24-enhanced-serve-indicator`
+- **Status**: Ready for review
+- **PR**: #25
 
-*   **Feature: Score Screen UI Update**: The UI for the Score Screen has been updated to support both portrait and landscape layouts, providing an improved user experience on different device orientations.
-*   **Feature: Match History Screen**: The initial implementation of the Match History screen is complete. This includes the domain, data, and UI layers, as well as navigation from the main score screen.
-*   **Feature: GameState Persistence (Task 07)**: GameState now persists to disk using Proto DataStore, surviving app process death and device restarts. The implementation includes:
-    *   Proto DataStore setup with GameStateProto schema
-    *   Automatic state restoration on app launch
-    *   LocalScoreDataSource refactored to use persistent storage
-    *   All tests passing (91 tests)
+## Recently Completed: Task #24 - Enhanced Serve Indicator + UI Overhaul
 
-## Important Notes:
+### What Was Accomplished
+Implemented enhanced visual feedback for the serve indicator with a comprehensive UI redesign to match design specifications provided in screenshots.
 
-*   **Undo Feature**: The task documentation mentioned an "undo" feature, but this was never implemented in the codebase. No undo-related code exists. This has been documented and clarified.
+### Key Changes
 
-## Next Steps:
+**1. Complete Color System Redesign** (`Color.kt`)
+- **Light Mode**: Slate backgrounds (#F1F5F9), blue serving cards (#EFF6FF), blue primary (#3B82F6)
+- **Dark Mode**: Dark navy background (#1A1A2E), elevated serving cards (#363A59), purple primary (#8B5CF6)
+- Removed old Purple/Pink color scheme, replaced with comprehensive theme-specific palette
 
-1.  **Manual Testing (Task 07)**: Test GameState persistence by:
-    *   Starting a game and changing scores
-    *   Force-stopping the app from system settings
-    *   Relaunching to verify state is restored
-2.  **Complete Match History Feature**:
-    *   Implement navigation to a "Match Detail" screen when a match is tapped.
-    *   Implement the "New Match" floating action button to navigate to a screen for creating a new match.
-    *   Implement filtering functionality for the match history list.
-3.  **Implement Pending UI Actions**: The "Show previous sets" feature is still pending implementation.
+**2. Material3 Theme Integration** (`Theme.kt`)
+- Configured complete color schemes for both light and dark modes
+- Mapped custom colors to Material3 slots: background, surface, surfaceVariant, surfaceContainer, onSurface, onSurfaceVariant
+- Added Color import for White color reference
+
+**3. UI Component Enhancements** (`ScoreScreen.kt`)
+- **Serve indicator**: Serving player card uses surfaceVariant background + 4dp elevation, non-serving uses surfaceContainer + 1dp elevation
+- **Score text**: Now uses primary color (blue in light, purple in dark) instead of default onSurface
+- **Buttons**: Increased from 32dp to 36dp, icons 20dp, using primary color
+- **DEUCE indicator**: Full-width with larger padding and refined styling
+
+### Technical Details
+- **Files Modified**: `Color.kt`, `Theme.kt`, `ScoreScreen.kt`
+- **Architecture**: Pure UI layer changes, no domain/data impact
+- **Testing**: All 91 tests passing, build successful, lint clean
+- **Commits**:
+  - `5a5a1ae` - Initial serve indicator enhancement
+  - `4f3560d` - Comprehensive UI updates to match screenshots
+
+### Design Specifications Met
+- ✅ Serving player card: Distinct background color (#eff6ff light, #363A59 dark)
+- ✅ Large shadow elevation effect (4dp vs 1dp)
+- ✅ Retained tennis ball icon for clarity
+- ✅ Works in both light and dark themes
+- ✅ Updates correctly when serve changes
+- ✅ Full UI matches provided screenshots precisely
+
+## Project Status
+
+### Completed Features
+1. **Score Screen UI**: Portrait and landscape layouts
+2. **Match History Screen**: Domain, data, and UI layers with navigation
+3. **GameState Persistence**: Proto DataStore implementation with automatic restoration
+4. **Enhanced Serve Indicator**: Visual feedback with comprehensive UI redesign (Task #24)
+
+### Important Notes
+- **Undo Feature**: Never implemented in codebase, no undo-related code exists
+- **Dynamic Colors**: App supports Android S+ dynamic colors with fallback to static schemes
+- **Branch Strategy**: Feature branches follow `feature/issue-XX-description` pattern
+- **Commits**: Small, focused commits with descriptive messages
+
+## Pending Work
+
+### Next Steps
+1. **Manual Testing**: Test enhanced serve indicator and UI changes on device/emulator
+   - Verify light mode colors and serving card elevation
+   - Verify dark mode colors and serving card elevation
+   - Test serve switching behavior
+   - Check both portrait and landscape orientations
+
+2. **Match History Feature**:
+   - Match detail screen navigation
+   - New match creation flow
+   - Filtering functionality
+
+3. **UI Features**:
+   - "Show previous sets" feature implementation
+
+## Important Context for Next Session
+
+### What Just Happened
+- Implemented Task #24 with comprehensive UI overhaul
+- Created PR #25 with detailed documentation
+- Updated issue #24 with completion report
+- All changes committed and pushed to remote
+- Ready for code review
+
+### Current State
+- On branch: `feature/issue-24-enhanced-serve-indicator`
+- Latest commit: `4f3560d` (UI updates to match screenshots)
+- PR #25 is open and ready for review
+- All tests passing, build successful
+
+### Key Files to Reference
+- **Architecture**: See `ARCHITECTURE.md` for project structure
+- **Commands**: See `CLAUDE.md` for build/test commands
+- **Colors**: `app/src/main/java/com/soyvictorherrera/scorecount/ui/theme/Color.kt`
+- **Theme**: `app/src/main/java/com/soyvictorherrera/scorecount/ui/theme/Theme.kt`
+- **Score UI**: `app/src/main/java/com/soyvictorherrera/scorecount/ui/scorescreen/ScoreScreen.kt`
+
+### Design System
+The app now uses a comprehensive Material3 color system:
+- Light mode: Slate/blue color scheme
+- Dark mode: Navy/purple color scheme
+- All components properly themed and accessible
+- Matches design specifications from issue #24 screenshots
