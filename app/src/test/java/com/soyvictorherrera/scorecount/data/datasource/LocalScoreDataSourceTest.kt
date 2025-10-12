@@ -43,7 +43,7 @@ class LocalScoreDataSourceTest {
                 produceFile = { File(tmpDir, "test_game_state.pb") }
             )
 
-        dataSource = LocalScoreDataSource(testDataStore)
+        dataSource = LocalScoreDataSource(testDataStore, testScope)
     }
 
     @AfterEach
@@ -262,7 +262,7 @@ class LocalScoreDataSourceTest {
             testScope.testScheduler.advanceUntilIdle()
 
             // When - create new data source pointing to same file
-            val newDataSource = LocalScoreDataSource(testDataStore)
+            val newDataSource = LocalScoreDataSource(testDataStore, testScope)
             testScope.testScheduler.advanceUntilIdle()
 
             // Then - state should be loaded from disk
