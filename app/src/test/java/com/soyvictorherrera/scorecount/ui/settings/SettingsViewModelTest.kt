@@ -1,12 +1,9 @@
 package com.soyvictorherrera.scorecount.ui.settings
 
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
-import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
+import com.soyvictorherrera.scorecount.util.fakes.FakeSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -235,32 +232,5 @@ class SettingsViewModelTest {
         val updatedSettings = viewModel.settings.first()
         assertEquals(newValue, updatedSettings.winnerServesNextGame)
         assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
-    }
-
-    // --- Fake Repository ---
-    class FakeSettingsRepository : SettingsRepository {
-        private val _settingsFlow = MutableStateFlow(GameSettings())
-        private var savedSettings: GameSettings? = null
-
-        override fun getSettings(): StateFlow<GameSettings> = _settingsFlow.asStateFlow()
-
-        override suspend fun saveSettings(settings: GameSettings) {
-            this.savedSettings = settings
-            // Also emit to the flow so subscribers see the change, simulating real behavior
-            _settingsFlow.value = settings
-        }
-
-        // Helper for tests to check what was saved
-        fun getSavedSettings(): GameSettings? = savedSettings
-
-        // Helper for tests to simulate new settings loaded from persistence
-        fun emitSettings(settings: GameSettings) {
-            _settingsFlow.value = settings
-        }
-
-        // Helper to reset for verifying "no save" scenarios (if applicable)
-        fun resetSavedSettings() {
-            savedSettings = null
-        }
     }
 }

@@ -2,18 +2,17 @@ package com.soyvictorherrera.scorecount.ui.scorescreen
 
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
-import com.soyvictorherrera.scorecount.domain.model.Match
 import com.soyvictorherrera.scorecount.domain.model.Player
-import com.soyvictorherrera.scorecount.domain.repository.ScoreRepository
-import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import com.soyvictorherrera.scorecount.domain.usecase.*
+import com.soyvictorherrera.scorecount.util.fakes.FakeMatchRepository
+import com.soyvictorherrera.scorecount.util.fakes.FakeScoreRepository
+import com.soyvictorherrera.scorecount.util.fakes.FakeSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -264,51 +263,5 @@ class ScoreViewModelTest {
         // Then - No match should be saved (because there was no transition)
         val savedMatches = fakeMatchRepository.getMatchList().first()
         assertEquals(0, savedMatches.size)
-    }
-
-    // --- Fake Repositories ---
-
-    class FakeScoreRepository : ScoreRepository {
-        private val _gameState = MutableStateFlow(
-            GameState(
-                player1 = Player(id = 1, name = "Player 1", score = 0),
-                player2 = Player(id = 2, name = "Player 2", score = 0),
-                servingPlayerId = 1
-            )
-        )
-
-        override fun getGameState(): StateFlow<GameState> = _gameState
-
-        override suspend fun updateGameState(newState: GameState) {
-            _gameState.value = newState
-        }
-
-        fun setState(state: GameState) {
-            _gameState.value = state
-        }
-    }
-
-    class FakeSettingsRepository : SettingsRepository {
-        private val _settings = MutableStateFlow(GameSettings())
-
-        override fun getSettings(): StateFlow<GameSettings> = _settings
-
-        override suspend fun saveSettings(settings: GameSettings) {
-            _settings.value = settings
-        }
-
-        fun setSettings(settings: GameSettings) {
-            _settings.value = settings
-        }
-    }
-
-    class FakeMatchRepository : com.soyvictorherrera.scorecount.domain.repository.MatchRepository {
-        private val _matches = MutableStateFlow<List<Match>>(emptyList())
-
-        override fun getMatchList(): Flow<List<Match>> = _matches
-
-        override suspend fun saveMatch(match: Match) {
-            _matches.value = _matches.value + match
-        }
     }
 }

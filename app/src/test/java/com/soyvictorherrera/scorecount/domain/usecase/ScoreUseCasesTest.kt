@@ -3,11 +3,9 @@ package com.soyvictorherrera.scorecount.domain.usecase
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.domain.model.Player
-import com.soyvictorherrera.scorecount.domain.repository.ScoreRepository
-import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
+import com.soyvictorherrera.scorecount.util.fakes.FakeScoreRepository
+import com.soyvictorherrera.scorecount.util.fakes.FakeSettingsRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -288,43 +286,5 @@ class ScoreUseCasesTest {
         assertEquals(0, savedState?.player2?.score)
         assertEquals(0, savedState?.player1SetsWon)
         assertEquals(0, savedState?.player2SetsWon)
-    }
-
-    // --- Fake Repositories ---
-
-    class FakeScoreRepository : ScoreRepository {
-        private val _gameState = MutableStateFlow(
-            GameState(
-                player1 = Player(id = 1, name = "Player 1", score = 0),
-                player2 = Player(id = 2, name = "Player 2", score = 0),
-                servingPlayerId = 1
-            )
-        )
-        var lastSavedState: GameState? = null
-
-        override fun getGameState(): StateFlow<GameState> = _gameState
-
-        override suspend fun updateGameState(newState: GameState) {
-            lastSavedState = newState
-            _gameState.value = newState
-        }
-
-        fun setState(state: GameState) {
-            _gameState.value = state
-        }
-    }
-
-    class FakeSettingsRepository : SettingsRepository {
-        private val _settings = MutableStateFlow(GameSettings())
-
-        override fun getSettings(): StateFlow<GameSettings> = _settings
-
-        override suspend fun saveSettings(settings: GameSettings) {
-            _settings.value = settings
-        }
-
-        fun setSettings(settings: GameSettings) {
-            _settings.value = settings
-        }
     }
 }
