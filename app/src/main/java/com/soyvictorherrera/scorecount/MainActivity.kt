@@ -46,7 +46,8 @@ class MainActivity : ComponentActivity() {
                         val scoreViewModel: ScoreViewModel = hiltViewModel()
                         ScoreScreen(
                             viewModel = scoreViewModel,
-                            navController = navController
+                            onNavigateToHistory = { navController.navigate(Screen.MatchHistoryScreen.route) },
+                            onNavigateToSettings = { navController.navigate(Screen.SettingsScreen.route) }
                         )
                     }
                     composable(Screen.SettingsScreen.route) {

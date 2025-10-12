@@ -1,5 +1,39 @@
 # Completed Tasks
 
+## Task 12: Improve DI Module Structure (Partial Implementation)
+
+*   **Objective**: Clean up redundant annotations in Hilt dependency injection modules.
+*   **Status**: Completed.
+
+### Decision Rationale:
+
+After critical evaluation, determined that:
+- The redundant `@Singleton` annotations on `@Binds` methods were genuinely problematic (unnecessary code)
+- Splitting `DataModule` into separate `DatabaseModule` would add complexity without significant benefit for this codebase size
+- Implemented only the clear improvement (removing redundancy) while avoiding over-engineering
+
+### Changes Implemented:
+
+1.  **Removed Redundant Annotations**:
+    *   Removed `@Singleton` annotations from all `@Binds` methods in `RepositoryModule.kt` (3 methods)
+    *   Removed `@Singleton` annotations from all `@Binds` methods in `DataSourceModule.kt` (1 method)
+    *   **Rationale**: `@Binds` methods inherit scope from their implementation classes, which are already `@Singleton` via constructor injection
+
+2.  **Cleaned Up Imports**:
+    *   Removed unused `javax.inject.Singleton` imports from `RepositoryModule.kt` and `DataSourceModule.kt`
+
+3.  **Validation**:
+    *   Build: ✓ Successful (`./gradlew clean build`)
+    *   Tests: ✓ All passing (`./gradlew test`)
+    *   Lint: ✓ No new issues (`./gradlew lintDebug`)
+
+### Files Modified:
+- `app/src/main/java/com/soyvictorherrera/scorecount/di/RepositoryModule.kt`
+- `app/src/main/java/com/soyvictorherrera/scorecount/di/DataSourceModule.kt`
+
+### Not Implemented:
+- Splitting `DataModule` into `DatabaseModule` and `DataSourceModule` - determined to be unnecessary refactoring for current codebase size
+
 ## Data Layer: Migrate to Preferences DataStore
 
 *   **Objective**: Replace `SharedPreferences` with `Preferences DataStore` for managing application settings and adopt a reactive approach for data retrieval.

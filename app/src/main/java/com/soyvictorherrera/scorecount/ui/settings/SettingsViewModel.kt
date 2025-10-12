@@ -1,5 +1,17 @@
 package com.soyvictorherrera.scorecount.ui.settings
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.RotateRight
+import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MilitaryTech
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonSearch
+import androidx.compose.material.icons.filled.ScreenLockPortrait
+import androidx.compose.material.icons.filled.Title
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
@@ -11,6 +23,33 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+sealed class SettingItemData {
+    data class ToggleItem(
+        val text: String,
+        val icon: ImageVector,
+        val isChecked: Boolean,
+        val onToggle: (Boolean) -> Unit
+    ) : SettingItemData()
+
+    data class StepperItem(
+        val text: String,
+        val subtitle: String? = null,
+        val icon: ImageVector,
+        val value: Int,
+        val onIncrement: () -> Unit,
+        val onDecrement: () -> Unit,
+        val valueRange: IntRange
+    ) : SettingItemData()
+
+    data class SwitchSetting(
+        val text: String,
+        val subtitle: String? = null,
+        val icon: ImageVector,
+        val isChecked: Boolean,
+        val onToggle: (Boolean) -> Unit
+    ) : SettingItemData()
+}
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -110,5 +149,55 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             settingsRepository.saveSettings(_settings.value)
         }
+    }
+
+    fun getGameControls(currentSettings: GameSettings): List<SettingItemData> {
+        return listOf(
+            SettingItemData.ToggleItem("Show title", Icons.Filled.Title, currentSettings.showTitle) { updateShowTitle(it) },
+            SettingItemData.ToggleItem("Show names", Icons.Filled.Badge, currentSettings.showNames) { updateShowNames(it) },
+            SettingItemData.ToggleItem("Show sets", Icons.Filled.CalendarToday, currentSettings.showSets) { updateShowSets(it) },
+            SettingItemData.ToggleItem("Mark serve", Icons.Filled.PersonSearch, currentSettings.markServe) { updateMarkServe(it) },
+            SettingItemData.ToggleItem("Mark deuce", Icons.Filled.Info, currentSettings.markDeuce) { updateMarkDeuce(it) },
+            SettingItemData.ToggleItem("Keep screen on", Icons.Filled.ScreenLockPortrait, currentSettings.keepScreenOn) { updateKeepScreenOn(it) }
+        )
+    }
+
+    fun getTableTennisRules(currentSettings: GameSettings): List<SettingItemData> {
+        return listOf(
+            SettingItemData.StepperItem(
+                text = "Set to",
+                subtitle = "Win by 2",
+                icon = Icons.Filled.EmojiEvents,
+                value = currentSettings.pointsToWinSet,
+                onIncrement = { updatePointsToWinSet(currentSettings.pointsToWinSet + 1) },
+                onDecrement = { updatePointsToWinSet(currentSettings.pointsToWinSet - 1) },
+                valueRange = 1..100
+            ),
+            SettingItemData.StepperItem(
+                text = "Match",
+                subtitle = "Best of ${currentSettings.numberOfSets} sets",
+                icon = Icons.Filled.MilitaryTech,
+                value = currentSettings.numberOfSets,
+                onIncrement = { updateNumberOfSets(currentSettings.numberOfSets + 2) },
+                onDecrement = { updateNumberOfSets(currentSettings.numberOfSets - 2) },
+                valueRange = 1..20
+            ),
+            SettingItemData.StepperItem(
+                text = "Serve rotation after",
+                subtitle = "1 after deuce",
+                icon = Icons.AutoMirrored.Filled.RotateRight,
+                value = currentSettings.serveRotationAfterPoints,
+                onIncrement = { updateServeRotationAfterPoints(currentSettings.serveRotationAfterPoints + 1) },
+                onDecrement = { updateServeRotationAfterPoints(currentSettings.serveRotationAfterPoints - 1) },
+                valueRange = 1..10
+            ),
+            SettingItemData.SwitchSetting(
+                text = "Winner serves",
+                subtitle = "The winner of a game serves first in the next game",
+                icon = Icons.Filled.Person,
+                isChecked = currentSettings.winnerServesNextGame,
+                onToggle = { updateWinnerServesNextGame(it) }
+            )
+        )
     }
 }
