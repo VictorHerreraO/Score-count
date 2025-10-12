@@ -30,7 +30,8 @@ class MatchHistoryViewModelTest {
         Dispatchers.setMain(testDispatcher)
         fakeMatchRepository = FakeMatchRepository()
         val getMatchesUseCase = GetMatchesUseCase(fakeMatchRepository)
-        viewModel = MatchHistoryViewModel(getMatchesUseCase)
+        viewModel = MatchHistoryViewModel(getMatchesUseCase, testDispatcher)
+        testDispatcher.scheduler.advanceUntilIdle() // Let init block complete
     }
 
     @AfterEach
@@ -77,7 +78,7 @@ class MatchHistoryViewModelTest {
 
             // Re-create ViewModel to trigger init block with pre-populated matches
             val getMatchesUseCase = GetMatchesUseCase(fakeMatchRepository)
-            viewModel = MatchHistoryViewModel(getMatchesUseCase)
+            viewModel = MatchHistoryViewModel(getMatchesUseCase, testDispatcher)
 
             // When
             testDispatcher.scheduler.advanceUntilIdle()
@@ -122,7 +123,10 @@ class MatchHistoryViewModelTest {
             // Given - Repository that throws an error
             val errorRepository =
                 object : MatchRepository {
-                    override fun getMatchList(): Flow<List<Match>> = throw RuntimeException("Database error")
+                    override fun getMatchList(): Flow<List<Match>> =
+                        kotlinx.coroutines.flow.flow {
+                            throw RuntimeException("Database error")
+                        }
 
                     override suspend fun saveMatch(match: Match) {
                         // Not used in this test
@@ -130,7 +134,7 @@ class MatchHistoryViewModelTest {
                 }
 
             val getMatchesUseCase = GetMatchesUseCase(errorRepository)
-            viewModel = MatchHistoryViewModel(getMatchesUseCase)
+            viewModel = MatchHistoryViewModel(getMatchesUseCase, testDispatcher)
 
             // When
             testDispatcher.scheduler.advanceUntilIdle()
@@ -179,7 +183,7 @@ class MatchHistoryViewModelTest {
 
             // Re-create ViewModel
             val getMatchesUseCase = GetMatchesUseCase(fakeMatchRepository)
-            viewModel = MatchHistoryViewModel(getMatchesUseCase)
+            viewModel = MatchHistoryViewModel(getMatchesUseCase, testDispatcher)
 
             // When
             testDispatcher.scheduler.advanceUntilIdle()

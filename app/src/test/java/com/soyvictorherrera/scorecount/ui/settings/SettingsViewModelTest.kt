@@ -28,7 +28,8 @@ class SettingsViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         fakeSettingsRepository = FakeSettingsRepository()
-        viewModel = SettingsViewModel(fakeSettingsRepository)
+        viewModel = SettingsViewModel(fakeSettingsRepository, testDispatcher)
+        testDispatcher.scheduler.advanceUntilIdle() // Let init block complete
     }
 
     @AfterEach
@@ -43,7 +44,7 @@ class SettingsViewModelTest {
             fakeSettingsRepository.emitSettings(initialRepoSettings)
 
             // Re-initialize ViewModel to trigger load with new emitted settings
-            viewModel = SettingsViewModel(fakeSettingsRepository)
+            viewModel = SettingsViewModel(fakeSettingsRepository, testDispatcher)
             testDispatcher.scheduler.advanceUntilIdle() // Ensure coroutines complete
 
             assertEquals(initialRepoSettings, viewModel.settings.first())
@@ -160,10 +161,10 @@ class SettingsViewModelTest {
     @Test
     fun `updateNumberOfSets updates settings, coerces value, and saves`() =
         runTest {
-            viewModel.updateNumberOfSets(5)
+            viewModel.updateNumberOfSets(7)
             testDispatcher.scheduler.advanceUntilIdle()
             var updatedSettings = viewModel.settings.first()
-            assertEquals(5, updatedSettings.numberOfSets)
+            assertEquals(7, updatedSettings.numberOfSets)
             assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
 
             // Test coercion (min)

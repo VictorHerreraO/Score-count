@@ -14,9 +14,11 @@ import androidx.compose.material.icons.filled.Title
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.soyvictorherrera.scorecount.di.DefaultDispatcher
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,7 +57,8 @@ sealed class SettingItemData {
 class SettingsViewModel
     @Inject
     constructor(
-        private val settingsRepository: SettingsRepository
+        private val settingsRepository: SettingsRepository,
+        @DefaultDispatcher private val dispatcher: CoroutineDispatcher
     ) : ViewModel() {
         private val _settings = MutableStateFlow(GameSettings()) // Initialize with default settings
         val settings: StateFlow<GameSettings> = _settings.asStateFlow()
@@ -65,7 +68,7 @@ class SettingsViewModel
         }
 
         private fun loadSettings() {
-            viewModelScope.launch {
+            viewModelScope.launch(dispatcher) {
                 settingsRepository.getSettings().collectLatest { loadedSettings ->
                     _settings.value = loadedSettings
                 }
@@ -147,7 +150,7 @@ class SettingsViewModel
         }
 
         private fun saveSettings() {
-            viewModelScope.launch {
+            viewModelScope.launch(dispatcher) {
                 settingsRepository.saveSettings(_settings.value)
             }
         }

@@ -4,10 +4,9 @@ import androidx.datastore.core.DataStore
 import com.soyvictorherrera.scorecount.GameStateProto
 import com.soyvictorherrera.scorecount.data.mapper.toDomain
 import com.soyvictorherrera.scorecount.data.mapper.toProto
+import com.soyvictorherrera.scorecount.di.ApplicationScope
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -25,10 +24,9 @@ import javax.inject.Singleton
 class LocalScoreDataSource
     @Inject
     constructor(
-        private val dataStore: DataStore<GameStateProto>
+        private val dataStore: DataStore<GameStateProto>,
+        @ApplicationScope private val scope: CoroutineScope
     ) {
-        private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
         /**
          * GameState loaded from disk and exposed as StateFlow.
          * Automatically restored on app restart.

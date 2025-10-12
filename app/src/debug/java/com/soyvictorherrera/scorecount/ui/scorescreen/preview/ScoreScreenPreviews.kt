@@ -12,6 +12,7 @@ import com.soyvictorherrera.scorecount.domain.usecase.SaveMatchUseCase
 import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreScreen
 import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreViewModel
 import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
+import kotlinx.coroutines.Dispatchers
 
 @Preview(showBackground = true)
 @Composable
@@ -79,6 +80,7 @@ private fun createPreviewViewModel(finished: Boolean = false): ScoreViewModel {
         manualSwitchServeUseCase = ManualSwitchServeUseCase(fakeScoreRepo),
         resetGameUseCase = ResetGameUseCase(fakeScoreRepo, fakeSettingsRepo),
         saveMatchUseCase = SaveMatchUseCase(fakeMatchRepo),
-        settingsRepository = fakeSettingsRepo
+        settingsRepository = fakeSettingsRepo,
+        dispatcher = Dispatchers.Unconfined
     )
 }

@@ -168,12 +168,18 @@ object ScoreCalculator {
         player1Name: String,
         player2Name: String,
         settings: GameSettings,
-        lastGameWinnerId: Int? = null
+        lastGameWinnerId: Int? = null,
+        currentServerId: Int? = null
     ): GameState {
         val firstServer =
             if (settings.winnerServesNextGame && lastGameWinnerId != null) {
+                // Winner serves next game
                 lastGameWinnerId
+            } else if (!settings.winnerServesNextGame && currentServerId != null) {
+                // Alternate server from current server
+                if (currentServerId == player1Id) player2Id else player1Id
             } else {
+                // Default to player 1
                 player1Id
             }
 
@@ -275,11 +281,18 @@ object ScoreCalculator {
             }
 
         // Check if it's time to rotate server
+        // Note: currentScores represents the state AFTER scoring the point
+        // The first N points are served by the initial server, then we rotate every N points
+        // Example with N=2: P1 serves points 1-2, P2 serves points 3-4, P1 serves points 5-6, etc.
+        // Rotation happens at the start of point N+1, 2N+1, 3N+1, etc.
         val totalPointsInCurrentSet = currentScores.first + currentScores.second
+
+        // Rotate when: we've completed at least one interval AND the previous point was the last of an interval
+        // (totalPoints - 1) % interval == 0 means the previous point was the Nth, 2Nth, 3Nth, etc.
         val shouldRotate =
             serveInterval > 0 &&
-                totalPointsInCurrentSet % serveInterval == 0 &&
-                totalPointsInCurrentSet > 0
+                totalPointsInCurrentSet > serveInterval &&
+                (totalPointsInCurrentSet - serveInterval - 1) % serveInterval == 0
 
         return if (shouldRotate) {
             if (currentServingPlayerId == p1Id) p2Id else p1Id

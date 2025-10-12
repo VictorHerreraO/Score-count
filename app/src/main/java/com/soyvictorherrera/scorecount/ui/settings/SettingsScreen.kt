@@ -50,6 +50,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -270,7 +271,8 @@ fun SettingsScreenPreview() {
                                 override suspend fun saveSettings(settings: GameSettings) {
                                     settingsFlow.value = settings
                                 }
-                            }
+                            },
+                        dispatcher = Dispatchers.Unconfined
                     )
             )
         }

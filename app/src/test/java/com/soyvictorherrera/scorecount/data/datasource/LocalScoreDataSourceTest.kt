@@ -43,7 +43,7 @@ class LocalScoreDataSourceTest {
                 produceFile = { File(tmpDir, "test_game_state.pb") }
             )
 
-        dataSource = LocalScoreDataSource(testDataStore)
+        dataSource = LocalScoreDataSource(testDataStore, testScope)
     }
 
     @AfterEach
@@ -91,9 +91,8 @@ class LocalScoreDataSourceTest {
             dataSource.updateState(newState)
             testScope.testScheduler.advanceUntilIdle()
 
-            // Then - read directly from DataStore to verify persistence
-            val persistedProto = testDataStore.data.first()
-            val persistedState = persistedProto.toDomain()
+            // Then - verify persistence via the exposed StateFlow (which reads from DataStore)
+            val persistedState = dataSource.gameState.first()
 
             assertEquals(10, persistedState.player1.score)
             assertEquals(8, persistedState.player2.score)
@@ -151,9 +150,8 @@ class LocalScoreDataSourceTest {
             dataSource.updateState(newState)
             testScope.testScheduler.advanceUntilIdle()
 
-            // Then
-            val persistedProto = testDataStore.data.first()
-            val persistedState = persistedProto.toDomain()
+            // Then - verify via the exposed StateFlow
+            val persistedState = dataSource.gameState.first()
             assertNull(persistedState.servingPlayerId)
         }
 
@@ -262,7 +260,7 @@ class LocalScoreDataSourceTest {
             testScope.testScheduler.advanceUntilIdle()
 
             // When - create new data source pointing to same file
-            val newDataSource = LocalScoreDataSource(testDataStore)
+            val newDataSource = LocalScoreDataSource(testDataStore, testScope)
             testScope.testScheduler.advanceUntilIdle()
 
             // Then - state should be loaded from disk

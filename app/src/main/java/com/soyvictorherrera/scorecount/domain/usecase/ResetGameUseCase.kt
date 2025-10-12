@@ -21,7 +21,7 @@ class ResetGameUseCase
             val currentState = scoreRepository.getGameState().first()
             val settings = settingsRepository.getSettings().first()
 
-            // Auto-determine winner if not provided
+            // Determine who should serve: use provided winner or auto-determine
             val winnerId = lastGameWinnerId ?: ScoreCalculator.determineWinner(currentState)
 
             val newState =
@@ -31,7 +31,8 @@ class ResetGameUseCase
                     player1Name = currentState.player1.name,
                     player2Name = currentState.player2.name,
                     settings = settings,
-                    lastGameWinnerId = winnerId
+                    lastGameWinnerId = winnerId,
+                    currentServerId = currentState.servingPlayerId
                 )
 
             scoreRepository.updateGameState(newState)

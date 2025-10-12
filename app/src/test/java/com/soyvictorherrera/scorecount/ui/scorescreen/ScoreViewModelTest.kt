@@ -49,8 +49,10 @@ class ScoreViewModelTest {
                 manualSwitchServeUseCase = manualSwitchServeUseCase,
                 resetGameUseCase = resetGameUseCase,
                 saveMatchUseCase = saveMatchUseCase,
-                settingsRepository = fakeSettingsRepository
+                settingsRepository = fakeSettingsRepository,
+                dispatcher = testDispatcher
             )
+        testDispatcher.scheduler.advanceUntilIdle() // Let init block complete
     }
 
     @AfterEach
@@ -202,25 +204,6 @@ class ScoreViewModelTest {
                     isFinished = false
                 )
             fakeScoreRepository.setState(initialState)
-
-            // Re-create ViewModel to trigger init block
-            val incrementScoreUseCase = IncrementScoreUseCase(fakeScoreRepository, fakeSettingsRepository)
-            val decrementScoreUseCase = DecrementScoreUseCase(fakeScoreRepository)
-            val manualSwitchServeUseCase = ManualSwitchServeUseCase(fakeScoreRepository)
-            val resetGameUseCase = ResetGameUseCase(fakeScoreRepository, fakeSettingsRepository)
-            val newSaveMatchUseCase = SaveMatchUseCase(fakeMatchRepository)
-
-            viewModel =
-                ScoreViewModel(
-                    scoreRepository = fakeScoreRepository,
-                    incrementScoreUseCase = incrementScoreUseCase,
-                    decrementScoreUseCase = decrementScoreUseCase,
-                    manualSwitchServeUseCase = manualSwitchServeUseCase,
-                    resetGameUseCase = resetGameUseCase,
-                    saveMatchUseCase = newSaveMatchUseCase,
-                    settingsRepository = fakeSettingsRepository
-                )
-
             testDispatcher.scheduler.advanceUntilIdle()
 
             // When - Change state to finished
@@ -241,7 +224,10 @@ class ScoreViewModelTest {
     @Test
     fun `does not auto-save match when game is already finished`() =
         runTest {
-            // Given - Game starts already finished
+            // Given - Create a fresh match repository to avoid interference from setUp() ViewModel
+            val isolatedMatchRepository = FakeMatchRepository()
+
+            // Game starts already finished
             val finishedState =
                 GameState(
                     player1 = Player(id = 1, name = "Alice", score = 0),
@@ -253,24 +239,25 @@ class ScoreViewModelTest {
                 )
             fakeScoreRepository.setState(finishedState)
 
-            // Re-create ViewModel
+            // Create a new ViewModel that will see the finished state as the first emission
             val incrementScoreUseCase = IncrementScoreUseCase(fakeScoreRepository, fakeSettingsRepository)
             val decrementScoreUseCase = DecrementScoreUseCase(fakeScoreRepository)
             val manualSwitchServeUseCase = ManualSwitchServeUseCase(fakeScoreRepository)
             val resetGameUseCase = ResetGameUseCase(fakeScoreRepository, fakeSettingsRepository)
-            val newSaveMatchUseCase = SaveMatchUseCase(fakeMatchRepository)
+            val isolatedSaveMatchUseCase = SaveMatchUseCase(isolatedMatchRepository)
 
-            viewModel =
+            @Suppress("UNUSED_VARIABLE")
+            val isolatedViewModel =
                 ScoreViewModel(
                     scoreRepository = fakeScoreRepository,
                     incrementScoreUseCase = incrementScoreUseCase,
                     decrementScoreUseCase = decrementScoreUseCase,
                     manualSwitchServeUseCase = manualSwitchServeUseCase,
                     resetGameUseCase = resetGameUseCase,
-                    saveMatchUseCase = newSaveMatchUseCase,
-                    settingsRepository = fakeSettingsRepository
+                    saveMatchUseCase = isolatedSaveMatchUseCase,
+                    settingsRepository = fakeSettingsRepository,
+                    dispatcher = testDispatcher
                 )
-
             testDispatcher.scheduler.advanceUntilIdle()
 
             // When - State remains finished (no transition from false to true)
@@ -278,8 +265,8 @@ class ScoreViewModelTest {
 
             testDispatcher.scheduler.advanceUntilIdle()
 
-            // Then - No match should be saved (because there was no transition)
-            val savedMatches = fakeMatchRepository.getMatchList().first()
+            // Then - No match should be saved to the isolated repository (because there was no transition)
+            val savedMatches = isolatedMatchRepository.getMatchList().first()
             assertEquals(0, savedMatches.size)
         }
 }
