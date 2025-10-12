@@ -156,3 +156,15 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
     }
     exclude("**/generated/**", "**/build/**")
 }
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+
+    // Prevent test hangs
+    systemProperty("junit.jupiter.execution.timeout.default", "30s")
+
+    reports {
+        junitXml.required.set(true)
+        html.required.set(true)
+    }
+}
