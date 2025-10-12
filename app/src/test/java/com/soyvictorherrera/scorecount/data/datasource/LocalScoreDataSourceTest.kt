@@ -53,7 +53,7 @@ class LocalScoreDataSourceTest {
 
     @Test
     fun `initial state is default GameState`() =
-        testScope.runTest {
+        runTest {
             // When
             val state = dataSource.gameState.first()
 
@@ -74,7 +74,7 @@ class LocalScoreDataSourceTest {
 
     @Test
     fun `updateState persists new state to DataStore`() =
-        testScope.runTest {
+        runTest {
             // Given
             val newState =
                 GameState(
@@ -106,7 +106,7 @@ class LocalScoreDataSourceTest {
 
     @Test
     fun `updateState updates exposed StateFlow`() =
-        testScope.runTest {
+        runTest {
             // Given
             val newState =
                 GameState(
@@ -134,7 +134,7 @@ class LocalScoreDataSourceTest {
 
     @Test
     fun `updateState handles null servingPlayerId`() =
-        testScope.runTest {
+        runTest {
             // Given
             val newState =
                 GameState(
@@ -159,7 +159,7 @@ class LocalScoreDataSourceTest {
 
     @Test
     fun `updateState handles finished game state`() =
-        testScope.runTest {
+        runTest {
             // Given
             val newState =
                 GameState(
@@ -185,7 +185,7 @@ class LocalScoreDataSourceTest {
 
     @Test
     fun `updateState handles deuce state`() =
-        testScope.runTest {
+        runTest {
             // Given
             val newState =
                 GameState(
@@ -211,7 +211,7 @@ class LocalScoreDataSourceTest {
 
     @Test
     fun `multiple updates preserve latest state`() =
-        testScope.runTest {
+        runTest {
             // Given - multiple rapid updates
             val state1 =
                 GameState(
@@ -245,7 +245,7 @@ class LocalScoreDataSourceTest {
 
     @Test
     fun `persistence survives data source recreation`() =
-        testScope.runTest {
+        runTest {
             // Given - save state with first data source
             val savedState =
                 GameState(
@@ -278,7 +278,7 @@ class LocalScoreDataSourceTest {
 
     @Test
     fun `handles empty player names`() =
-        testScope.runTest {
+        runTest {
             // Given
             val newState =
                 GameState(
@@ -303,7 +303,7 @@ class LocalScoreDataSourceTest {
 
     @Test
     fun `handles high score values`() =
-        testScope.runTest {
+        runTest {
             // Given
             val newState =
                 GameState(
