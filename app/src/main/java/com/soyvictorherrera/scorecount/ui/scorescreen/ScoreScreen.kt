@@ -93,7 +93,7 @@ fun ScoreScreenPortrait(
             TopAppBar(
                 title = {
                     if (gameSettings.showTitle) {
-                        Text("Table Tennis", fontWeight = FontWeight.Bold)
+                        Text(stringResource(com.soyvictorherrera.scorecount.R.string.score_table_tennis_title), fontWeight = FontWeight.Bold)
                     }
                 },
                 actions = {

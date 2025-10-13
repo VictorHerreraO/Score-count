@@ -81,7 +81,7 @@ fun CentralControls(
                 ) {
                     Icon(Icons.Default.RestartAlt, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("New Game")
+                    Text(stringResource(com.soyvictorherrera.scorecount.R.string.action_new_game))
                 }
             } else {
                 OutlinedButton(
@@ -91,7 +91,7 @@ fun CentralControls(
                 ) {
                     Icon(Icons.Default.RestartAlt, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Reset")
+                    Text(stringResource(com.soyvictorherrera.scorecount.R.string.action_reset))
                 }
                 if (gameSettings.markServe) {
                     OutlinedButton(
@@ -101,7 +101,7 @@ fun CentralControls(
                     ) {
                         Icon(Icons.Default.SwapHoriz, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Switch")
+                        Text(stringResource(com.soyvictorherrera.scorecount.R.string.action_switch))
                     }
                 }
             }

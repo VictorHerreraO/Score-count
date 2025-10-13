@@ -48,7 +48,7 @@ fun BottomBarActions(
                     onClick = onStartNewGame,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Start New Game")
+                    Text(stringResource(com.soyvictorherrera.scorecount.R.string.action_start_new_game))
                 }
             } else {
                 OutlinedButton(
@@ -57,7 +57,7 @@ fun BottomBarActions(
                 ) {
                     Icon(Icons.Default.RestartAlt, contentDescription = "Reset")
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Reset")
+                    Text(stringResource(com.soyvictorherrera.scorecount.R.string.action_reset))
                 }
                 if (showSwitchServe) {
                     OutlinedButton(
@@ -66,7 +66,7 @@ fun BottomBarActions(
                     ) {
                         Icon(Icons.Default.SwapHoriz, contentDescription = "Switch Serve")
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Switch Serve")
+                        Text(stringResource(com.soyvictorherrera.scorecount.R.string.action_switch_serve))
                     }
                 }
             }

@@ -8,155 +8,26 @@ This file tracks the current state of development for the Score-Count applicatio
 - **Status**: ✅ All 107 tests passing - Task #35 complete
 - **Related Issue**: #35
 
-## Current Work: Task #35 - Fix Pre-Existing Unit Test Failures ✅ COMPLETE
+## Current Work: Replace hardcoded UI strings with string resources (in progress)
 
-### Context
-After enabling JUnit 5 test execution in task #23, we discovered that 22 out of 107 tests were failing. These failures were previously hidden because the `useJUnitPlatform()` configuration was missing from the Gradle build files. Task #35 was to fix all these failures.
+### Summary
+- Replaced hardcoded strings in settings and some score screen components with Android string resources.
+- Updated `SettingItemData` to carry string resource IDs instead of raw strings so the ViewModel remains context-free.
 
-### Progress Summary
-- **Initial State**: 22 failing tests out of 107 (79.4% passing)
-- **Final State**: 0 failing tests out of 107 (100% passing) ✅
-- **Tests Fixed**: All 22 tests (100% resolution)
-- **Commits Made**: 12 focused commits
-- **Build Status**: ✅ All checks passing (tests, lint, ktlint, detekt, build)
+### Files changed
+- `app/src/main/res/values/strings.xml` - added multiple string entries for settings and score UI
+- `app/src/main/java/com/soyvictorherrera/scorecount/ui/settings/SettingsViewModel.kt` - now uses R.string ids for settings items
+- `app/src/main/java/com/soyvictorherrera/scorecount/ui/settings/SettingsScreen.kt` - consumes resource ids via `stringResource()` and updates content descriptions
+- `app/src/main/java/com/soyvictorherrera/scorecount/ui/scorescreen/components/BottomBarActions.kt` - uses string resources
+- `app/src/main/java/com/soyvictorherrera/scorecount/ui/scorescreen/components/CentralControls.kt` - uses string resources
+- `app/src/main/java/com/soyvictorherrera/scorecount/ui/scorescreen/ScoreScreen.kt` - title now from string resources
 
-### Test Failures Fixed (22 tests - All resolved)
+### Status
+- In-progress: Added resources and updated composables. Compile attempt failed in container due to missing Android SDK (`local.properties` or ANDROID_HOME not set). Manual/CI build required to fully validate.
 
-**1. ScoreCalculator Server Rotation Logic (2 tests)** ✅
-- **Issue**: Server rotation logic was calculating rotation timing incorrectly
-- **Root Cause**: Formula `totalPoints % interval == 0` rotated too early
-- **Fix**: Changed to `(totalPoints - serveInterval - 1) % serveInterval == 0` to ensure first N points are served by initial server, then rotation every N points
-- **Commit**: `fd6052c` - "fix: Correct server rotation logic in ScoreCalculator"
-- **File**: `app/src/main/java/com/soyvictorherrera/scorecount/domain/calculator/ScoreCalculator.kt:122-125`
-
-**2. ResetGameUseCase Winner Serve Logic (1 test)** ✅
-- **Issue**: When `winnerServesNextGame` setting was false, the use case wasn't properly alternating servers
-- **Root Cause**: Alternation logic was in the wrong place, and the winner was being passed instead of the current server
-- **Fix**: Added `currentServerId` parameter to `ScoreCalculator.resetGame()` and implemented proper alternation logic
-- **Commits**:
-  - `8e750a9` - "fix: Respect winnerServesNextGame setting in ResetGameUseCase"
-  - `4e8286f` - "fix: Properly implement serve alternation in ResetGameUseCase"
-- **Files**:
-  - `app/src/main/java/com/soyvictorherrera/scorecount/domain/calculator/ScoreCalculator.kt:165-184`
-  - `app/src/main/java/com/soyvictorherrera/scorecount/domain/usecase/ResetGameUseCase.kt:20-39`
-
-**3. LocalScoreDataSource Test Timing (3 of 5 tests)** ✅
-- **Issue**: DataStore operations weren't completing before assertions
-- **Root Cause**: LocalScoreDataSource was creating its own CoroutineScope, which wasn't controlled by tests
-- **Fix**: Injected `@ApplicationScope` into LocalScoreDataSource, allowing tests to inject TestScope
-- **Commits**:
-  - `6508e7d` - "feat: Add coroutine dispatcher DI and fix LocalScoreDataSource tests"
-- **Files**:
-  - Created: `app/src/main/java/com/soyvictorherrera/scorecount/di/CoroutineModule.kt`
-  - Modified: `app/src/main/java/com/soyvictorherrera/scorecount/data/datasource/LocalScoreDataSource.kt:28`
-  - Modified: `app/src/test/java/com/soyvictorherrera/scorecount/data/datasource/LocalScoreDataSourceTest.kt:46`
-
-**4. ViewModel Dispatcher Injection (11 of 14 tests)** ✅
-- **Issue**: ViewModel init block coroutines weren't controlled by test dispatcher, causing tests to hang waiting for StateFlow values
-- **Root Cause**: ViewModels were using `Dispatchers.Main` or `Dispatchers.Default`, not the injected test dispatcher
-- **Fix**:
-  - Added dispatcher injection to all ViewModels via `@DefaultDispatcher` qualifier
-  - Updated ViewModel tests to inject `testDispatcher`
-  - Added `testDispatcher.scheduler.advanceUntilIdle()` in test `setUp()` methods
-- **Commits**:
-  - `908de2b` - "feat: Inject dispatchers into ViewModels for testability"
-  - `096725d` - "fix: Add dispatcher parameter to preview ViewModels"
-  - `37ab870` - "test: Advance test dispatcher in setUp() for ViewModel tests"
-- **Files Modified**:
-  - `app/src/main/java/com/soyvictorherrera/scorecount/ui/settings/SettingsViewModel.kt:61,71,153`
-  - `app/src/main/java/com/soyvictorherrera/scorecount/ui/scorescreen/ScoreViewModel.kt:28,36`
-  - `app/src/main/java/com/soyvictorherrera/scorecount/ui/matchhistory/MatchHistoryViewModel.kt:21,27`
-  - `app/src/test/java/com/soyvictorherrera/scorecount/ui/settings/SettingsViewModelTest.kt:31-32`
-  - `app/src/test/java/com/soyvictorherrera/scorecount/ui/scorescreen/ScoreViewModelTest.kt:54-55`
-  - `app/src/test/java/com/soyvictorherrera/scorecount/ui/matchhistory/MatchHistoryViewModelTest.kt:33-34`
-  - `app/src/debug/java/com/soyvictorherrera/scorecount/ui/scorescreen/preview/ScoreScreenPreviews.kt:84`
-  - `app/src/main/java/com/soyvictorherrera/scorecount/ui/settings/SettingsScreen.kt:275`
-  - `detekt-baseline.xml` (added ScoreViewModel LongParameterList to baseline)
-
-**5. MatchHistoryViewModel Error Handling (1 test)** ✅
-- **Issue**: Test was throwing RuntimeException immediately instead of in the flow
-- **Root Cause**: `override fun getMatchList(): Flow<List<Match>> = throw RuntimeException("Database error")` throws before returning a flow
-- **Fix**: Changed to return a flow that throws: `flow { throw RuntimeException("Database error") }`
-- **Commit**: `f6b276b` - "test: Fix test scope issues in LocalScoreDataSource and MatchHistoryViewModel tests"
-- **File**: `app/src/test/java/com/soyvictorherrera/scorecount/ui/matchhistory/MatchHistoryViewModelTest.kt:126-129`
-
-**6. LocalScoreDataSourceTest (2 additional tests)** ✅
-- `updateState persists new state to DataStore()` - TimeoutException
-- `updateState handles null servingPlayerId()` - TimeoutException
-- **Issue**: Tests were reading directly from `testDataStore.data.first()` which timed out because DataStore operations were in a different coroutine scope
-- **Root Cause**: Tests needed to read from the StateFlow (`dataSource.gameState.first()`) instead of directly from DataStore to avoid scope issues
-- **Fix**: Changed assertions to use `dataSource.gameState.first()` which is already mapped from DataStore and properly scoped
-- **Commit**: Part of final test fixes
-- **Files**: `app/src/test/java/com/soyvictorherrera/scorecount/data/datasource/LocalScoreDataSourceTest.kt:95,154`
-
-**7. ScoreViewModelTest (2 tests)** ✅
-- `auto-saves match when game finishes()` - Expected 1 match saved but got 2
-- `does not auto-save match when game is already finished()` - Expected 0 matches but got 1
-- **Issue**: Tests were creating multiple ViewModel instances that all watched the same repository, causing duplicate auto-saves
-- **Root Cause**: ViewModel from setUp() and test-created ViewModel both triggered auto-save when state changed
-- **Fix**:
-  - Test 1: Reuse the ViewModel from setUp() instead of creating a new one
-  - Test 2: Create isolated FakeMatchRepository to avoid interference from setUp() ViewModel
-- **Commit**: Part of final test fixes
-- **Files**: `app/src/test/java/com/soyvictorherrera/scorecount/ui/scorescreen/ScoreViewModelTest.kt:193-222,224-270`
-
-**8. SettingsViewModelTest (1 test)** ✅
-- `updateNumberOfSets updates settings, coerces value, and saves()` - Expected GameSettings but got null
-- **Issue**: Test was trying to set numberOfSets to 5, but default value was already 5, so the if condition failed and saveSettings() was never called
-- **Root Cause**: ViewModel's `updateNumberOfSets()` has an if guard: `if (_settings.value.numberOfSets != newSets)` which prevented saving when value didn't change
-- **Fix**: Changed test to use value 7 instead of 5 to trigger an actual change
-- **Commit**: Part of final test fixes
-- **Files**: `app/src/test/java/com/soyvictorherrera/scorecount/ui/settings/SettingsViewModelTest.kt:164`
-
-### Technical Patterns Discovered
-
-**Coroutine Testing Best Practices:**
-1. Always inject `CoroutineDispatcher` into ViewModels using DI qualifiers
-2. Use `testDispatcher.scheduler.advanceUntilIdle()` after ViewModel creation in setUp()
-3. Inject `CoroutineScope` into data sources that need async operations
-4. Use `StandardTestDispatcher` for deterministic test execution
-5. ⚠️ **AVOID**: `testScope.runTest` creates nested scopes - use plain `runTest` instead
-
-**StateFlow Testing Pattern:**
-```kotlin
-@BeforeEach
-fun setUp() {
-    Dispatchers.setMain(testDispatcher)
-    viewModel = MyViewModel(repository, testDispatcher)
-    testDispatcher.scheduler.advanceUntilIdle() // Critical!
-}
-```
-
-**Dispatcher Injection Pattern:**
-```kotlin
-@HiltViewModel
-class MyViewModel @Inject constructor(
-    private val repository: Repository,
-    @DefaultDispatcher private val dispatcher: CoroutineDispatcher
-) : ViewModel() {
-    init {
-        viewModelScope.launch(dispatcher) {
-            // Now controlled by test dispatcher
-        }
-    }
-}
-```
-
-### Next Steps
-
-**Immediate (Complete Task #35):**
-1. ✅ Fix remaining 2 LocalScoreDataSourceTest timeouts
-2. ✅ Fix remaining 2 ScoreViewModelTest assertion failures
-3. ✅ Fix remaining 1 SettingsViewModelTest assertion failure
-4. ✅ Run full test suite to verify all 107 tests pass
-5. ✅ Run lint and build checks
-6. ✅ Create pull request for issue #35
-7. ✅ Update this MEMORY.md with final results
-
-**Future Considerations:**
-- ScoreViewModel has 8 parameters (threshold is 7) - consider refactoring into a composite use case
-- LocalScoreDataSource DataStore testing may need improved synchronization strategy
-- Consider adding integration tests for ViewModel + Repository interactions
+### Next steps
+1. Run full build in an environment with Android SDK available (local machine or CI) and fix any remaining references.
+2. Audit remaining UI files for hardcoded strings and update accordingly.
 
 ### Commits Log (Task #35)
 1. `fd6052c` - fix: Correct server rotation logic in ScoreCalculator
