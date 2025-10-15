@@ -210,3 +210,10 @@ tasks.withType<Test>().configureEach {
         html.required.set(true)
     }
 }
+
+// Task to print version for CI
+tasks.register("printVersionName") {
+    doLast {
+        println(android.defaultConfig.versionName)
+    }
+}
