@@ -65,6 +65,22 @@ When working on this project, update these files to maintain continuity across s
 ./gradlew ktlintFormat           # Auto-fix Kotlin code formatting
 ```
 
+### Release Management
+```bash
+# Trigger release build manually
+gh workflow run release-build.yml --ref main
+
+# List recent releases
+gh release list
+
+# Download latest release APK
+gh release download --pattern '*.apk'
+
+# Create a new version tag
+git tag -a v1.1.0 -m "Release v1.1.0"
+git push origin v1.1.0
+```
+
 ## Quick Reference
 
 ### Package Structure
@@ -106,6 +122,13 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the complete workflow. Quick summary:
 - **Testing**: Unit tests with fakes/mocks under `app/src/test/`
 - **Orientation**: Handle in composable logic (see `ScoreScreen.kt`)
 - **Code Formatting**: Pre-commit hook automatically formats Kotlin files with ktlint
+
+### Release Process
+1. Merge feature PR to `main`
+2. CI automatically builds signed release APK
+3. Download APK from Actions artifacts
+4. (Optional) Create git tag for formal release: `git tag -a v1.x.x -m "Release note"`
+5. Push tag to trigger GitHub Release: `git push origin v1.x.x`
 
 ### Version Catalog
 Add dependencies to `gradle/libs.versions.toml` before using them in build files.
