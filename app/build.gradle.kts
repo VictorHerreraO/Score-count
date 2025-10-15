@@ -13,6 +13,27 @@ android {
     namespace = "com.soyvictorherrera.scorecount"
     compileSdk = 36
 
+    // Add signing configuration
+    signingConfigs {
+        create("release") {
+            // CI environment variables (from GitHub Secrets)
+            val keystoreFile = System.getenv("KEYSTORE_FILE")
+            val keystorePassword = System.getenv("KEYSTORE_PASSWORD")
+            val keyAlias = System.getenv("KEY_ALIAS")
+            val keyPassword = System.getenv("KEY_PASSWORD")
+
+            if (keystoreFile != null && File(keystoreFile).exists()) {
+                storeFile = File(keystoreFile)
+                storePassword = keystorePassword
+                this.keyAlias = keyAlias
+                this.keyPassword = keyPassword
+            } else {
+                // Fallback for local development (optional)
+                logger.warn("Release signing not configured. Using debug signing.")
+            }
+        }
+    }
+
     defaultConfig {
         applicationId = "com.soyvictorherrera.scorecount"
         minSdk = 28
@@ -29,6 +50,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            signingConfig = signingConfigs.getByName("release") // Add this line
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
