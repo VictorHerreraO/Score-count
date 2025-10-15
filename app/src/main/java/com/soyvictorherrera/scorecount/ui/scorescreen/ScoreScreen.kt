@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.soyvictorherrera.scorecount.R
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.BottomBarActions
@@ -95,7 +96,7 @@ fun ScoreScreenPortrait(
                 title = {
                     if (gameSettings.showTitle) {
                         Text(
-                            stringResource(com.soyvictorherrera.scorecount.R.string.score_table_tennis_title),
+                            stringResource(R.string.score_table_tennis_title),
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -106,7 +107,7 @@ fun ScoreScreenPortrait(
                             Icons.Default.History,
                             contentDescription =
                                 stringResource(
-                                    id = com.soyvictorherrera.scorecount.R.string.cd_history
+                                    id = R.string.cd_history
                                 )
                         )
                     }
@@ -115,7 +116,7 @@ fun ScoreScreenPortrait(
                             Icons.Default.Settings,
                             contentDescription =
                                 stringResource(
-                                    id = com.soyvictorherrera.scorecount.R.string.cd_settings
+                                    id = R.string.cd_settings
                                 )
                         )
                     }
@@ -164,7 +165,7 @@ fun ScoreScreenPortrait(
                         )
                     }
                     Text(
-                        text = stringResource(id = com.soyvictorherrera.scorecount.R.string.sets_separator),
+                        text = stringResource(id = R.string.sets_separator),
                         style = MaterialTheme.typography.headlineSmall
                     )
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {

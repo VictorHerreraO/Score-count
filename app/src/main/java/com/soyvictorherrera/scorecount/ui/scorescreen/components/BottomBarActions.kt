@@ -50,7 +50,7 @@ fun BottomBarActions(
                     onClick = onStartNewGame,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text(stringResource(com.soyvictorherrera.scorecount.R.string.action_start_new_game))
+                    Text(stringResource(R.string.action_start_new_game))
                 }
             } else {
                 OutlinedButton(
@@ -62,7 +62,7 @@ fun BottomBarActions(
                         contentDescription = stringResource(id = R.string.action_reset)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(com.soyvictorherrera.scorecount.R.string.action_reset))
+                    Text(stringResource(R.string.action_reset))
                 }
                 if (showSwitchServe) {
                     OutlinedButton(
@@ -74,7 +74,7 @@ fun BottomBarActions(
                             contentDescription = stringResource(id = R.string.action_switch_serve)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(com.soyvictorherrera.scorecount.R.string.action_switch_serve))
+                        Text(stringResource(R.string.action_switch_serve))
                     }
                 }
             }

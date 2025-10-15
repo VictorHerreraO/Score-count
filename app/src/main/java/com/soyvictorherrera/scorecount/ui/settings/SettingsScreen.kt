@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.soyvictorherrera.scorecount.R
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
@@ -71,14 +72,14 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(com.soyvictorherrera.scorecount.R.string.settings_title)) },
+                title = { Text(stringResource(R.string.settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription =
                                 stringResource(
-                                    com.soyvictorherrera.scorecount.R.string.cd_navigate_back
+                                    R.string.cd_navigate_back
                                 )
                         )
                     }
@@ -99,9 +100,9 @@ fun SettingsScreen(
                     .padding(horizontal = 16.dp)
                     .verticalScroll(rememberScrollState())
         ) {
-            SectionHeader(stringResource(com.soyvictorherrera.scorecount.R.string.section_game_controls))
+            SectionHeader(stringResource(R.string.section_game_controls))
             SettingsGrid(items = gameControls, modifier = Modifier.padding(bottom = 16.dp))
-            SectionHeader(stringResource(com.soyvictorherrera.scorecount.R.string.section_table_tennis_rules))
+            SectionHeader(stringResource(R.string.section_table_tennis_rules))
             SettingsList(items = tableTennisRules)
 
             Spacer(modifier = Modifier.height(16.dp)) // Add some padding at the bottom
@@ -225,7 +226,7 @@ fun StepperSettingItem(item: SettingItemData.StepperItem) {
             } else if (item.subtitleRes ==
                 com.soyvictorherrera.scorecount.R.string.setting_best_of_x
             ) {
-                Text(stringResource(com.soyvictorherrera.scorecount.R.string.setting_best_of_x, item.value))
+                Text(stringResource(R.string.setting_best_of_x, item.value))
             }
         },
         leadingContent = { Icon(item.icon, contentDescription = stringResource(item.textRes)) },
@@ -237,7 +238,7 @@ fun StepperSettingItem(item: SettingItemData.StepperItem) {
                 ) {
                     Icon(
                         Icons.Filled.Remove,
-                        contentDescription = stringResource(com.soyvictorherrera.scorecount.R.string.cd_decrement)
+                        contentDescription = stringResource(R.string.cd_decrement)
                     )
                 }
                 Text(
@@ -252,7 +253,7 @@ fun StepperSettingItem(item: SettingItemData.StepperItem) {
                 ) {
                     Icon(
                         Icons.Filled.Add,
-                        contentDescription = stringResource(com.soyvictorherrera.scorecount.R.string.cd_increment)
+                        contentDescription = stringResource(R.string.cd_increment)
                     )
                 }
             }

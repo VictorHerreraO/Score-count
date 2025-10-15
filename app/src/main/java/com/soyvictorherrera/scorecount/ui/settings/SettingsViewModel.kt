@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Title
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.soyvictorherrera.scorecount.R
 import com.soyvictorherrera.scorecount.di.DefaultDispatcher
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
@@ -158,32 +159,32 @@ class SettingsViewModel
         fun getGameControls(currentSettings: GameSettings): List<SettingItemData> =
             listOf(
                 SettingItemData.ToggleItem(
-                    com.soyvictorherrera.scorecount.R.string.setting_show_title,
+                    R.string.setting_show_title,
                     Icons.Filled.Title,
                     currentSettings.showTitle
                 ) { updateShowTitle(it) },
                 SettingItemData.ToggleItem(
-                    com.soyvictorherrera.scorecount.R.string.setting_show_names,
+                    R.string.setting_show_names,
                     Icons.Filled.Badge,
                     currentSettings.showNames
                 ) { updateShowNames(it) },
                 SettingItemData.ToggleItem(
-                    com.soyvictorherrera.scorecount.R.string.setting_show_sets,
+                    R.string.setting_show_sets,
                     Icons.Filled.CalendarToday,
                     currentSettings.showSets
                 ) { updateShowSets(it) },
                 SettingItemData.ToggleItem(
-                    com.soyvictorherrera.scorecount.R.string.setting_mark_serve,
+                    R.string.setting_mark_serve,
                     Icons.Filled.PersonSearch,
                     currentSettings.markServe
                 ) { updateMarkServe(it) },
                 SettingItemData.ToggleItem(
-                    com.soyvictorherrera.scorecount.R.string.setting_mark_deuce,
+                    R.string.setting_mark_deuce,
                     Icons.Filled.Info,
                     currentSettings.markDeuce
                 ) { updateMarkDeuce(it) },
                 SettingItemData.ToggleItem(
-                    com.soyvictorherrera.scorecount.R.string.setting_keep_screen_on,
+                    R.string.setting_keep_screen_on,
                     Icons.Filled.ScreenLockPortrait,
                     currentSettings.keepScreenOn
                 ) {
@@ -194,8 +195,8 @@ class SettingsViewModel
         fun getTableTennisRules(currentSettings: GameSettings): List<SettingItemData> =
             listOf(
                 SettingItemData.StepperItem(
-                    textRes = com.soyvictorherrera.scorecount.R.string.setting_set_to,
-                    subtitleRes = com.soyvictorherrera.scorecount.R.string.setting_win_by_two,
+                    textRes = R.string.setting_set_to,
+                    subtitleRes = R.string.setting_win_by_two,
                     icon = Icons.Filled.EmojiEvents,
                     value = currentSettings.pointsToWinSet,
                     onIncrement = { updatePointsToWinSet(currentSettings.pointsToWinSet + 1) },
@@ -203,8 +204,8 @@ class SettingsViewModel
                     valueRange = 1..100
                 ),
                 SettingItemData.StepperItem(
-                    textRes = com.soyvictorherrera.scorecount.R.string.setting_match,
-                    subtitleRes = com.soyvictorherrera.scorecount.R.string.setting_best_of_x,
+                    textRes = R.string.setting_match,
+                    subtitleRes = R.string.setting_best_of_x,
                     icon = Icons.Filled.MilitaryTech,
                     value = currentSettings.numberOfSets,
                     onIncrement = { updateNumberOfSets(currentSettings.numberOfSets + 2) },
@@ -212,8 +213,8 @@ class SettingsViewModel
                     valueRange = 1..20
                 ),
                 SettingItemData.StepperItem(
-                    textRes = com.soyvictorherrera.scorecount.R.string.setting_serve_rotation_after,
-                    subtitleRes = com.soyvictorherrera.scorecount.R.string.setting_serve_after_deuce,
+                    textRes = R.string.setting_serve_rotation_after,
+                    subtitleRes = R.string.setting_serve_after_deuce,
                     icon = Icons.AutoMirrored.Filled.RotateRight,
                     value = currentSettings.serveRotationAfterPoints,
                     onIncrement = { updateServeRotationAfterPoints(currentSettings.serveRotationAfterPoints + 1) },
@@ -221,8 +222,8 @@ class SettingsViewModel
                     valueRange = 1..10
                 ),
                 SettingItemData.SwitchSetting(
-                    textRes = com.soyvictorherrera.scorecount.R.string.setting_winner_serves,
-                    subtitleRes = com.soyvictorherrera.scorecount.R.string.setting_winner_serves_subtitle,
+                    textRes = R.string.setting_winner_serves,
+                    subtitleRes = R.string.setting_winner_serves_subtitle,
                     icon = Icons.Filled.Person,
                     isChecked = currentSettings.winnerServesNextGame,
                     onToggle = { updateWinnerServesNextGame(it) }

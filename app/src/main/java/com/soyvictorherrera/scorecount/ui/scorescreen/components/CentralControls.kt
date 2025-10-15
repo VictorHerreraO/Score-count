@@ -92,7 +92,7 @@ fun CentralControls(
                         contentDescription = stringResource(id = R.string.action_new_game)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(com.soyvictorherrera.scorecount.R.string.action_new_game))
+                    Text(stringResource(R.string.action_new_game))
                 }
             } else {
                 OutlinedButton(
@@ -105,7 +105,7 @@ fun CentralControls(
                         contentDescription = stringResource(id = R.string.action_reset)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(com.soyvictorherrera.scorecount.R.string.action_reset))
+                    Text(stringResource(R.string.action_reset))
                 }
                 if (gameSettings.markServe) {
                     OutlinedButton(
@@ -118,7 +118,7 @@ fun CentralControls(
                             contentDescription = stringResource(id = R.string.action_switch)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(com.soyvictorherrera.scorecount.R.string.action_switch))
+                        Text(stringResource(R.string.action_switch))
                     }
                 }
             }
