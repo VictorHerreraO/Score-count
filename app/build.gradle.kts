@@ -38,8 +38,28 @@ android {
         applicationId = "com.soyvictorherrera.scorecount"
         minSdk = 28
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+
+        // Dynamic versioning based on Git tags and commits
+        val gitTag =
+            providers
+                .exec {
+                    commandLine("bash", "-c", "git describe --tags --abbrev=0 || echo \"1.0.0\"")
+                }.standardOutput.asText
+                .get()
+                .trim()
+                .removePrefix("v")
+
+        val gitCommitCount =
+            providers
+                .exec {
+                    commandLine("git", "rev-list", "--count", "HEAD")
+                }.standardOutput.asText
+                .get()
+                .trim()
+                .toIntOrNull() ?: 1
+
+        versionCode = gitCommitCount
+        versionName = gitTag
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
