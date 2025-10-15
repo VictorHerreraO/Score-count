@@ -57,7 +57,7 @@ Keep replies brief and informative:
 
 **Always sign your comments:**
 ```
-- Claude
+-[Your Name]
 ```
 
 ## Example Reply Format
