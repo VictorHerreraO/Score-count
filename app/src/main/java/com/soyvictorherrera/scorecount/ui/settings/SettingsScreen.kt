@@ -219,14 +219,8 @@ fun StepperSettingItem(item: SettingItemData.StepperItem) {
     ListItem(
         headlineContent = { Text(stringResource(item.textRes)) },
         supportingContent = {
-            if (item.subtitleRes !=
-                null
-            ) {
-                Text(stringResource(item.subtitleRes, item.value))
-            } else if (item.subtitleRes ==
-                com.soyvictorherrera.scorecount.R.string.setting_best_of_x
-            ) {
-                Text(stringResource(R.string.setting_best_of_x, item.value))
+            item.subtitleRes?.let { subtitleId ->
+                Text(stringResource(subtitleId))
             }
         },
         leadingContent = { Icon(item.icon, contentDescription = stringResource(item.textRes)) },
