@@ -2,10 +2,12 @@ package com.soyvictorherrera.scorecount.ui.scorescreen.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
@@ -37,7 +39,11 @@ fun CentralControls(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxHeight(),
+        modifier =
+            modifier
+                .fillMaxHeight()
+                .width(IntrinsicSize.Max),
+        // This forces the column to be as wide as its widest child (the buttons)
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
@@ -53,6 +59,7 @@ fun CentralControls(
         }
 
         Column(
+            modifier = Modifier.fillMaxWidth(), // This column will now respect the parent's constrained width
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
@@ -65,7 +72,8 @@ fun CentralControls(
                 )
             }
             if (gameSettings.markDeuce && gameState.isDeuce) {
-                DeuceIndicator()
+                // This will fill the width defined by the parent, which is the same as the buttons'
+                DeuceIndicator(modifier = Modifier.fillMaxWidth())
             }
         }
 
