@@ -34,7 +34,6 @@ Score-Count is an Android table tennis score tracking application built with Kot
 This project uses dedicated files for tracking work progress:
 
 - **[MEMORY.md](MEMORY.md)**: Current in-progress work and next steps
-- **[COMPLETED.md](COMPLETED.md)**: Log of completed features and changes
 
 When working on this project, update these files to maintain continuity across sessions.
 
@@ -119,7 +118,7 @@ When working on features or changes:
 2. **Plan**: Break down into actionable steps
 3. **Validate**: Review plan and confirm approach
 4. **Act**: Execute the steps
-5. **Document**: Update MEMORY.md and COMPLETED.md as appropriate
+5. **Document**: Update MEMORY.md as appropriate
 
 Before starting work, always reference ARCHITECTURE.md to understand the layered architecture and ensure changes align with established patterns.
 

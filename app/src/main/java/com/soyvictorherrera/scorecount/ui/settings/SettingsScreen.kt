@@ -42,11 +42,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.soyvictorherrera.scorecount.R
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
@@ -70,10 +72,16 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(R.string.settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Navigate back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription =
+                                stringResource(
+                                    R.string.cd_navigate_back
+                                )
+                        )
                     }
                 },
                 colors =
@@ -92,10 +100,9 @@ fun SettingsScreen(
                     .padding(horizontal = 16.dp)
                     .verticalScroll(rememberScrollState())
         ) {
-            SectionHeader("Game Controls & Actions")
+            SectionHeader(stringResource(R.string.section_game_controls))
             SettingsGrid(items = gameControls, modifier = Modifier.padding(bottom = 16.dp))
-
-            SectionHeader("Table Tennis Rules Configuration")
+            SectionHeader(stringResource(R.string.section_table_tennis_rules))
             SettingsList(items = tableTennisRules)
 
             Spacer(modifier = Modifier.height(16.dp)) // Add some padding at the bottom
@@ -171,7 +178,7 @@ fun ToggleSettingCard(item: SettingItemData.ToggleItem) {
             ) {
                 Icon(
                     item.icon,
-                    contentDescription = item.text,
+                    contentDescription = stringResource(item.textRes),
                     modifier = Modifier.size(36.dp),
                     tint =
                         if (item.isChecked) {
@@ -185,7 +192,7 @@ fun ToggleSettingCard(item: SettingItemData.ToggleItem) {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = item.text,
+                    text = stringResource(item.textRes),
                     style = MaterialTheme.typography.labelMedium,
                     textAlign = TextAlign.Center
                 )
@@ -210,16 +217,23 @@ fun SettingsList(items: List<SettingItemData>) {
 @Composable
 fun StepperSettingItem(item: SettingItemData.StepperItem) {
     ListItem(
-        headlineContent = { Text(item.text) },
-        supportingContent = { if (item.subtitle != null) Text(item.subtitle) },
-        leadingContent = { Icon(item.icon, contentDescription = item.text) },
+        headlineContent = { Text(stringResource(item.textRes)) },
+        supportingContent = {
+            item.subtitleRes?.let { subtitleId ->
+                Text(stringResource(subtitleId))
+            }
+        },
+        leadingContent = { Icon(item.icon, contentDescription = stringResource(item.textRes)) },
         trailingContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(
                     onClick = item.onDecrement,
                     enabled = item.value > item.valueRange.first
                 ) {
-                    Icon(Icons.Filled.Remove, contentDescription = "Decrement")
+                    Icon(
+                        Icons.Filled.Remove,
+                        contentDescription = stringResource(R.string.cd_decrement)
+                    )
                 }
                 Text(
                     text = item.value.toString(),
@@ -231,7 +245,10 @@ fun StepperSettingItem(item: SettingItemData.StepperItem) {
                     onClick = item.onIncrement,
                     enabled = item.value < item.valueRange.last
                 ) {
-                    Icon(Icons.Filled.Add, contentDescription = "Increment")
+                    Icon(
+                        Icons.Filled.Add,
+                        contentDescription = stringResource(R.string.cd_increment)
+                    )
                 }
             }
         }
@@ -241,9 +258,13 @@ fun StepperSettingItem(item: SettingItemData.StepperItem) {
 @Composable
 fun SwitchSettingItem(item: SettingItemData.SwitchSetting) {
     ListItem(
-        headlineContent = { Text(item.text) },
-        supportingContent = { if (item.subtitle != null) Text(item.subtitle) },
-        leadingContent = { Icon(item.icon, contentDescription = item.text) },
+        headlineContent = { Text(stringResource(item.textRes)) },
+        supportingContent = {
+            if (item.subtitleRes != null) {
+                Text(stringResource(item.subtitleRes))
+            }
+        },
+        leadingContent = { Icon(item.icon, contentDescription = stringResource(item.textRes)) },
         trailingContent = {
             Switch(
                 checked = item.isChecked,

@@ -24,9 +24,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.soyvictorherrera.scorecount.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +83,7 @@ fun PlayerScoreCard(
                         Spacer(modifier = Modifier.width(8.dp))
                         Icon(
                             Icons.Default.SportsTennis,
-                            contentDescription = "Serving",
+                            contentDescription = stringResource(id = R.string.cd_serving),
                             tint = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier.size(16.dp)
                         )
@@ -105,13 +107,13 @@ fun PlayerScoreCard(
                 SmallIconButton(
                     onClick = onDecrement,
                     icon = Icons.Filled.Remove,
-                    description = "Decrement score",
+                    description = stringResource(id = R.string.cd_decrement),
                     enabled = !isFinished
                 )
                 SmallIconButton(
                     onClick = onIncrement,
                     icon = Icons.Filled.Add,
-                    description = "Increment score",
+                    description = stringResource(id = R.string.cd_increment),
                     enabled = !isFinished
                 )
             }

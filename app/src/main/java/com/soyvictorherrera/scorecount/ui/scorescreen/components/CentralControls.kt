@@ -23,7 +23,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.soyvictorherrera.scorecount.R
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
 
@@ -51,10 +53,16 @@ fun CentralControls(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             IconButton(onClick = onNavigateToHistory) {
-                Icon(Icons.Default.History, contentDescription = "History")
+                Icon(
+                    Icons.Default.History,
+                    contentDescription = stringResource(id = R.string.cd_history)
+                )
             }
             IconButton(onClick = onNavigateToSettings) {
-                Icon(Icons.Default.Settings, contentDescription = "Settings")
+                Icon(
+                    Icons.Default.Settings,
+                    contentDescription = stringResource(id = R.string.cd_settings)
+                )
             }
         }
 
@@ -87,9 +95,12 @@ fun CentralControls(
                     shape = MaterialTheme.shapes.extraLarge,
                     contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
                 ) {
-                    Icon(Icons.Default.RestartAlt, contentDescription = null)
+                    Icon(
+                        Icons.Default.RestartAlt,
+                        contentDescription = stringResource(id = R.string.action_new_game)
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("New Game")
+                    Text(stringResource(R.string.action_new_game))
                 }
             } else {
                 OutlinedButton(
@@ -97,9 +108,12 @@ fun CentralControls(
                     shape = MaterialTheme.shapes.extraLarge,
                     contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
                 ) {
-                    Icon(Icons.Default.RestartAlt, contentDescription = null)
+                    Icon(
+                        Icons.Default.RestartAlt,
+                        contentDescription = stringResource(id = R.string.action_reset)
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Reset")
+                    Text(stringResource(R.string.action_reset))
                 }
                 if (gameSettings.markServe) {
                     OutlinedButton(
@@ -107,9 +121,12 @@ fun CentralControls(
                         shape = MaterialTheme.shapes.extraLarge,
                         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
                     ) {
-                        Icon(Icons.Default.SwapHoriz, contentDescription = null)
+                        Icon(
+                            Icons.Default.SwapHoriz,
+                            contentDescription = stringResource(id = R.string.action_switch)
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Switch")
+                        Text(stringResource(R.string.action_switch))
                     }
                 }
             }

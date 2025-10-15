@@ -3,4 +3,43 @@
 
     <string name="match_history_title">Match History</string>
     <string name="cd_navigate_back">Navigate back</string>
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="section_game_controls">Game Controls &amp; Actions</string>
+    <string name="section_table_tennis_rules">Table Tennis Rules Configuration</string>
+
+    <string name="setting_show_title">Show title</string>
+    <string name="setting_show_names">Show names</string>
+    <string name="setting_show_sets">Show sets</string>
+    <string name="setting_mark_serve">Mark serve</string>
+    <string name="setting_mark_deuce">Mark deuce</string>
+    <string name="setting_keep_screen_on">Keep screen on</string>
+
+    <string name="setting_set_to">Set to</string>
+    <string name="setting_win_by_two">Win by 2</string>
+    <string name="setting_match">Match</string>
+    <string name="setting_best_of_x">Best of %1$d sets</string>
+    <string name="setting_serve_rotation_after">Serve rotation after</string>
+    <string name="setting_serve_after_deuce">1 after deuce</string>
+    <string name="setting_winner_serves">Winner serves</string>
+    <string name="setting_winner_serves_subtitle">The winner of a game serves first in the next game</string>
+
+    <!-- Score screen -->
+    <string name="score_table_tennis_title">Table Tennis</string>
+    <string name="action_start_new_game">Start New Game</string>
+    <string name="action_reset">Reset</string>
+    <string name="action_switch_serve">Switch Serve</string>
+    <string name="action_new_game">New Game</string>
+    <string name="action_switch">Switch</string>
+    <string name="cd_decrement">Decrement</string>
+    <string name="cd_increment">Increment</string>
+    <string name="cd_history">History</string>
+    <string name="cd_settings">Settings</string>
+    <string name="sets_separator">:</string>
+    <string name="deuce_indicator_text">DEUCE</string>
+    <string name="cd_serving">Serving</string>
+
+    <!-- Match History -->
+    <string name="match_list_item_headline">%1$s vs. %2$s</string>
+    <string name="match_list_item_supporting_text">%1$s | %2$d - %3$d</string>
 </resources>

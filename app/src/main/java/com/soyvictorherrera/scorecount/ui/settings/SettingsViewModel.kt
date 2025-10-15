@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Title
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.soyvictorherrera.scorecount.R
 import com.soyvictorherrera.scorecount.di.DefaultDispatcher
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
@@ -28,15 +29,15 @@ import javax.inject.Inject
 
 sealed class SettingItemData {
     data class ToggleItem(
-        val text: String,
+        val textRes: Int,
         val icon: ImageVector,
         val isChecked: Boolean,
         val onToggle: (Boolean) -> Unit
     ) : SettingItemData()
 
     data class StepperItem(
-        val text: String,
-        val subtitle: String? = null,
+        val textRes: Int,
+        val subtitleRes: Int? = null,
         val icon: ImageVector,
         val value: Int,
         val onIncrement: () -> Unit,
@@ -45,8 +46,8 @@ sealed class SettingItemData {
     ) : SettingItemData()
 
     data class SwitchSetting(
-        val text: String,
-        val subtitle: String? = null,
+        val textRes: Int,
+        val subtitleRes: Int? = null,
         val icon: ImageVector,
         val isChecked: Boolean,
         val onToggle: (Boolean) -> Unit
@@ -158,32 +159,32 @@ class SettingsViewModel
         fun getGameControls(currentSettings: GameSettings): List<SettingItemData> =
             listOf(
                 SettingItemData.ToggleItem(
-                    "Show title",
+                    R.string.setting_show_title,
                     Icons.Filled.Title,
                     currentSettings.showTitle
                 ) { updateShowTitle(it) },
                 SettingItemData.ToggleItem(
-                    "Show names",
+                    R.string.setting_show_names,
                     Icons.Filled.Badge,
                     currentSettings.showNames
                 ) { updateShowNames(it) },
                 SettingItemData.ToggleItem(
-                    "Show sets",
+                    R.string.setting_show_sets,
                     Icons.Filled.CalendarToday,
                     currentSettings.showSets
                 ) { updateShowSets(it) },
                 SettingItemData.ToggleItem(
-                    "Mark serve",
+                    R.string.setting_mark_serve,
                     Icons.Filled.PersonSearch,
                     currentSettings.markServe
                 ) { updateMarkServe(it) },
                 SettingItemData.ToggleItem(
-                    "Mark deuce",
+                    R.string.setting_mark_deuce,
                     Icons.Filled.Info,
                     currentSettings.markDeuce
                 ) { updateMarkDeuce(it) },
                 SettingItemData.ToggleItem(
-                    "Keep screen on",
+                    R.string.setting_keep_screen_on,
                     Icons.Filled.ScreenLockPortrait,
                     currentSettings.keepScreenOn
                 ) {
@@ -194,8 +195,8 @@ class SettingsViewModel
         fun getTableTennisRules(currentSettings: GameSettings): List<SettingItemData> =
             listOf(
                 SettingItemData.StepperItem(
-                    text = "Set to",
-                    subtitle = "Win by 2",
+                    textRes = R.string.setting_set_to,
+                    subtitleRes = R.string.setting_win_by_two,
                     icon = Icons.Filled.EmojiEvents,
                     value = currentSettings.pointsToWinSet,
                     onIncrement = { updatePointsToWinSet(currentSettings.pointsToWinSet + 1) },
@@ -203,8 +204,8 @@ class SettingsViewModel
                     valueRange = 1..100
                 ),
                 SettingItemData.StepperItem(
-                    text = "Match",
-                    subtitle = "Best of ${currentSettings.numberOfSets} sets",
+                    textRes = R.string.setting_match,
+                    subtitleRes = R.string.setting_best_of_x,
                     icon = Icons.Filled.MilitaryTech,
                     value = currentSettings.numberOfSets,
                     onIncrement = { updateNumberOfSets(currentSettings.numberOfSets + 2) },
@@ -212,8 +213,8 @@ class SettingsViewModel
                     valueRange = 1..20
                 ),
                 SettingItemData.StepperItem(
-                    text = "Serve rotation after",
-                    subtitle = "1 after deuce",
+                    textRes = R.string.setting_serve_rotation_after,
+                    subtitleRes = R.string.setting_serve_after_deuce,
                     icon = Icons.AutoMirrored.Filled.RotateRight,
                     value = currentSettings.serveRotationAfterPoints,
                     onIncrement = { updateServeRotationAfterPoints(currentSettings.serveRotationAfterPoints + 1) },
@@ -221,8 +222,8 @@ class SettingsViewModel
                     valueRange = 1..10
                 ),
                 SettingItemData.SwitchSetting(
-                    text = "Winner serves",
-                    subtitle = "The winner of a game serves first in the next game",
+                    textRes = R.string.setting_winner_serves,
+                    subtitleRes = R.string.setting_winner_serves_subtitle,
                     icon = Icons.Filled.Person,
                     isChecked = currentSettings.winnerServesNextGame,
                     onToggle = { updateWinnerServesNextGame(it) }
