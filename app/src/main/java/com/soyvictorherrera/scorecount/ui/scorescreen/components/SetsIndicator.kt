@@ -7,8 +7,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.soyvictorherrera.scorecount.R
 
 @Composable
 fun SetsIndicator(
@@ -33,7 +35,11 @@ fun SetsIndicator(
                 fontWeight = FontWeight.Bold
             )
         }
-        Text(text = ":", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.outline)
+        Text(
+            text = stringResource(id = R.string.sets_separator),
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.outline
+        )
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = player2Name,

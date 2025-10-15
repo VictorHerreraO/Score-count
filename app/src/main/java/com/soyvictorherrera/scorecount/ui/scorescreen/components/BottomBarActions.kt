@@ -19,7 +19,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.soyvictorherrera.scorecount.R
 
 @Composable
 fun BottomBarActions(
@@ -55,7 +57,10 @@ fun BottomBarActions(
                     onClick = onReset,
                     modifier = Modifier.weight(1f),
                 ) {
-                    Icon(Icons.Default.RestartAlt, contentDescription = "Reset")
+                    Icon(
+                        Icons.Default.RestartAlt,
+                        contentDescription = stringResource(id = R.string.action_reset)
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(com.soyvictorherrera.scorecount.R.string.action_reset))
                 }
@@ -64,7 +69,10 @@ fun BottomBarActions(
                         onClick = onSwitchServe,
                         modifier = Modifier.weight(1f),
                     ) {
-                        Icon(Icons.Default.SwapHoriz, contentDescription = "Switch Serve")
+                        Icon(
+                            Icons.Default.SwapHoriz,
+                            contentDescription = stringResource(id = R.string.action_switch_serve)
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(stringResource(com.soyvictorherrera.scorecount.R.string.action_switch_serve))
                     }

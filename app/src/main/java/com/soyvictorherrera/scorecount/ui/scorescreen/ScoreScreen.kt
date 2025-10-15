@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
@@ -93,15 +94,30 @@ fun ScoreScreenPortrait(
             TopAppBar(
                 title = {
                     if (gameSettings.showTitle) {
-                        Text(stringResource(com.soyvictorherrera.scorecount.R.string.score_table_tennis_title), fontWeight = FontWeight.Bold)
+                        Text(
+                            stringResource(com.soyvictorherrera.scorecount.R.string.score_table_tennis_title),
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = onNavigateToHistory) {
-                        Icon(Icons.Default.History, contentDescription = "History")
+                        Icon(
+                            Icons.Default.History,
+                            contentDescription =
+                                stringResource(
+                                    id = com.soyvictorherrera.scorecount.R.string.cd_history
+                                )
+                        )
                     }
                     IconButton(onClick = onNavigateToSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription =
+                                stringResource(
+                                    id = com.soyvictorherrera.scorecount.R.string.cd_settings
+                                )
+                        )
                     }
                 },
                 colors =
@@ -147,7 +163,10 @@ fun ScoreScreenPortrait(
                             style = MaterialTheme.typography.headlineSmall
                         )
                     }
-                    Text(text = ":", style = MaterialTheme.typography.headlineSmall)
+                    Text(
+                        text = stringResource(id = com.soyvictorherrera.scorecount.R.string.sets_separator),
+                        style = MaterialTheme.typography.headlineSmall
+                    )
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         if (gameSettings.showNames) {
                             Text(

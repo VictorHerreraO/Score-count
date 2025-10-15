@@ -39,10 +39,10 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -74,7 +74,13 @@ fun SettingsScreen(
                 title = { Text(stringResource(com.soyvictorherrera.scorecount.R.string.settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(com.soyvictorherrera.scorecount.R.string.cd_navigate_back))
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription =
+                                stringResource(
+                                    com.soyvictorherrera.scorecount.R.string.cd_navigate_back
+                                )
+                        )
                     }
                 },
                 colors =
@@ -210,16 +216,29 @@ fun SettingsList(items: List<SettingItemData>) {
 @Composable
 fun StepperSettingItem(item: SettingItemData.StepperItem) {
     ListItem(
-    headlineContent = { Text(stringResource(item.textRes)) },
-    supportingContent = { if (item.subtitleRes != null) Text(stringResource(item.subtitleRes, item.value)) else if (item.subtitleRes == com.soyvictorherrera.scorecount.R.string.setting_best_of_x) Text(stringResource(com.soyvictorherrera.scorecount.R.string.setting_best_of_x, item.value)) },
-    leadingContent = { Icon(item.icon, contentDescription = stringResource(item.textRes)) },
+        headlineContent = { Text(stringResource(item.textRes)) },
+        supportingContent = {
+            if (item.subtitleRes !=
+                null
+            ) {
+                Text(stringResource(item.subtitleRes, item.value))
+            } else if (item.subtitleRes ==
+                com.soyvictorherrera.scorecount.R.string.setting_best_of_x
+            ) {
+                Text(stringResource(com.soyvictorherrera.scorecount.R.string.setting_best_of_x, item.value))
+            }
+        },
+        leadingContent = { Icon(item.icon, contentDescription = stringResource(item.textRes)) },
         trailingContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(
                     onClick = item.onDecrement,
                     enabled = item.value > item.valueRange.first
                 ) {
-                        Icon(Icons.Filled.Remove, contentDescription = stringResource(com.soyvictorherrera.scorecount.R.string.cd_decrement))
+                    Icon(
+                        Icons.Filled.Remove,
+                        contentDescription = stringResource(com.soyvictorherrera.scorecount.R.string.cd_decrement)
+                    )
                 }
                 Text(
                     text = item.value.toString(),
@@ -231,7 +250,10 @@ fun StepperSettingItem(item: SettingItemData.StepperItem) {
                     onClick = item.onIncrement,
                     enabled = item.value < item.valueRange.last
                 ) {
-                    Icon(Icons.Filled.Add, contentDescription = stringResource(com.soyvictorherrera.scorecount.R.string.cd_increment))
+                    Icon(
+                        Icons.Filled.Add,
+                        contentDescription = stringResource(com.soyvictorherrera.scorecount.R.string.cd_increment)
+                    )
                 }
             }
         }
@@ -241,9 +263,13 @@ fun StepperSettingItem(item: SettingItemData.StepperItem) {
 @Composable
 fun SwitchSettingItem(item: SettingItemData.SwitchSetting) {
     ListItem(
-        headlineContent = { Text(item.text) },
-        supportingContent = { if (item.subtitle != null) Text(item.subtitle) },
-        leadingContent = { Icon(item.icon, contentDescription = item.text) },
+        headlineContent = { Text(stringResource(item.textRes)) },
+        supportingContent = {
+            if (item.subtitleRes != null) {
+                Text(stringResource(item.subtitleRes))
+            }
+        },
+        leadingContent = { Icon(item.icon, contentDescription = stringResource(item.textRes)) },
         trailingContent = {
             Switch(
                 checked = item.isChecked,
