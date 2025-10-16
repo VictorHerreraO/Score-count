@@ -9,14 +9,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 1. **Question the premise** - Does this task solve a real problem or is it refactoring for refactoring's sake?
 2. **Analyze the trade-offs** - Will this make the code objectively better or just different?
 3. **Push back immediately** if:
-   - The existing code is already clean and maintainable
-   - The "problem" is subjective preference, not an actual issue
-   - The solution adds complexity without clear benefits
-   - The task is over-engineering a simple problem
+    - The existing code is already clean and maintainable
+    - The "problem" is subjective preference, not an actual issue
+    - The solution adds complexity without clear benefits
+    - The task is over-engineering a simple problem
 
 **Your job is to provide engineering judgment, not blindly execute tasks.**
 
 If a task doesn't pass critical evaluation, respond with:
+
 - Clear analysis of why the current approach is adequate
 - Specific trade-offs the proposed change would introduce
 - Recommendation to close/modify the task
@@ -40,6 +41,7 @@ When working on this project, update these files to maintain continuity across s
 ## Essential Commands
 
 ### Build & Install
+
 ```bash
 ./gradlew assembleDebug          # Build debug APK
 ./gradlew assembleRelease        # Build release APK
@@ -48,6 +50,7 @@ When working on this project, update these files to maintain continuity across s
 ```
 
 ### Testing
+
 ```bash
 ./gradlew test                   # Run all unit tests
 ./gradlew app:test               # Run app module tests
@@ -58,6 +61,7 @@ When working on this project, update these files to maintain continuity across s
 ```
 
 ### Code Quality
+
 ```bash
 ./gradlew lint                   # Run lint checks
 ./gradlew lintDebug              # Generate lint report
@@ -66,6 +70,7 @@ When working on this project, update these files to maintain continuity across s
 ```
 
 ### Release Management
+
 ```bash
 # Trigger release build manually
 gh workflow run release-build.yml --ref main
@@ -84,6 +89,7 @@ git push origin v1.1.0
 ## Quick Reference
 
 ### Package Structure
+
 ```
 com.soyvictorherrera.scorecount/
 ├── di/                 # Hilt DI modules
@@ -93,6 +99,7 @@ com.soyvictorherrera.scorecount/
 ```
 
 ### Key Files & Locations
+
 - **Navigation routes**: `ui/Screen.kt`
 - **Hilt modules**: `di/DataModule.kt`, `di/RepositoryModule.kt`, `di/DataSourceModule.kt`
 - **Database**: `data/database/AppDatabase.kt`, `data/database/dao/MatchDao.kt`
@@ -100,6 +107,7 @@ com.soyvictorherrera.scorecount/
 - **Use cases**: `domain/usecase/` (IncrementScoreUseCase, SaveMatchUseCase, etc.)
 
 ### Configuration
+
 - **Package**: `com.soyvictorherrera.scorecount`
 - **Min SDK**: 28 | **Target SDK**: 36 | **JVM**: 11
 - **Dependencies**: Managed via `gradle/libs.versions.toml`
@@ -109,13 +117,16 @@ com.soyvictorherrera.scorecount/
 ## Development Workflow
 
 ### Adding New Features
+
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the complete workflow. Quick summary:
+
 1. Domain models → Repository interface → Use cases
 2. Repository implementation → Data sources
 3. ViewModel → Compose UI
 4. Wire with Hilt modules
 
 ### Important Patterns
+
 - **State management**: ViewModels expose `StateFlow` (see ARCHITECTURE.md for pattern)
 - **Dependency injection**: Hilt throughout
 - **UI**: Stateless Compose screens driven by ViewModel state
@@ -124,6 +135,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the complete workflow. Quick summary:
 - **Code Formatting**: Pre-commit hook automatically formats Kotlin files with ktlint
 
 ### Release Process
+
 1. Merge feature PR to `main`
 2. CI automatically builds signed release APK
 3. Download APK from Actions artifacts
@@ -131,6 +143,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the complete workflow. Quick summary:
 5. Push tag to trigger GitHub Release: `git push origin v1.x.x`
 
 ### Version Catalog
+
 Add dependencies to `gradle/libs.versions.toml` before using them in build files.
 
 ## Development Methodology

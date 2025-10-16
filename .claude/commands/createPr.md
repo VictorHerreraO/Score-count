@@ -86,7 +86,7 @@ git push -u origin HEAD
 gh pr create --title "[Fix/Feature]: Title" --body "$(cat <<'EOF'
 [Paste filled template here]
 
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
+🤖 Generated with [Your Name]
 EOF
 )"
 ```

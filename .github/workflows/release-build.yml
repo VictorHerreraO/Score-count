@@ -14,7 +14,7 @@ jobs:
   build-release:
     name: Build & Publish Release APK
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     steps:
       - name: Checkout code
@@ -41,7 +41,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses || true
+        run: yes | sdkmanager --licenses
 
       - name: Decode Keystore
         run: |
@@ -62,21 +62,33 @@ jobs:
           echo "version_name=${VERSION_NAME}" >> $GITHUB_OUTPUT
           echo "Building version: ${VERSION_NAME}"
 
-      - name: Rename APK
+      - name: Find and Rename APK
         run: |
           VERSION_NAME="${{ steps.version.outputs.version_name }}"
           COMMIT_SHA="${{ github.sha }}"
           SHORT_SHA="${COMMIT_SHA:0:7}"
-          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+
+          # Find the release APK dynamically
+          APK_SRC=$(find app/build/outputs/apk/release -type f -name "*.apk" | sort | tail -n 1)
+
+          if [ -z "$APK_SRC" ]; then
+            echo "❌ ERROR: No release APK found in app/build/outputs/apk/release"
+            echo "Available files:"
+            ls -la app/build/outputs/apk/release/ || echo "Directory does not exist"
+            exit 1
+          fi
+
+          echo "✅ Found APK: $APK_SRC"
 
           # Create descriptive filename
           APK_NAME="scorecount-v${VERSION_NAME}-${SHORT_SHA}.apk"
+          APK_DEST="app/build/outputs/apk/release/${APK_NAME}"
 
-          mv app/build/outputs/apk/release/app-release.apk \
-             app/build/outputs/apk/release/${APK_NAME}
+          mv "$APK_SRC" "$APK_DEST"
 
+          echo "✅ Renamed to: $APK_NAME"
           echo "apk_name=${APK_NAME}" >> $GITHUB_OUTPUT
-          echo "apk_path=app/build/outputs/apk/release/${APK_NAME}" >> $GITHUB_OUTPUT
+          echo "apk_path=${APK_DEST}" >> $GITHUB_OUTPUT
         id: rename
 
       - name: Upload APK Artifact
@@ -87,9 +99,11 @@ jobs:
           retention-days: 30
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v2
+        # Only create release for: 1) tagged releases (v*), 2) main branch pushes, or 3) manual workflow dispatch
+        if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: v${{ steps.version.outputs.version_name }}
           name: Release v${{ steps.version.outputs.version_name }}
           body: |
@@ -111,6 +125,8 @@ jobs:
           files: ${{ steps.rename.outputs.apk_path }}
           draft: false
           prerelease: false
+          fail_on_unmatched_files: true
+          generate_release_notes: true
 
       - name: Build Summary
         if: always()
