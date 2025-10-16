@@ -13,12 +13,53 @@ android {
     namespace = "com.soyvictorherrera.scorecount"
     compileSdk = 36
 
+    // Add signing configuration
+    signingConfigs {
+        create("release") {
+            // CI environment variables (from GitHub Secrets)
+            val keystoreFile = System.getenv("KEYSTORE_FILE")
+            val keystorePassword = System.getenv("KEYSTORE_PASSWORD")
+            val keyAlias = System.getenv("KEY_ALIAS")
+            val keyPassword = System.getenv("KEY_PASSWORD")
+
+            if (keystoreFile != null && File(keystoreFile).exists()) {
+                storeFile = File(keystoreFile)
+                storePassword = keystorePassword
+                this.keyAlias = keyAlias
+                this.keyPassword = keyPassword
+            } else {
+                // Fallback for local development (optional)
+                logger.warn("Release signing not configured. Using debug signing.")
+            }
+        }
+    }
+
     defaultConfig {
         applicationId = "com.soyvictorherrera.scorecount"
         minSdk = 28
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+
+        // Dynamic versioning based on Git tags and commits
+        val gitTag =
+            providers
+                .exec {
+                    commandLine("bash", "-c", "git describe --tags --abbrev=0 || echo \"1.0.0\"")
+                }.standardOutput.asText
+                .get()
+                .trim()
+                .removePrefix("v")
+
+        val gitCommitCount =
+            providers
+                .exec {
+                    commandLine("git", "rev-list", "--count", "HEAD")
+                }.standardOutput.asText
+                .get()
+                .trim()
+                .toIntOrNull() ?: 1
+
+        versionCode = gitCommitCount
+        versionName = gitTag
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -29,6 +70,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            signingConfig = signingConfigs.getByName("release") // Add this line
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -166,5 +208,12 @@ tasks.withType<Test>().configureEach {
     reports {
         junitXml.required.set(true)
         html.required.set(true)
+    }
+}
+
+// Task to print version for CI
+tasks.register("printVersionName") {
+    doLast {
+        println(android.defaultConfig.versionName)
     }
 }
