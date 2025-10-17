@@ -2,17 +2,27 @@
 
 [![Build Release APK](https://github.com/VictorHerreraO/Score-count/actions/workflows/release-build.yml/badge.svg)](https://github.com/VictorHerreraO/Score-count/actions/workflows/release-build.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+<img src="asset/app-icon.png" width="200"/>
+
 Welcome to Score-Count! This application provides a simple and intuitive way to keep track of scores during table tennis matches. Whether you're playing a casual game with friends or a more competitive match, Score-Count helps you focus on the game without worrying about scorekeeping.
 
 ## Table of Contents
 
-- [Features](#features)
-- [Screenshots](#screenshots)
-- [Tech Stack & Architecture](#tech-stack--architecture)
-- [How to Build](#how-to-build)
-- [Contributing](#contributing)
-- [License](#license)
-- [Roadmap (Future Enhancements)](#roadmap-future-enhancements)
+- [Score-Count](#score-count)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Screenshots](#screenshots)
+  - [Tech Stack \& Architecture](#tech-stack--architecture)
+  - [How to Build](#how-to-build)
+    - [Prerequisites](#prerequisites)
+    - [Steps](#steps)
+    - [Code Quality](#code-quality)
+      - [Continuous Integration](#continuous-integration)
+      - [ktlint (Code Formatting)](#ktlint-code-formatting)
+      - [detekt (Static Code Analysis)](#detekt-static-code-analysis)
+      - [Configuration Files](#configuration-files)
+  - [Contributing](#contributing)
+  - [License](#license)
 
 ## Features
 
@@ -25,9 +35,7 @@ Welcome to Score-Count! This application provides a simple and intuitive way to 
 
 ## Screenshots
 
-*(Coming Soon! Add screenshots of the main app screens here.)*
-
-<img src="screenshot/portrait-light.png" width="200"/> <img src="screenshot/landscape-dark.png" width="200"/>
+<img src="asset/portrait-light.png" width="200"/> <img src="asset/landscape-dark.png" width="600"/>
 
 ## Tech Stack & Architecture
 
@@ -201,7 +209,7 @@ If you have a suggestion that would make this better, please fork the repo and c
 
 ## License
 
-This project is licensed under the MIT License - see the `LICENSE.md` file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 Icon: layer by Cahya Kurniawan from [Noun Project](https://thenounproject.com/browse/icons/term/layer/) (CC BY 3.0)
 
