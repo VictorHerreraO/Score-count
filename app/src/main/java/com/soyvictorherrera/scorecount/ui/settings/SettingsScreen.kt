@@ -220,7 +220,7 @@ fun StepperSettingItem(item: SettingItemData.StepperItem) {
         headlineContent = { Text(stringResource(item.textRes)) },
         supportingContent = {
             item.subtitleRes?.let { subtitleId ->
-                Text(stringResource(subtitleId))
+                Text(stringResource(subtitleId, item.value))
             }
         },
         leadingContent = { Icon(item.icon, contentDescription = stringResource(item.textRes)) },
