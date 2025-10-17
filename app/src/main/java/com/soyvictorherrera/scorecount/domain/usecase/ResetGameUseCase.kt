@@ -31,8 +31,7 @@ class ResetGameUseCase
                     player1Name = currentState.player1.name,
                     player2Name = currentState.player2.name,
                     settings = settings,
-                    lastGameWinnerId = winnerId,
-                    currentServerId = currentState.servingPlayerId
+                    lastGameWinnerId = winnerId
                 )
 
             scoreRepository.updateGameState(newState)

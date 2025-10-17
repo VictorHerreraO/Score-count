@@ -281,10 +281,9 @@ class ScoreUseCasesTest {
             // When - Player 2 won last game
             useCase(lastGameWinnerId = 2)
 
-            // Then - Server alternates, not based on winner
+            // Then - Always resets to Player 1 (initial state), not based on winner
             val newState = fakeScoreRepository.getGameState().value
-            // Server should be player 2 (alternates from player 1)
-            assertEquals(2, newState.servingPlayerId)
+            assertEquals(1, newState.servingPlayerId)
         }
 
     @Test

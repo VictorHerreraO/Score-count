@@ -159,7 +159,8 @@ object ScoreCalculator {
      * @param player1Name The name of player 1
      * @param player2Name The name of player 2
      * @param settings The game settings
-     * @param lastGameWinnerId Optional: ID of the last game winner (determines first server)
+     * @param lastGameWinnerId Optional: ID of the last game winner
+     *   (determines first server when winnerServesNextGame is true)
      * @return A new game state in initial configuration
      */
     fun resetGame(
@@ -168,18 +169,14 @@ object ScoreCalculator {
         player1Name: String,
         player2Name: String,
         settings: GameSettings,
-        lastGameWinnerId: Int? = null,
-        currentServerId: Int? = null
+        lastGameWinnerId: Int? = null
     ): GameState {
         val firstServer =
             if (settings.winnerServesNextGame && lastGameWinnerId != null) {
                 // Winner serves next game
                 lastGameWinnerId
-            } else if (!settings.winnerServesNextGame && currentServerId != null) {
-                // Alternate server from current server
-                if (currentServerId == player1Id) player2Id else player1Id
             } else {
-                // Default to player 1
+                // Always reset to player 1 (initial state)
                 player1Id
             }
 
