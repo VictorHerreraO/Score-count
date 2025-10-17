@@ -284,17 +284,29 @@ object ScoreCalculator {
         // Note: currentScores represents the state AFTER scoring the point
         // The first N points are served by the initial server, then we rotate every N points
         // Example with N=2: P1 serves points 1-2, P2 serves points 3-4, P1 serves points 5-6, etc.
-        // Rotation happens at the start of point N+1, 2N+1, 3N+1, etc.
+        // Rotation happens at the transition: after point 2 (to serve point 3), after point 4 (to serve point 5), etc.
         val totalPointsInCurrentSet = currentScores.first + currentScores.second
 
-        // Rotate when: we've completed at least one interval AND the previous point was the last of an interval
-        // (totalPoints - 1) % interval == 0 means the previous point was the Nth, 2Nth, 3Nth, etc.
-        val shouldRotate =
-            serveInterval > 0 &&
-                totalPointsInCurrentSet > serveInterval &&
-                (totalPointsInCurrentSet - serveInterval - 1) % serveInterval == 0
+        // Calculate how many complete serve intervals have been played
+        // and determine if the current server should change
+        if (serveInterval <= 0) {
+            return currentServingPlayerId
+        }
 
-        return if (shouldRotate) {
+        // Determine which serve interval we're in (0-indexed)
+        // Interval 0: points 0-N (initial server)
+        // Interval 1: points N+1 to 2N (other server)
+        // Interval 2: points 2N+1 to 3N (back to initial), etc.
+        val intervalNumber = (totalPointsInCurrentSet - 1) / serveInterval
+
+        // Check if we switched intervals on this point
+        // This happens when the previous total would have been in a different interval
+        val previousTotal = totalPointsInCurrentSet - 1
+        val previousIntervalNumber = if (previousTotal > 0) (previousTotal - 1) / serveInterval else 0
+
+        val switchedInterval = intervalNumber != previousIntervalNumber
+
+        return if (switchedInterval) {
             if (currentServingPlayerId == p1Id) p2Id else p1Id
         } else {
             currentServingPlayerId
