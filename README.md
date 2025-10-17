@@ -1,6 +1,6 @@
 # Score-Count
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/yourusername/score-count) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Release APK](https://github.com/VictorHerreraO/Score-count/actions/workflows/release-build.yml/badge.svg)](https://github.com/VictorHerreraO/Score-count/actions/workflows/release-build.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Welcome to Score-Count! This application provides a simple and intuitive way to keep track of scores during table tennis matches. Whether you're playing a casual game with friends or a more competitive match, Score-Count helps you focus on the game without worrying about scorekeeping.
 
@@ -16,26 +16,32 @@ Welcome to Score-Count! This application provides a simple and intuitive way to 
 
 ## Features
 
-*   Increment and decrement scores for two players.
-*   Display current scores clearly.
-*   Reset scores for a new game.
-*   (Add more features as they are developed, e.g., Player names, Game history, Set tracking)
+*   **Score Tracking:** Increment and decrement scores for two players.
+*   **Set and Serve Management:** Automatically tracks sets won and indicates the current server.
+*   **Game State Persistence:** Your current game is automatically saved, so you can pick up where you left off.
+*   **Match History:** Review a list of your past matches.
+*   **Customizable Rules:** Adjust game settings like points to win a set.
+*   **Reset:** Easily reset the score for a new game.
 
 ## Screenshots
 
 *(Coming Soon! Add screenshots of the main app screens here.)*
 
-<img src="placeholder_screenshot1.png" width="200"/> <img src="placeholder_screenshot2.png" width="200"/>
+<img src="screenshot/portrait-light.png" width="200"/> <img src="screenshot/landscape-dark.png" width="200"/>
 
 ## Tech Stack & Architecture
 
-*   **Programming Language:** Kotlin
-*   **UI Toolkit:** Jetpack Compose
-*   **Dependency Injection:** Hilt
-*   **Architecture:** Follows a layered architecture pattern:
-    *   **UI Layer:** (Jetpack Compose) Responsible for displaying the application data on the screen and handling user interactions.
-    *   **Domain Layer:** Contains the business logic of the application (Use Cases).
-    *   **Data Layer:** Responsible for managing application data (Repositories, Data Sources).
+*   **Programming Language:** [Kotlin](https://kotlinlang.org/)
+*   **UI Toolkit:** [Jetpack Compose](https://developer.android.com/jetpack/compose) for a modern, declarative UI.
+*   **Architecture:** Follows Google's recommended [Guide to App Architecture](https://developer.android.com/topic/architecture), promoting a clean, scalable, and testable codebase.
+    *   **UI Layer:** Built with Jetpack Compose, using State-driven ViewModels.
+    *   **Domain Layer:** Contains business logic encapsulated in Use Cases.
+    *   **Data Layer:** Manages data using the Repository pattern.
+*   **Asynchronous Programming:** [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-guide.html) and [Flow](https://developer.android.com/kotlin/flow) for managing background threads and data streams.
+*   **Dependency Injection:** [Hilt](https://dagger.dev/hilt/) for managing dependencies.
+*   **Data Persistence:**
+    *   [Room](https://developer.android.com/training/data-storage/room) for storing match history in a local SQLite database.
+    *   [Proto DataStore](https://developer.android.com/topic/libraries/architecture/datastore) for persisting game state and user settings.
 
 ## How to Build
 
@@ -50,10 +56,9 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/yourusername/score-count.git
+    git clone https://github.com/soyvictorherrera/score-count.git
     cd score-count
     ```
-    *(Replace `yourusername` with the actual GitHub username/organization if applicable)*
 
 2.  **Set up pre-commit hook (optional but recommended):**
 
@@ -196,16 +201,8 @@ If you have a suggestion that would make this better, please fork the repo and c
 
 ## License
 
-This project is licensed under the MIT License - see the `LICENSE.md` file for details. (You'll need to create a `LICENSE.md` file with the MIT License text).
+This project is licensed under the MIT License - see the `LICENSE.md` file for details.
 
-## Roadmap (Future Enhancements)
-
-*   [ ] Player name customization
-*   [ ] Game/Match history
-*   [ ] Set tracking (e.g., best of 3, best of 5)
-*   [ ] Themes (Dark/Light)
-*   [ ] Data persistence (e.g., using Room or DataStore)
+Icon: layer by Cahya Kurniawan from [Noun Project](https://thenounproject.com/browse/icons/term/layer/) (CC BY 3.0)
 
 ---
-
-_This README was last updated on $(date)._
