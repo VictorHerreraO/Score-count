@@ -132,23 +132,23 @@ class ScoreCalculatorTest {
     fun `server rotates every 2 points`() {
         var state = initialState
 
-        // Point 1: P1 serves
+        // Point 1: P1 serves (total=1, 1%2!=0, no rotation, P1 serves)
         state = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
         assertEquals(player1.id, state.servingPlayerId)
 
-        // Point 2: P1 still serves
+        // Point 2: After 2 points scored, rotate (total=2, 2%2==0, rotate to P2)
+        state = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
+        assertEquals(player2.id, state.servingPlayerId)
+
+        // Point 3: P2 serves (total=3, 3%2!=0, no rotation, P2 serves)
+        state = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
+        assertEquals(player2.id, state.servingPlayerId)
+
+        // Point 4: After 4 points total, rotate (total=4, 4%2==0, rotate to P1)
         state = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
         assertEquals(player1.id, state.servingPlayerId)
 
-        // Point 3: P2 now serves (after 2 points)
-        state = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
-        assertEquals(player2.id, state.servingPlayerId)
-
-        // Point 4: P2 still serves
-        state = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
-        assertEquals(player2.id, state.servingPlayerId)
-
-        // Point 5: P1 serves again
+        // Point 5: P1 serves (total=5, 5%2!=0, no rotation, P1 serves)
         state = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
         assertEquals(player1.id, state.servingPlayerId)
     }
@@ -346,13 +346,13 @@ class ScoreCalculatorTest {
         val settings = defaultSettings.copy(serveRotationAfterPoints = 5)
         var state = initialState
 
-        // Score 5 points, should still be P1 serving
+        // Score 5 points, after 5th point should rotate to P2
         repeat(5) {
             state = ScoreCalculator.incrementScore(state, settings, player1.id)
         }
-        assertEquals(player1.id, state.servingPlayerId)
+        assertEquals(player2.id, state.servingPlayerId)
 
-        // On 6th point, should switch to P2
+        // On 6th point, P2 still serves
         state = ScoreCalculator.incrementScore(state, settings, player1.id)
         assertEquals(player2.id, state.servingPlayerId)
     }
@@ -439,29 +439,29 @@ class ScoreCalculatorTest {
         val settings = defaultSettings.copy(pointsToWinSet = 7, serveRotationAfterPoints = 2)
         var state = initialState
 
-        // Point 1: P1 serves (total = 1)
+        // Point 1: P1 serves (total=1, no rotation)
         state = ScoreCalculator.incrementScore(state, settings, player1.id)
         assertEquals(player1.id, state.servingPlayerId, "Point 1: P1 should serve")
 
-        // Point 2: P1 still serves (total = 2)
+        // Point 2: Rotation (total=2, 2%2==0, rotate to P2)
         state = ScoreCalculator.incrementScore(state, settings, player1.id)
-        assertEquals(player1.id, state.servingPlayerId, "Point 2: P1 should serve")
+        assertEquals(player2.id, state.servingPlayerId, "Point 2: After 2 points, rotate to P2")
 
-        // Point 3: P2 now serves (total = 3, rotation after 2)
+        // Point 3: P2 serves (total=3, no rotation)
         state = ScoreCalculator.incrementScore(state, settings, player1.id)
-        assertEquals(player2.id, state.servingPlayerId, "Point 3: P2 should serve (rotation)")
+        assertEquals(player2.id, state.servingPlayerId, "Point 3: P2 should serve")
 
-        // Point 4: P2 still serves (total = 4)
+        // Point 4: Rotation (total=4, 4%2==0, rotate to P1)
         state = ScoreCalculator.incrementScore(state, settings, player1.id)
-        assertEquals(player2.id, state.servingPlayerId, "Point 4: P2 should serve")
+        assertEquals(player1.id, state.servingPlayerId, "Point 4: After 4 points, rotate to P1")
 
-        // Point 5: P1 serves again (total = 5, rotation after 4)
+        // Point 5: P1 serves (total=5, no rotation)
         state = ScoreCalculator.incrementScore(state, settings, player1.id)
-        assertEquals(player1.id, state.servingPlayerId, "Point 5: P1 should serve (rotation)")
+        assertEquals(player1.id, state.servingPlayerId, "Point 5: P1 should serve")
 
-        // Point 6: P1 still serves (total = 6, score is 6-0)
+        // Point 6: Rotation (total=6, 6%2==0, rotate to P2, score is 6-0)
         state = ScoreCalculator.incrementScore(state, settings, player1.id)
-        assertEquals(player1.id, state.servingPlayerId, "Point 6: P1 should serve")
+        assertEquals(player2.id, state.servingPlayerId, "Point 6: After 6 points, rotate to P2")
         assertEquals(6, state.player1.score)
 
         // Point 7: P1 scores and wins set (7-0)
@@ -478,25 +478,25 @@ class ScoreCalculatorTest {
         val settings = defaultSettings.copy(pointsToWinSet = 21, serveRotationAfterPoints = 5)
         var state = initialState
 
-        // Score 5 points, P1 should serve all (total = 1-5)
-        repeat(5) { i ->
+        // Points 1-4: P1 serves
+        repeat(4) { i ->
             state = ScoreCalculator.incrementScore(state, settings, player1.id)
             assertEquals(player1.id, state.servingPlayerId, "Point ${i + 1}: P1 should serve")
         }
 
-        // Point 6: P2 serves (total = 6, rotation after 5)
+        // Point 5: After 5 total points, rotate to P2
         state = ScoreCalculator.incrementScore(state, settings, player1.id)
-        assertEquals(player2.id, state.servingPlayerId, "Point 6: P2 should serve (rotation)")
+        assertEquals(player2.id, state.servingPlayerId, "Point 5: After 5 points, rotate to P2")
 
-        // Points 7-10: P2 still serves (total = 7-10)
+        // Points 6-9: P2 serves
         repeat(4) { i ->
             state = ScoreCalculator.incrementScore(state, settings, player1.id)
-            assertEquals(player2.id, state.servingPlayerId, "Point ${i + 7}: P2 should serve")
+            assertEquals(player2.id, state.servingPlayerId, "Point ${i + 6}: P2 should serve")
         }
 
-        // Point 11: P1 serves (total = 11, rotation after 10)
+        // Point 10: After 10 total points, rotate to P1
         state = ScoreCalculator.incrementScore(state, settings, player1.id)
-        assertEquals(player1.id, state.servingPlayerId, "Point 11: P1 should serve (rotation)")
+        assertEquals(player1.id, state.servingPlayerId, "Point 10: After 10 points, rotate to P1")
     }
 
     @Test
@@ -504,26 +504,32 @@ class ScoreCalculatorTest {
         val settings = defaultSettings.copy(pointsToWinSet = 7, serveRotationAfterPoints = 2)
         var state = initialState
 
-        // P1 serves points 1-2 (P1 scores both)
-        state = ScoreCalculator.incrementScore(state, settings, player1.id) // 1-0
-        assertEquals(player1.id, state.servingPlayerId)
-        state = ScoreCalculator.incrementScore(state, settings, player1.id) // 2-0
+        // Point 1: P1 serves (P1 scores) - 1-0
+        state = ScoreCalculator.incrementScore(state, settings, player1.id)
         assertEquals(player1.id, state.servingPlayerId)
 
-        // P2 serves points 3-4 (P2 scores both)
-        state = ScoreCalculator.incrementScore(state, settings, player2.id) // 2-1
-        assertEquals(player2.id, state.servingPlayerId)
-        state = ScoreCalculator.incrementScore(state, settings, player2.id) // 2-2
+        // Point 2: Rotate to P2 (P1 scores) - 2-0
+        state = ScoreCalculator.incrementScore(state, settings, player1.id)
         assertEquals(player2.id, state.servingPlayerId)
 
-        // P1 serves points 5-6 (alternating scores)
-        state = ScoreCalculator.incrementScore(state, settings, player1.id) // 3-2
-        assertEquals(player1.id, state.servingPlayerId)
-        state = ScoreCalculator.incrementScore(state, settings, player2.id) // 3-3
+        // Point 3: P2 serves (P2 scores) - 2-1
+        state = ScoreCalculator.incrementScore(state, settings, player2.id)
+        assertEquals(player2.id, state.servingPlayerId)
+
+        // Point 4: Rotate to P1 (P2 scores) - 2-2
+        state = ScoreCalculator.incrementScore(state, settings, player2.id)
         assertEquals(player1.id, state.servingPlayerId)
 
-        // P2 serves points 7-8
-        state = ScoreCalculator.incrementScore(state, settings, player1.id) // 4-3
+        // Point 5: P1 serves (P1 scores) - 3-2
+        state = ScoreCalculator.incrementScore(state, settings, player1.id)
+        assertEquals(player1.id, state.servingPlayerId)
+
+        // Point 6: Rotate to P2 (P2 scores) - 3-3
+        state = ScoreCalculator.incrementScore(state, settings, player2.id)
+        assertEquals(player2.id, state.servingPlayerId)
+
+        // Point 7: P2 serves (P1 scores) - 4-3
+        state = ScoreCalculator.incrementScore(state, settings, player1.id)
         assertEquals(player2.id, state.servingPlayerId)
     }
 
@@ -582,22 +588,34 @@ class ScoreCalculatorTest {
         val settings = defaultSettings.copy(serveRotationAfterPoints = 3)
         var state = initialState
 
-        // Points 1-3: P1 serves
-        repeat(3) { i ->
+        // Points 1-2: P1 serves
+        repeat(2) { i ->
             state = ScoreCalculator.incrementScore(state, settings, player1.id)
             assertEquals(player1.id, state.servingPlayerId, "Point ${i + 1}: P1 should serve")
         }
 
-        // Points 4-6: P2 serves
-        repeat(3) { i ->
+        // Point 3: After 3 points, rotate to P2
+        state = ScoreCalculator.incrementScore(state, settings, player1.id)
+        assertEquals(player2.id, state.servingPlayerId, "Point 3: Rotate to P2")
+
+        // Points 4-5: P2 serves
+        repeat(2) { i ->
             state = ScoreCalculator.incrementScore(state, settings, player1.id)
             assertEquals(player2.id, state.servingPlayerId, "Point ${i + 4}: P2 should serve")
         }
 
-        // Points 7-9: P1 serves
-        repeat(3) { i ->
+        // Point 6: After 6 points, rotate to P1
+        state = ScoreCalculator.incrementScore(state, settings, player1.id)
+        assertEquals(player1.id, state.servingPlayerId, "Point 6: Rotate to P1")
+
+        // Points 7-8: P1 serves
+        repeat(2) { i ->
             state = ScoreCalculator.incrementScore(state, settings, player1.id)
             assertEquals(player1.id, state.servingPlayerId, "Point ${i + 7}: P1 should serve")
         }
+
+        // Point 9: After 9 points, rotate to P2
+        state = ScoreCalculator.incrementScore(state, settings, player1.id)
+        assertEquals(player2.id, state.servingPlayerId, "Point 9: Rotate to P2")
     }
 }
