@@ -2,6 +2,7 @@
 agp = "8.13.0"
 kotlin = "2.2.20"
 coreKtx = "1.17.0"
+splashscreen = "1.2.0-rc01"
 lifecycle-runtime-ktx = "2.9.4"
 activity-compose = "1.11.0"
 compose-bom = "2025.09.01"
@@ -33,6 +34,7 @@ ui-test-manifest = "1.9.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

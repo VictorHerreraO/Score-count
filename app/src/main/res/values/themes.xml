@@ -1,7 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme for when not using Compose theme directly in Activity -->
+    <!-- Base application theme for light mode -->
     <style name="Theme.Scorecount" parent="android:Theme.Material.Light.NoActionBar">
-        <!-- You can add system-level theme customizations here if needed,
-             but prefer doing theming in Compose if possible. -->
+        <!-- Splash screen attributes for Android 12+ -->
+        <item name="android:windowSplashScreenBackground" tools:targetApi="s">@color/ic_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="s">@mipmap/ic_launcher_round</item>
     </style>
 </resources>
