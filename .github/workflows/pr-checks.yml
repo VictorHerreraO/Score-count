@@ -46,6 +46,24 @@ jobs:
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses || true
 
+      - name: Validate version.txt Format
+        run: |
+          if [ ! -f version.txt ]; then
+            echo "❌ version.txt not found at project root"
+            exit 1
+          fi
+
+          VERSION=$(cat version.txt | tr -d '[:space:]')
+
+          # Validate semver format (MAJOR.MINOR.PATCH)
+          if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ version.txt format invalid: '$VERSION'"
+            echo "Expected format: MAJOR.MINOR.PATCH (e.g., 1.0.1)"
+            exit 1
+          fi
+
+          echo "✅ version.txt validation passed: $VERSION"
+
       - name: Compile Debug Build
         run: ./gradlew assembleDebug --no-daemon --stacktrace
 

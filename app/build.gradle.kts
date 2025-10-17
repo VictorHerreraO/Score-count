@@ -39,27 +39,32 @@ android {
         minSdk = 28
         targetSdk = 36
 
-        // Dynamic versioning based on Git tags and commits
-        val gitTag =
-            providers
-                .exec {
-                    commandLine("bash", "-c", "git describe --tags --abbrev=0 || echo \"1.0.0\"")
-                }.standardOutput.asText
-                .get()
-                .trim()
-                .removePrefix("v")
+        // Semantic versioning using version.txt and GitHub run number
+        val versionFile =
+            File(rootDir, "version.txt")
+        val baseVersion =
+            if (versionFile.exists()) {
+                versionFile.readText().trim()
+            } else {
+                "1.0.0"
+            }
 
-        val gitCommitCount =
-            providers
-                .exec {
-                    commandLine("git", "rev-list", "--count", "HEAD")
-                }.standardOutput.asText
-                .get()
-                .trim()
-                .toIntOrNull() ?: 1
+        // Parse MAJOR.MINOR.PATCH from version.txt
+        val versionParts = baseVersion.split(".")
+        val major = versionParts.getOrNull(0)?.toIntOrNull() ?: 1
+        val minor = versionParts.getOrNull(1)?.toIntOrNull() ?: 0
+        val patch = versionParts.getOrNull(2)?.toIntOrNull() ?: 0
 
-        versionCode = gitCommitCount
-        versionName = gitTag
+        // Get BUILD number from GitHub Actions environment variable
+        // Falls back to 1 for local development builds
+        val buildNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
+
+        // Calculate versionCode using formula:
+        // MAJOR * 100,000,000 + MINOR * 1,000,000 + PATCH * 10,000 + BUILD
+        versionCode = (major * 100_000_000) + (minor * 1_000_000) + (patch * 10_000) + buildNumber
+
+        // Construct versionName as MAJOR.MINOR.PATCH.BUILD
+        versionName = "$major.$minor.$patch.$buildNumber"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
