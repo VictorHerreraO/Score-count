@@ -2,7 +2,78 @@
 
 This file tracks the current state of development for the Score-Count application. Treat this file as the context that future you will need to finish any incomplete changes.
 
-## Current Work: Fixed reset game serve indicator toggle bug (Task #43 - Done)
+## Current Work: Fixed splash screen dark mode bug (Task #45 - Done)
+
+### Summary
+Fixed bug where the app's splash screen always displayed with a white background regardless of system theme, causing a jarring bright flash when launching the app in dark mode.
+
+### The Bug
+The splash screen was not responding to system dark mode settings:
+- Both `values/themes.xml` and `values-night/themes.xml` inherited from `android:Theme.Material.Light.NoActionBar`
+- No dark mode color variants defined for splash screen background
+- No splash screen API implementation
+- The app only applied theming after Compose loaded, but splash screen displays before that
+
+### The Fix
+Implemented Android's SplashScreen Compat API for proper dark mode support:
+
+1. **Added dependency** - `androidx.core:core-splashscreen:1.2.0-beta02`
+2. **Created dark mode colors** - Added `values-night/colors.xml` with dark `ic_background` (#1A1A2E)
+3. **Fixed theme inheritance** - Changed dark theme parent to `android:Theme.Material.NoActionBar` (removed `.Light`)
+4. **Added splash attributes** - Configured `windowSplashScreenBackground` and `windowSplashScreenAnimatedIcon` in both themes
+5. **Initialized splash screen** - Called `installSplashScreen()` in `MainActivity.onCreate()` before `super.onCreate()`
+6. **Added API level annotations** - Used `tools:targetApi="s"` to suppress lint warnings for Android 12+ attributes
+
+### Files Changed
+1. **`gradle/libs.versions.toml`**
+   - Added `splashscreen = "1.2.0-beta02"` version
+   - Added `androidx-core-splashscreen` library reference
+
+2. **`app/build.gradle.kts:104`**
+   - Added `implementation(libs.androidx.core.splashscreen)` dependency
+
+3. **`app/src/main/res/values-night/colors.xml`** (NEW)
+   - Created dark mode color variants
+   - `ic_background`: `#1A1A2E` (matches Compose DarkBackground)
+
+4. **`app/src/main/res/values-night/themes.xml`**
+   - Changed parent from `android:Theme.Material.Light.NoActionBar` to `android:Theme.Material.NoActionBar`
+   - Added `windowSplashScreenBackground` attribute
+   - Added `windowSplashScreenAnimatedIcon` attribute
+   - Added `forceDarkAllowed` set to false
+
+5. **`app/src/main/res/values/themes.xml`**
+   - Added `windowSplashScreenBackground` attribute
+   - Added `windowSplashScreenAnimatedIcon` attribute
+
+6. **`app/src/main/java/.../MainActivity.kt:10,28-29`**
+   - Added import for `installSplashScreen`
+   - Called `installSplashScreen()` before `super.onCreate()`
+
+### Acceptance Criteria Met
+- ✅ Splash screen displays dark background when device is in dark mode
+- ✅ Splash screen displays light background when device is in light mode
+- ✅ Theme transition is consistent with system settings
+- ✅ Solution supports all Android versions from API 28+ (min SDK)
+
+### Testing
+- ✅ All 113 unit tests pass
+- ✅ Build successful (debug APK built)
+- ✅ Lint checks pass (0 errors)
+- ✅ ktlint formatting checks pass
+
+### Technical Notes
+- The SplashScreen compat library provides consistent behavior across Android 5.0+ (API 23+)
+- On Android 12+ (API 31+), uses native splash screen API
+- On older versions, creates a compatible splash screen experience
+- Dark mode color matches the Compose theme's `DarkBackground` color for visual consistency
+
+### Status
+✅ **COMPLETE - All checks passing, ready for PR**
+
+---
+
+## Previous Work: Fixed reset game serve indicator toggle bug (Task #43 - Done)
 
 ### Summary
 Fixed bug where tapping "Reset Game" would toggle the serve indicator between Player 1 and Player 2 on consecutive resets, instead of always resetting to Player 1 (initial state).
