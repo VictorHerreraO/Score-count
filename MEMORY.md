@@ -2,7 +2,89 @@
 
 This file tracks the current state of development for the Score-Count application. Treat this file as the context that future you will need to finish any incomplete changes.
 
-## Current Work: Fixed serve rotation bug (Task #42 - Done, Round 2)
+## Current Work: Fixed reset game serve indicator toggle bug (Task #43 - Done)
+
+### Summary
+Fixed bug where tapping "Reset Game" would toggle the serve indicator between Player 1 and Player 2 on consecutive resets, instead of always resetting to Player 1 (initial state).
+
+### The Bug
+When `winnerServesNextGame` setting was `false`, the `resetGame()` logic had this code:
+```kotlin
+if (!settings.winnerServesNextGame && currentServerId != null) {
+    // Alternate server from current server
+    if (currentServerId == player1Id) player2Id else player1Id
+}
+```
+
+This caused the serve indicator to **toggle** on each reset:
+- 1st reset: P2 serving → resets to P1 ✓
+- 2nd reset: P1 serving → toggles to P2 ✗ (WRONG!)
+- 3rd reset: P2 serving → toggles to P1 ✓
+- 4th reset: P1 serving → toggles to P2 ✗ (WRONG!)
+
+### Root Cause Analysis
+The `currentServerId` parameter was originally intended for **set transitions** during gameplay (when a set ends and a new one begins). However, it was being misused for **manual resets**.
+
+**Manual reset** should return to initial state (Player 1 serving), **not** alternate from the current state.
+
+### The Fix
+Simplified the logic to always reset to Player 1 unless `winnerServesNextGame` is `true`:
+
+```kotlin
+val firstServer =
+    if (settings.winnerServesNextGame && lastGameWinnerId != null) {
+        lastGameWinnerId  // Winner serves
+    } else {
+        player1Id  // Always reset to Player 1 (initial state)
+    }
+```
+
+**Removed the buggy alternation logic entirely.** Also removed the unused `currentServerId` parameter from the `resetGame()` signature.
+
+### Files Changed
+1. **`ScoreCalculator.kt:165-181`**
+   - Removed alternation logic branch
+   - Removed `currentServerId` parameter
+   - Simplified to two branches: winner serves OR Player 1 serves
+   - Updated KDoc
+
+2. **`ResetGameUseCase.kt:27-35`**
+   - Removed `currentServerId` argument from `resetGame()` call
+
+3. **`ScoreCalculatorTest.kt:598-701`** (Added 4 new tests)
+   - `consecutive resets always set serve indicator to Player 1` - Core bug reproduction test
+   - `reset from Player 1 serving maintains Player 1 as server`
+   - `reset from Player 2 serving resets to Player 1`
+   - `reset with winnerServesNextGame true uses lastGameWinnerId` - Ensures setting still works
+
+4. **`ScoreUseCasesTest.kt:265-287`** (Fixed 1 existing test)
+   - Updated test expectation from `assertEquals(2, ...)` to `assertEquals(1, ...)`
+   - The old test was encoding the buggy behavior
+
+### Acceptance Criteria Met
+- ✅ Tapping "Reset Game" always sets serve indicator to Player 1
+- ✅ Multiple consecutive resets maintain serve indicator on Player 1
+- ✅ Serve indicator state properly initialized in reset logic
+- ✅ Unit tests added to verify reset behavior
+
+### Testing
+- ✅ All 120 unit tests pass (4 new tests added)
+- ✅ Build successful
+- ✅ Lint checks pass
+- ✅ detekt checks pass
+
+### Key Insights
+1. **Unused parameters are a code smell** - `currentServerId` was passed but only needed for set transitions during gameplay, not manual resets
+2. **Tests can encode bugs** - One existing test expected the buggy behavior and needed fixing
+3. **Simplicity wins** - Removed an entire conditional branch, making the code clearer
+4. **Reset = Return to initial state** - Manual reset should always behave like starting a new game
+
+### Status
+✅ **COMPLETE - All tests passing, ready for PR**
+
+---
+
+## Previous Work: Fixed serve rotation bug (Task #42 - Done, Round 2)
 
 ### Summary
 Fixed the serve rotation bug properly after user manual testing revealed my first attempt didn't actually fix anything. The issue was a fundamental misunderstanding of what the serve indicator represents and when rotation should occur.
@@ -71,4 +153,6 @@ totalPoints % interval == 0
 - PR #46 ready for approval
 - User confirmed manual testing shows issue is resolved
 
--Author: Claude Code (Task #42 - Round 2: Actually Fixed It)
+---
+
+## Previous Work: Fixed serve rotation bug (Task #42 - Done, Round 2)

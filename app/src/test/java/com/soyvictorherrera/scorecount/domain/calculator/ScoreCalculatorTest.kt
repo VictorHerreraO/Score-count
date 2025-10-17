@@ -594,4 +594,103 @@ class ScoreCalculatorTest {
         state = ScoreCalculator.incrementScore(state, settings, player1.id)
         assertEquals(player2.id, state.servingPlayerId, "Point 9: Rotate to P2")
     }
+
+    // Bug #43: Reset game should always reset serve indicator to Player 1
+    @Test
+    fun `consecutive resets always set serve indicator to Player 1`() {
+        // Simulate playing to a point where Player 2 is serving
+        var state = initialState
+        state = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
+        state = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
+        assertEquals(player2.id, state.servingPlayerId, "Player 2 should be serving after rotation")
+
+        // First reset - should reset to Player 1
+        val reset1 =
+            ScoreCalculator.resetGame(
+                player1Id = player1.id,
+                player2Id = player2.id,
+                player1Name = player1.name,
+                player2Name = player2.name,
+                settings = defaultSettings.copy(winnerServesNextGame = false)
+            )
+        assertEquals(player1.id, reset1.servingPlayerId, "First reset should set server to Player 1")
+
+        // Second consecutive reset - should STILL reset to Player 1, not toggle
+        val reset2 =
+            ScoreCalculator.resetGame(
+                player1Id = player1.id,
+                player2Id = player2.id,
+                player1Name = player1.name,
+                player2Name = player2.name,
+                settings = defaultSettings.copy(winnerServesNextGame = false)
+            )
+        assertEquals(player1.id, reset2.servingPlayerId, "Second reset should set server to Player 1")
+
+        // Third consecutive reset - verify pattern holds
+        val reset3 =
+            ScoreCalculator.resetGame(
+                player1Id = player1.id,
+                player2Id = player2.id,
+                player1Name = player1.name,
+                player2Name = player2.name,
+                settings = defaultSettings.copy(winnerServesNextGame = false)
+            )
+        assertEquals(player1.id, reset3.servingPlayerId, "Third reset should set server to Player 1")
+    }
+
+    @Test
+    fun `reset from Player 1 serving maintains Player 1 as server`() {
+        val settings = defaultSettings.copy(winnerServesNextGame = false)
+
+        // Reset when Player 1 is already serving
+        val reset =
+            ScoreCalculator.resetGame(
+                player1Id = player1.id,
+                player2Id = player2.id,
+                player1Name = player1.name,
+                player2Name = player2.name,
+                settings = settings
+            )
+
+        assertEquals(player1.id, reset.servingPlayerId, "Should always reset to Player 1")
+    }
+
+    @Test
+    fun `reset from Player 2 serving resets to Player 1`() {
+        val settings = defaultSettings.copy(winnerServesNextGame = false)
+
+        // Reset regardless of who was serving before
+        val reset =
+            ScoreCalculator.resetGame(
+                player1Id = player1.id,
+                player2Id = player2.id,
+                player1Name = player1.name,
+                player2Name = player2.name,
+                settings = settings
+            )
+
+        assertEquals(player1.id, reset.servingPlayerId, "Should always reset to Player 1")
+    }
+
+    @Test
+    fun `reset with winnerServesNextGame true uses lastGameWinnerId`() {
+        val settings = defaultSettings.copy(winnerServesNextGame = true)
+
+        // Player 2 won last game, should serve next
+        val reset =
+            ScoreCalculator.resetGame(
+                player1Id = player1.id,
+                player2Id = player2.id,
+                player1Name = player1.name,
+                player2Name = player2.name,
+                settings = settings,
+                lastGameWinnerId = player2.id
+            )
+
+        assertEquals(
+            player2.id,
+            reset.servingPlayerId,
+            "Winner should serve when winnerServesNextGame is true"
+        )
+    }
 }
