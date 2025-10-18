@@ -36,7 +36,7 @@ class ScoreViewModelTest {
 
         // Create use cases
         val incrementScoreUseCase = IncrementScoreUseCase(fakeScoreRepository, fakeSettingsRepository)
-        val decrementScoreUseCase = DecrementScoreUseCase(fakeScoreRepository)
+        val decrementScoreUseCase = DecrementScoreUseCase(fakeScoreRepository, fakeSettingsRepository)
         val manualSwitchServeUseCase = ManualSwitchServeUseCase(fakeScoreRepository)
         val resetGameUseCase = ResetGameUseCase(fakeScoreRepository, fakeSettingsRepository)
         saveMatchUseCase = SaveMatchUseCase(fakeMatchRepository)
@@ -241,7 +241,7 @@ class ScoreViewModelTest {
 
             // Create a new ViewModel that will see the finished state as the first emission
             val incrementScoreUseCase = IncrementScoreUseCase(fakeScoreRepository, fakeSettingsRepository)
-            val decrementScoreUseCase = DecrementScoreUseCase(fakeScoreRepository)
+            val decrementScoreUseCase = DecrementScoreUseCase(fakeScoreRepository, fakeSettingsRepository)
             val manualSwitchServeUseCase = ManualSwitchServeUseCase(fakeScoreRepository)
             val resetGameUseCase = ResetGameUseCase(fakeScoreRepository, fakeSettingsRepository)
             val isolatedSaveMatchUseCase = SaveMatchUseCase(isolatedMatchRepository)

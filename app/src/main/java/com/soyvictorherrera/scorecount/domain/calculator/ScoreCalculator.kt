@@ -50,7 +50,7 @@ object ScoreCalculator {
         var lastSetWinnerId: Int? = null
 
         // Determine deuce state
-        val isDeuce = calculateDeuceState(newP1Score, newP2Score, settings)
+        var isDeuce = calculateDeuceState(newP1Score, newP2Score, settings)
 
         // Handle set completion
         if (p1WinsSet || p2WinsSet) {
@@ -68,6 +68,8 @@ object ScoreCalculator {
         if (setJustEnded) {
             newP1Score = 0
             newP2Score = 0
+            // Recalculate deuce state based on reset scores (should be false at 0-0)
+            isDeuce = calculateDeuceState(newP1Score, newP2Score, settings)
         }
 
         // Check if match is finished
@@ -102,11 +104,13 @@ object ScoreCalculator {
      *
      * @param currentState The current game state
      * @param playerId The ID of the player whose score should be decremented
+     * @param settings The game settings (needed to recalculate deuce state)
      * @return The new game state after the score is decremented
      */
     fun decrementScore(
         currentState: GameState,
-        playerId: Int
+        playerId: Int,
+        settings: GameSettings
     ): GameState {
         // Cannot decrement if game is finished
         if (currentState.isFinished) return currentState
@@ -125,9 +129,13 @@ object ScoreCalculator {
                 currentState.player2
             }
 
+        // Recalculate deuce state based on new scores
+        val isDeuce = calculateDeuceState(newPlayer1.score, newPlayer2.score, settings)
+
         return currentState.copy(
             player1 = newPlayer1,
-            player2 = newPlayer2
+            player2 = newPlayer2,
+            isDeuce = isDeuce
         )
     }
 

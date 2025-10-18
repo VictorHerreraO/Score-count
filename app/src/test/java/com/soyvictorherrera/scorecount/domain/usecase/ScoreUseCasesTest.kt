@@ -34,7 +34,7 @@ class ScoreUseCasesTest {
     fun `DecrementScoreUseCase decrements player 1 score from 5-3 to 4-3`() =
         runTest {
             // Given
-            val useCase = DecrementScoreUseCase(fakeScoreRepository)
+            val useCase = DecrementScoreUseCase(fakeScoreRepository, fakeSettingsRepository)
             val initialState =
                 GameState(
                     player1 = Player(id = 1, name = "Alice", score = 5),
@@ -56,7 +56,7 @@ class ScoreUseCasesTest {
     fun `DecrementScoreUseCase decrements player 2 score from 3-7 to 3-6`() =
         runTest {
             // Given
-            val useCase = DecrementScoreUseCase(fakeScoreRepository)
+            val useCase = DecrementScoreUseCase(fakeScoreRepository, fakeSettingsRepository)
             val initialState =
                 GameState(
                     player1 = Player(id = 1, name = "Alice", score = 3),
@@ -78,7 +78,7 @@ class ScoreUseCasesTest {
     fun `DecrementScoreUseCase does not go below 0`() =
         runTest {
             // Given
-            val useCase = DecrementScoreUseCase(fakeScoreRepository)
+            val useCase = DecrementScoreUseCase(fakeScoreRepository, fakeSettingsRepository)
             val initialState =
                 GameState(
                     player1 = Player(id = 1, name = "Alice", score = 0),
@@ -100,7 +100,7 @@ class ScoreUseCasesTest {
     fun `DecrementScoreUseCase updates repository`() =
         runTest {
             // Given
-            val useCase = DecrementScoreUseCase(fakeScoreRepository)
+            val useCase = DecrementScoreUseCase(fakeScoreRepository, fakeSettingsRepository)
             val initialState =
                 GameState(
                     player1 = Player(id = 1, name = "Alice", score = 10),

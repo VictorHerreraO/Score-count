@@ -76,7 +76,7 @@ private fun createPreviewViewModel(finished: Boolean = false): ScoreViewModel {
     return ScoreViewModel(
         scoreRepository = fakeScoreRepo,
         incrementScoreUseCase = IncrementScoreUseCase(fakeScoreRepo, fakeSettingsRepo),
-        decrementScoreUseCase = DecrementScoreUseCase(fakeScoreRepo),
+        decrementScoreUseCase = DecrementScoreUseCase(fakeScoreRepo, fakeSettingsRepo),
         manualSwitchServeUseCase = ManualSwitchServeUseCase(fakeScoreRepo),
         resetGameUseCase = ResetGameUseCase(fakeScoreRepo, fakeSettingsRepo),
         saveMatchUseCase = SaveMatchUseCase(fakeMatchRepo),
