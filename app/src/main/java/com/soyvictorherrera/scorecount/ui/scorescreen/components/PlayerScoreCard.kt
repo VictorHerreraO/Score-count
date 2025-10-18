@@ -38,12 +38,11 @@ fun PlayerScoreCard(
     isServing: Boolean,
     isFinished: Boolean,
     showPlayerName: Boolean,
-    onIncrement: () -> Unit,
-    onDecrement: () -> Unit,
+    callbacks: PlayerScoreCardCallbacks,
     modifier: Modifier = Modifier
 ) {
     Card(
-        onClick = onIncrement,
+        onClick = callbacks.onIncrement,
         enabled = !isFinished,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -105,13 +104,13 @@ fun PlayerScoreCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 SmallIconButton(
-                    onClick = onDecrement,
+                    onClick = callbacks.onDecrement,
                     icon = Icons.Filled.Remove,
                     description = stringResource(id = R.string.cd_decrement),
                     enabled = !isFinished
                 )
                 SmallIconButton(
-                    onClick = onIncrement,
+                    onClick = callbacks.onIncrement,
                     icon = Icons.Filled.Add,
                     description = stringResource(id = R.string.cd_increment),
                     enabled = !isFinished
