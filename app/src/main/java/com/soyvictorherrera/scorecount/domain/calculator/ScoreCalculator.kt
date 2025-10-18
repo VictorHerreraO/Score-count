@@ -5,6 +5,19 @@ import com.soyvictorherrera.scorecount.domain.model.GameState
 import kotlin.math.abs
 
 /**
+ * Parameters for determining the next server.
+ * Groups related data to reduce parameter list complexity.
+ */
+private data class ServerDeterminationParams(
+    val currentScores: Pair<Int, Int>,
+    val currentServingPlayerId: Int,
+    val playerIds: Pair<Int, Int>,
+    val settings: GameSettings,
+    val setEnded: Boolean,
+    val lastSetWinnerId: Int?
+)
+
+/**
  * Pure business logic for score calculation.
  * Contains all game rules for table tennis scoring, server rotation, and match progression.
  * This class has no dependencies and is fully testable.
@@ -79,12 +92,14 @@ object ScoreCalculator {
         // Determine next server
         val newServingPlayerId =
             determineNextServer(
-                currentScores = Pair(newP1Score, newP2Score),
-                currentServingPlayerId = currentState.servingPlayerId ?: currentState.player1.id,
-                playerIds = Pair(currentState.player1.id, currentState.player2.id),
-                settings = settings,
-                setEnded = setJustEnded,
-                lastSetWinnerId = lastSetWinnerId
+                ServerDeterminationParams(
+                    currentScores = Pair(newP1Score, newP2Score),
+                    currentServingPlayerId = currentState.servingPlayerId ?: currentState.player1.id,
+                    playerIds = Pair(currentState.player1.id, currentState.player2.id),
+                    settings = settings,
+                    setEnded = setJustEnded,
+                    lastSetWinnerId = lastSetWinnerId
+                )
             )
 
         return currentState.copy(
@@ -244,22 +259,11 @@ object ScoreCalculator {
     /**
      * Determine who should serve the next point based on game rules.
      *
-     * @param currentScores Current scores (P1, P2) for the point about to be played
-     * @param currentServingPlayerId The current server's ID
-     * @param playerIds Pair of player IDs (P1, P2)
-     * @param settings The game settings
-     * @param setEnded Whether the set just ended
-     * @param lastSetWinnerId The ID of the player who won the last set (if applicable)
+     * @param params Parameters for server determination
      * @return The ID of the player who should serve next
      */
-    private fun determineNextServer(
-        currentScores: Pair<Int, Int>,
-        currentServingPlayerId: Int,
-        playerIds: Pair<Int, Int>,
-        settings: GameSettings,
-        setEnded: Boolean,
-        lastSetWinnerId: Int?
-    ): Int {
+    private fun determineNextServer(params: ServerDeterminationParams): Int {
+        val (currentScores, currentServingPlayerId, playerIds, settings, setEnded, lastSetWinnerId) = params
         val (p1Id, p2Id) = playerIds
 
         // If a set just ended, determine server for the new set
