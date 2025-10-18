@@ -9,6 +9,7 @@ import com.soyvictorherrera.scorecount.domain.usecase.IncrementScoreUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.ManualSwitchServeUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.ResetGameUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.SaveMatchUseCase
+import com.soyvictorherrera.scorecount.domain.usecase.ScoreUseCases
 import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreScreen
 import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreViewModel
 import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
@@ -73,13 +74,18 @@ private fun createPreviewViewModel(finished: Boolean = false): ScoreViewModel {
     val fakeSettingsRepo = FakeSettingsRepository()
     val fakeMatchRepo = FakeMatchRepository()
 
+    val scoreUseCases =
+        ScoreUseCases(
+            increment = IncrementScoreUseCase(fakeScoreRepo, fakeSettingsRepo),
+            decrement = DecrementScoreUseCase(fakeScoreRepo, fakeSettingsRepo),
+            switchServe = ManualSwitchServeUseCase(fakeScoreRepo),
+            reset = ResetGameUseCase(fakeScoreRepo, fakeSettingsRepo),
+            saveMatch = SaveMatchUseCase(fakeMatchRepo)
+        )
+
     return ScoreViewModel(
         scoreRepository = fakeScoreRepo,
-        incrementScoreUseCase = IncrementScoreUseCase(fakeScoreRepo, fakeSettingsRepo),
-        decrementScoreUseCase = DecrementScoreUseCase(fakeScoreRepo, fakeSettingsRepo),
-        manualSwitchServeUseCase = ManualSwitchServeUseCase(fakeScoreRepo),
-        resetGameUseCase = ResetGameUseCase(fakeScoreRepo, fakeSettingsRepo),
-        saveMatchUseCase = SaveMatchUseCase(fakeMatchRepo),
+        scoreUseCases = scoreUseCases,
         settingsRepository = fakeSettingsRepo,
         dispatcher = Dispatchers.Unconfined
     )

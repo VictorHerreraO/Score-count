@@ -3,7 +3,12 @@ package com.soyvictorherrera.scorecount.ui.scorescreen
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.domain.model.Player
-import com.soyvictorherrera.scorecount.domain.usecase.*
+import com.soyvictorherrera.scorecount.domain.usecase.DecrementScoreUseCase
+import com.soyvictorherrera.scorecount.domain.usecase.IncrementScoreUseCase
+import com.soyvictorherrera.scorecount.domain.usecase.ManualSwitchServeUseCase
+import com.soyvictorherrera.scorecount.domain.usecase.ResetGameUseCase
+import com.soyvictorherrera.scorecount.domain.usecase.SaveMatchUseCase
+import com.soyvictorherrera.scorecount.domain.usecase.ScoreUseCases
 import com.soyvictorherrera.scorecount.util.fakes.FakeMatchRepository
 import com.soyvictorherrera.scorecount.util.fakes.FakeScoreRepository
 import com.soyvictorherrera.scorecount.util.fakes.FakeSettingsRepository
@@ -41,14 +46,20 @@ class ScoreViewModelTest {
         val resetGameUseCase = ResetGameUseCase(fakeScoreRepository, fakeSettingsRepository)
         saveMatchUseCase = SaveMatchUseCase(fakeMatchRepository)
 
+        // Create ScoreUseCases container
+        val scoreUseCases =
+            ScoreUseCases(
+                increment = incrementScoreUseCase,
+                decrement = decrementScoreUseCase,
+                switchServe = manualSwitchServeUseCase,
+                reset = resetGameUseCase,
+                saveMatch = saveMatchUseCase
+            )
+
         viewModel =
             ScoreViewModel(
                 scoreRepository = fakeScoreRepository,
-                incrementScoreUseCase = incrementScoreUseCase,
-                decrementScoreUseCase = decrementScoreUseCase,
-                manualSwitchServeUseCase = manualSwitchServeUseCase,
-                resetGameUseCase = resetGameUseCase,
-                saveMatchUseCase = saveMatchUseCase,
+                scoreUseCases = scoreUseCases,
                 settingsRepository = fakeSettingsRepository,
                 dispatcher = testDispatcher
             )
@@ -246,15 +257,20 @@ class ScoreViewModelTest {
             val resetGameUseCase = ResetGameUseCase(fakeScoreRepository, fakeSettingsRepository)
             val isolatedSaveMatchUseCase = SaveMatchUseCase(isolatedMatchRepository)
 
+            val isolatedScoreUseCases =
+                ScoreUseCases(
+                    increment = incrementScoreUseCase,
+                    decrement = decrementScoreUseCase,
+                    switchServe = manualSwitchServeUseCase,
+                    reset = resetGameUseCase,
+                    saveMatch = isolatedSaveMatchUseCase
+                )
+
             @Suppress("UNUSED_VARIABLE")
             val isolatedViewModel =
                 ScoreViewModel(
                     scoreRepository = fakeScoreRepository,
-                    incrementScoreUseCase = incrementScoreUseCase,
-                    decrementScoreUseCase = decrementScoreUseCase,
-                    manualSwitchServeUseCase = manualSwitchServeUseCase,
-                    resetGameUseCase = resetGameUseCase,
-                    saveMatchUseCase = isolatedSaveMatchUseCase,
+                    scoreUseCases = isolatedScoreUseCases,
                     settingsRepository = fakeSettingsRepository,
                     dispatcher = testDispatcher
                 )

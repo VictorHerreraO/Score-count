@@ -33,11 +33,7 @@ import com.soyvictorherrera.scorecount.domain.model.GameState
 fun CentralControls(
     gameState: GameState,
     gameSettings: GameSettings,
-    onReset: () -> Unit,
-    onSwitchServe: () -> Unit,
-    onStartNewGame: () -> Unit,
-    onNavigateToHistory: () -> Unit,
-    onNavigateToSettings: () -> Unit,
+    callbacks: CentralControlsCallbacks,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -52,13 +48,13 @@ fun CentralControls(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            IconButton(onClick = onNavigateToHistory) {
+            IconButton(onClick = callbacks.onNavigateToHistory) {
                 Icon(
                     Icons.Default.History,
                     contentDescription = stringResource(id = R.string.cd_history)
                 )
             }
-            IconButton(onClick = onNavigateToSettings) {
+            IconButton(onClick = callbacks.onNavigateToSettings) {
                 Icon(
                     Icons.Default.Settings,
                     contentDescription = stringResource(id = R.string.cd_settings)
@@ -91,7 +87,7 @@ fun CentralControls(
         ) {
             if (gameState.isFinished) {
                 Button(
-                    onClick = onStartNewGame,
+                    onClick = callbacks.onStartNewGame,
                     shape = MaterialTheme.shapes.extraLarge,
                     contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
                 ) {
@@ -104,7 +100,7 @@ fun CentralControls(
                 }
             } else {
                 OutlinedButton(
-                    onClick = onReset,
+                    onClick = callbacks.onReset,
                     shape = MaterialTheme.shapes.extraLarge,
                     contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
                 ) {
@@ -117,7 +113,7 @@ fun CentralControls(
                 }
                 if (gameSettings.markServe) {
                     OutlinedButton(
-                        onClick = onSwitchServe,
+                        onClick = callbacks.onSwitchServe,
                         shape = MaterialTheme.shapes.extraLarge,
                         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
                     ) {

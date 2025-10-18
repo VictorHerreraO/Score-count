@@ -32,8 +32,10 @@ import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.BottomBarActions
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.CentralControls
+import com.soyvictorherrera.scorecount.ui.scorescreen.components.CentralControlsCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.DeuceIndicator
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCard
+import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCardCallbacks
 import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
 
 @Composable
@@ -46,32 +48,31 @@ fun ScoreScreen(
     val gameSettings by viewModel.gameSettings.collectAsState()
     val configuration = LocalConfiguration.current
 
+    val callbacks =
+        ScoreScreenCallbacks(
+            onIncrement = viewModel::incrementScore,
+            onDecrement = viewModel::decrementScore,
+            onReset = viewModel::resetGame,
+            onSwitchServe = viewModel::manualSwitchServe,
+            onStartNewGame = viewModel::resetGame,
+            onNavigateToHistory = onNavigateToHistory,
+            onNavigateToSettings = onNavigateToSettings
+        )
+
     ScoreCountTheme {
         when (configuration.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> {
                 ScoreScreenLandscape(
                     gameState = gameState,
                     gameSettings = gameSettings,
-                    onIncrement = viewModel::incrementScore,
-                    onDecrement = viewModel::decrementScore,
-                    onReset = viewModel::resetGame,
-                    onSwitchServe = viewModel::manualSwitchServe,
-                    onStartNewGame = viewModel::resetGame,
-                    onNavigateToHistory = onNavigateToHistory,
-                    onNavigateToSettings = onNavigateToSettings
+                    callbacks = callbacks
                 )
             }
             else -> {
                 ScoreScreenPortrait(
                     gameState = gameState,
                     gameSettings = gameSettings,
-                    onIncrement = viewModel::incrementScore,
-                    onDecrement = viewModel::decrementScore,
-                    onReset = viewModel::resetGame,
-                    onSwitchServe = viewModel::manualSwitchServe,
-                    onStartNewGame = viewModel::resetGame,
-                    onNavigateToHistory = onNavigateToHistory,
-                    onNavigateToSettings = onNavigateToSettings
+                    callbacks = callbacks
                 )
             }
         }
@@ -83,13 +84,7 @@ fun ScoreScreen(
 fun ScoreScreenPortrait(
     gameState: GameState,
     gameSettings: GameSettings,
-    onIncrement: (Int) -> Unit,
-    onDecrement: (Int) -> Unit,
-    onReset: () -> Unit,
-    onSwitchServe: () -> Unit,
-    onStartNewGame: () -> Unit,
-    onNavigateToHistory: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    callbacks: ScoreScreenCallbacks
 ) {
     Scaffold(
         topBar = {
@@ -103,7 +98,7 @@ fun ScoreScreenPortrait(
                     }
                 },
                 actions = {
-                    IconButton(onClick = onNavigateToHistory) {
+                    IconButton(onClick = callbacks.onNavigateToHistory) {
                         Icon(
                             Icons.Default.History,
                             contentDescription =
@@ -112,7 +107,7 @@ fun ScoreScreenPortrait(
                                 )
                         )
                     }
-                    IconButton(onClick = onNavigateToSettings) {
+                    IconButton(onClick = callbacks.onNavigateToSettings) {
                         Icon(
                             Icons.Default.Settings,
                             contentDescription =
@@ -133,9 +128,9 @@ fun ScoreScreenPortrait(
             BottomBarActions(
                 isFinished = gameState.isFinished,
                 showSwitchServe = gameSettings.markServe,
-                onReset = onReset,
-                onSwitchServe = onSwitchServe,
-                onStartNewGame = onStartNewGame
+                onReset = callbacks.onReset,
+                onSwitchServe = callbacks.onSwitchServe,
+                onStartNewGame = callbacks.onStartNewGame
             )
         }
     ) { paddingValues ->
@@ -190,8 +185,11 @@ fun ScoreScreenPortrait(
                 isServing = gameSettings.markServe && gameState.servingPlayerId == gameState.player1.id,
                 isFinished = gameState.isFinished,
                 showPlayerName = gameSettings.showNames,
-                onIncrement = { onIncrement(gameState.player1.id) },
-                onDecrement = { onDecrement(gameState.player1.id) },
+                callbacks =
+                    PlayerScoreCardCallbacks(
+                        onIncrement = { callbacks.onIncrement(gameState.player1.id) },
+                        onDecrement = { callbacks.onDecrement(gameState.player1.id) }
+                    ),
                 modifier = Modifier.weight(1f)
             )
 
@@ -205,8 +203,11 @@ fun ScoreScreenPortrait(
                 isServing = gameSettings.markServe && gameState.servingPlayerId == gameState.player2.id,
                 isFinished = gameState.isFinished,
                 showPlayerName = gameSettings.showNames,
-                onIncrement = { onIncrement(gameState.player2.id) },
-                onDecrement = { onDecrement(gameState.player2.id) },
+                callbacks =
+                    PlayerScoreCardCallbacks(
+                        onIncrement = { callbacks.onIncrement(gameState.player2.id) },
+                        onDecrement = { callbacks.onDecrement(gameState.player2.id) }
+                    ),
                 modifier = Modifier.weight(1f)
             )
         }
@@ -217,13 +218,7 @@ fun ScoreScreenPortrait(
 fun ScoreScreenLandscape(
     gameState: GameState,
     gameSettings: GameSettings,
-    onIncrement: (Int) -> Unit,
-    onDecrement: (Int) -> Unit,
-    onReset: () -> Unit,
-    onSwitchServe: () -> Unit,
-    onStartNewGame: () -> Unit,
-    onNavigateToHistory: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    callbacks: ScoreScreenCallbacks
 ) {
     Scaffold { paddingValues ->
         Row(
@@ -241,8 +236,11 @@ fun ScoreScreenLandscape(
                 isServing = gameSettings.markServe && gameState.servingPlayerId == gameState.player1.id,
                 isFinished = gameState.isFinished,
                 showPlayerName = gameSettings.showNames,
-                onIncrement = { onIncrement(gameState.player1.id) },
-                onDecrement = { onDecrement(gameState.player1.id) },
+                callbacks =
+                    PlayerScoreCardCallbacks(
+                        onIncrement = { callbacks.onIncrement(gameState.player1.id) },
+                        onDecrement = { callbacks.onDecrement(gameState.player1.id) }
+                    ),
                 modifier = Modifier.weight(1f)
             )
 
@@ -250,11 +248,14 @@ fun ScoreScreenLandscape(
                 modifier = Modifier.padding(horizontal = 4.dp),
                 gameState = gameState,
                 gameSettings = gameSettings,
-                onReset = onReset,
-                onSwitchServe = onSwitchServe,
-                onStartNewGame = onStartNewGame,
-                onNavigateToHistory = onNavigateToHistory,
-                onNavigateToSettings = onNavigateToSettings
+                callbacks =
+                    CentralControlsCallbacks(
+                        onReset = callbacks.onReset,
+                        onSwitchServe = callbacks.onSwitchServe,
+                        onStartNewGame = callbacks.onStartNewGame,
+                        onNavigateToHistory = callbacks.onNavigateToHistory,
+                        onNavigateToSettings = callbacks.onNavigateToSettings
+                    )
             )
 
             PlayerScoreCard(
@@ -263,8 +264,11 @@ fun ScoreScreenLandscape(
                 isServing = gameSettings.markServe && gameState.servingPlayerId == gameState.player2.id,
                 isFinished = gameState.isFinished,
                 showPlayerName = gameSettings.showNames,
-                onIncrement = { onIncrement(gameState.player2.id) },
-                onDecrement = { onDecrement(gameState.player2.id) },
+                callbacks =
+                    PlayerScoreCardCallbacks(
+                        onIncrement = { callbacks.onIncrement(gameState.player2.id) },
+                        onDecrement = { callbacks.onDecrement(gameState.player2.id) }
+                    ),
                 modifier = Modifier.weight(1f)
             )
         }
