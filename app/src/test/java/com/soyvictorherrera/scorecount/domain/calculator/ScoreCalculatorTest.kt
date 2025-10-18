@@ -211,7 +211,7 @@ class ScoreCalculatorTest {
                 player2 = player2.copy(score = 3)
             )
 
-        val newState = ScoreCalculator.decrementScore(state, player1.id)
+        val newState = ScoreCalculator.decrementScore(state, player1.id, defaultSettings)
 
         assertEquals(4, newState.player1.score)
         assertEquals(3, newState.player2.score)
@@ -225,7 +225,7 @@ class ScoreCalculatorTest {
                 player2 = player2.copy(score = 3)
             )
 
-        val newState = ScoreCalculator.decrementScore(state, player1.id)
+        val newState = ScoreCalculator.decrementScore(state, player1.id, defaultSettings)
 
         assertEquals(0, newState.player1.score)
     }
@@ -238,9 +238,77 @@ class ScoreCalculatorTest {
                 player1 = player1.copy(score = 5)
             )
 
-        val newState = ScoreCalculator.decrementScore(finishedState, player1.id)
+        val newState = ScoreCalculator.decrementScore(finishedState, player1.id, defaultSettings)
 
         assertEquals(finishedState, newState)
+    }
+
+    @Test
+    fun `decrementScore recalculates deuce state correctly`() {
+        // Start at 11-11 (deuce)
+        val state =
+            initialState.copy(
+                player1 = player1.copy(score = 11),
+                player2 = player2.copy(score = 11),
+                isDeuce = true
+            )
+
+        // Decrement player 1's score to 10-11 (still deuce: both >= 10)
+        val newState1 = ScoreCalculator.decrementScore(state, player1.id, defaultSettings)
+
+        assertEquals(10, newState1.player1.score)
+        assertEquals(11, newState1.player2.score)
+        assertTrue(newState1.isDeuce) // Still deuce since both >= 10
+
+        // Decrement again to 9-11 (no longer deuce)
+        val newState2 = ScoreCalculator.decrementScore(newState1, player1.id, defaultSettings)
+
+        assertEquals(9, newState2.player1.score)
+        assertEquals(11, newState2.player2.score)
+        assertFalse(newState2.isDeuce) // Not deuce anymore
+    }
+
+    @Test
+    fun `decrementScore transitions from deuce to non-deuce state`() {
+        // Start in deuce at 10-10
+        val state =
+            initialState.copy(
+                player1 = player1.copy(score = 10),
+                player2 = player2.copy(score = 10),
+                isDeuce = true
+            )
+
+        // Decrement player 2's score to 10-9 (no longer deuce)
+        val newState = ScoreCalculator.decrementScore(state, player2.id, defaultSettings)
+
+        assertEquals(10, newState.player1.score)
+        assertEquals(9, newState.player2.score)
+        assertFalse(newState.isDeuce)
+    }
+
+    @Test
+    fun `incrementScore resets deuce state when set ends after deuce`() {
+        // Scenario: Set reaches deuce at 10-10, then player 1 wins 11-9
+        val deuceState =
+            initialState.copy(
+                player1 = player1.copy(score = 10),
+                player2 = player2.copy(score = 10),
+                isDeuce = true
+            )
+
+        // Player 1 scores to 11-10 (still deuce)
+        val afterFirstPoint = ScoreCalculator.incrementScore(deuceState, defaultSettings, player1.id)
+        assertTrue(afterFirstPoint.isDeuce)
+
+        // Player 1 scores to win the set 12-10
+        val setWon = ScoreCalculator.incrementScore(afterFirstPoint, defaultSettings, player1.id)
+
+        // Set should be won, scores reset to 0-0, and deuce should be false
+        assertEquals(1, setWon.player1SetsWon)
+        assertEquals(0, setWon.player2SetsWon)
+        assertEquals(0, setWon.player1.score)
+        assertEquals(0, setWon.player2.score)
+        assertFalse(setWon.isDeuce) // Deuce should be reset when new set starts
     }
 
     @Test
