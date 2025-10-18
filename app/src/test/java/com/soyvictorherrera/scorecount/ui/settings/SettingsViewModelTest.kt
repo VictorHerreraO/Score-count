@@ -21,9 +21,6 @@ class SettingsViewModelTest {
     private lateinit var viewModel: SettingsViewModel
     private lateinit var fakeSettingsRepository: FakeSettingsRepository
 
-    // Helper to get default settings for comparison
-    private val defaultSettings = GameSettings()
-
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)

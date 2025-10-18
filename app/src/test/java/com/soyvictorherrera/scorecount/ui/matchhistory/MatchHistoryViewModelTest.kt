@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.IOException
 
 @ExperimentalCoroutinesApi
 class MatchHistoryViewModelTest {
@@ -125,7 +126,7 @@ class MatchHistoryViewModelTest {
                 object : MatchRepository {
                     override fun getMatchList(): Flow<List<Match>> =
                         kotlinx.coroutines.flow.flow {
-                            throw RuntimeException("Database error")
+                            throw IOException("Database error")
                         }
 
                     override suspend fun saveMatch(match: Match) {
