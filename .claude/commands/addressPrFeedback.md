@@ -8,9 +8,13 @@ When the user informs you that they've added comments to a PR, follow this proce
 
 ## 1. Fetch and Review Comments
 
-Use the GitHub CLI to fetch PR comments:
-```bash
-gh api repos/{owner}/{repo}/pulls/{pr_number}/comments
+Use the GitHub MCP tool `mcp__github__pull_request_read` with method='get_review_comments' to fetch PR comments:
+```
+Use mcp__github__pull_request_read tool with:
+- method: "get_review_comments"
+- owner: Repository owner
+- repo: Repository name
+- pullNumber: PR number
 ```
 
 Read and understand each piece of feedback carefully.
@@ -45,9 +49,13 @@ For each comment, determine:
 
 ## 4. Reply to Comments
 
-After addressing each comment, add a reply using:
-```bash
-gh pr review {pr_number} --comment --body "..."
+After addressing each comment, add a reply using the GitHub MCP tool `mcp__github__add_issue_comment`:
+```
+Use mcp__github__add_issue_comment tool with:
+- owner: Repository owner
+- repo: Repository name
+- issue_number: PR number
+- body: Reply text
 ```
 
 Keep replies brief and informative:

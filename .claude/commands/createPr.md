@@ -80,15 +80,17 @@ Steps to verify:
 
 ## 4. Create the PR
 
-Push changes and create PR:
-```bash
-git push -u origin HEAD
-gh pr create --title "[Fix/Feature]: Title" --body "$(cat <<'EOF'
-[Paste filled template here]
+Push changes and create PR using the GitHub MCP tool `mcp__github__create_pull_request`:
+```
+Use the mcp__github__create_pull_request tool with:
+- owner: Repository owner
+- repo: Repository name
+- title: "[Fix/Feature]: Title"
+- head: Current branch name
+- base: "main"
+- body: [Paste filled template here]
 
 🤖 Generated with [Your Name]
-EOF
-)"
 ```
 
 ## Important Notes

@@ -1,0 +1,137 @@
+# Auto-Implementation Completion Report
+
+## Task #{{TASK_ID}}: {{TASK_TITLE}}
+
+**Status**: {{✅ COMPLETE | ⚠️ ESCALATED | ❌ REJECTED}}
+**Result**: {{APPROVED & PR CREATED | REQUEST_CHANGES | REJECTED | ESCALATED}}
+**Duration**: ~{{X}} minutes
+**Iterations**: {{N}} ({{single-pass success | required revisions}})
+
+---
+
+## Workflow Summary
+
+### Phase 1: Analysis
+- **Agent**: Analyzer
+- **Decision**: {{APPROVE | REJECT}}
+- **Duration**: ~{{X}} minutes
+- **Output**: {{Comprehensive plan | Rejection with reasoning}}
+
+**Key Findings**:
+{{Summary of critical evaluation}}
+
+### Phase 2: Implementation
+- **Agent**: Builder
+- **Decision**: {{COMPLETE_IMPLEMENTATION | REQUEST_PLAN_REVISION | ESCALATE}}
+- **Duration**: ~{{X}} minutes
+- **Output**: {{Clean implementation | Plan revision request}}
+
+**Changes Made**:
+{{Brief summary of implementation}}
+
+**Verification**:
+- {{✅|✗}} All tests pass ({{X}}/{{Y}} tasks)
+- {{✅|✗}} Lint checks pass ({{N}} violations)
+- {{✅|✗}} Pre-commit hooks pass
+
+### Phase 3: Review
+- **Agent**: Reviewer
+- **Decision**: {{APPROVE | REQUEST_CHANGES | ESCALATE}}
+- **Duration**: ~{{X}} minutes
+- **Output**: {{Approved PR | Change requests}}
+
+**Quality Assessment**:
+- All {{N}} acceptance criteria {{met | not met}}
+- {{Clean | Issues found in}} commit quality
+- {{Zero | Some}} functional impact
+- {{Safe to merge | Needs work}}
+
+---
+
+## Deliverables
+
+### Pull Request
+{{Only if APPROVED}}
+**URL**: {{PR_URL}}
+**Title**: {{PR_TITLE}}
+**Status**: Open, ready for human review
+**Branch**: {{branch-name}}
+**Commit**: {{sha}}
+
+### Artifacts Generated
+1. `.claude/workflow/task-{{TASK_ID}}/PLAN.md` - Analysis and implementation plan
+2. `.claude/workflow/task-{{TASK_ID}}/IMPLEMENTATION.md` - Builder's implementation report
+3. `.claude/workflow/task-{{TASK_ID}}/REVIEW.md` - Reviewer's validation report
+4. `.claude/workflow/task-{{TASK_ID}}/state.yml` - Workflow state tracking
+5. `.claude/workflow/task-{{TASK_ID}}/COMPLETION.md` - This summary
+
+---
+
+## Metrics
+
+| Metric | Value |
+|--------|-------|
+| Total Duration | {{X}} minutes |
+| Time Budget Used | {{X}}% ({{X}}/20 minutes) |
+| Analyzer Iterations | {{N}} |
+| Builder Iterations | {{N}} |
+| Reviewer Iterations | {{N}} |
+| Files Changed | {{N}} |
+| Lines Added | {{N}} |
+| Lines Removed | {{N}} |
+| Net Change | {{+/-N}} lines |
+| Tests Passing | {{X}}% |
+| Lint Violations | {{N}} |
+
+---
+
+## Success Factors
+
+{{If successful}}
+1. **{{Factor}}**: {{Description}}
+2. **{{Factor}}**: {{Description}}
+
+{{If escalated/rejected}}
+## Escalation/Rejection Reasons
+
+1. **{{Reason}}**: {{Description}}
+
+---
+
+## Workflow Efficiency
+
+**Status**: {{EXCELLENT | GOOD | FAIR | POOR}}
+
+{{Summary of efficiency}}
+- {{Comments on iterations}}
+- {{Comments on time budget}}
+- {{Comments on quality gates}}
+
+---
+
+## Next Steps for Human
+
+{{If APPROVED}}
+1. ✅ Review PR #{{PR_NUM}} at {{PR_URL}}
+2. ✅ Merge when satisfied ({{low | medium | high}} risk)
+3. ✅ Close issue #{{TASK_ID}} automatically via PR merge
+
+{{If REQUEST_CHANGES}}
+1. ⚠️ Review requested changes in REVIEW.md
+2. ⚠️ Decide whether to continue iterations or take over manually
+3. ⚠️ Check iteration count: {{N}}/3
+
+{{If REJECTED}}
+1. ❌ Review rejection reasoning in PLAN.md
+2. ❌ Close issue #{{TASK_ID}} or modify scope
+3. ❌ Consider whether task should be redefined
+
+{{If ESCALATED}}
+1. ⚠️ Review ESCALATION.md for details
+2. ⚠️ Review available artifacts for context
+3. ⚠️ Take manual action as recommended
+
+---
+
+**Workflow Completed**: {{TIMESTAMP}}
+**Orchestrator**: Auto-Implement Multi-Agent System v1.0
