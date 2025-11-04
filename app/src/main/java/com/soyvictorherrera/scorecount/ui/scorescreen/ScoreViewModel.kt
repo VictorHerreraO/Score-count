@@ -7,7 +7,7 @@ import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.domain.model.Match
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
-import com.soyvictorherrera.scorecount.domain.usecase.*
+import com.soyvictorherrera.scorecount.domain.usecase.ScoreUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.StateFlow
@@ -19,11 +19,7 @@ class ScoreViewModel
     @Inject
     constructor(
         private val scoreRepository: com.soyvictorherrera.scorecount.domain.repository.ScoreRepository,
-        private val incrementScoreUseCase: IncrementScoreUseCase,
-        private val decrementScoreUseCase: DecrementScoreUseCase,
-        private val manualSwitchServeUseCase: ManualSwitchServeUseCase,
-        private val resetGameUseCase: ResetGameUseCase,
-        private val saveMatchUseCase: SaveMatchUseCase,
+        private val scoreUseCases: ScoreUseCases,
         settingsRepository: SettingsRepository,
         @DefaultDispatcher private val dispatcher: CoroutineDispatcher
     ) : ViewModel() {
@@ -46,25 +42,25 @@ class ScoreViewModel
 
         fun incrementScore(playerId: Int) {
             viewModelScope.launch {
-                incrementScoreUseCase(playerId)
+                scoreUseCases.increment(playerId)
             }
         }
 
         fun decrementScore(playerId: Int) {
             viewModelScope.launch {
-                decrementScoreUseCase(playerId)
+                scoreUseCases.decrement(playerId)
             }
         }
 
         fun manualSwitchServe() {
             viewModelScope.launch {
-                manualSwitchServeUseCase()
+                scoreUseCases.switchServe()
             }
         }
 
         fun resetGame() {
             viewModelScope.launch {
-                resetGameUseCase()
+                scoreUseCases.reset()
             }
         }
 
@@ -79,7 +75,7 @@ class ScoreViewModel
                         playerTwoScore = gameState.player2SetsWon,
                         date = System.currentTimeMillis()
                     )
-                saveMatchUseCase(match)
+                scoreUseCases.saveMatch(match)
             }
         }
     }
