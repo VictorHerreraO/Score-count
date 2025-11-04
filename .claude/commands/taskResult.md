@@ -4,7 +4,7 @@ description: Document task completion with detailed results and learnings
 
 # Document Task Result
 
-When the user asks you to document a completed task, using the `gh` CLI tool add a comment to the issue number #$ARGUMENTS.
+When the user asks you to document a completed task, use the GitHub MCP tool `mcp__github__add_issue_comment` to add a comment to the issue number #$ARGUMENTS.
 
 ## File Structure
 
