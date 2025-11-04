@@ -8,6 +8,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.soyvictorherrera.scorecount.GameStateProto
 import com.soyvictorherrera.scorecount.data.database.AppDatabase
+import com.soyvictorherrera.scorecount.data.database.MIGRATION_1_2
 import com.soyvictorherrera.scorecount.data.database.dao.MatchDao
 import com.soyvictorherrera.scorecount.data.datasource.GameStateSerializer
 import dagger.Module
@@ -38,7 +39,8 @@ object DataModule {
                 context,
                 AppDatabase::class.java,
                 "score-count-database"
-            ).build()
+            ).addMigrations(MIGRATION_1_2)
+            .build()
 
     @Provides
     @Singleton
