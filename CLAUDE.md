@@ -134,13 +134,30 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the complete workflow. Quick summary:
 - **Orientation**: Handle in composable logic (see `ScoreScreen.kt`)
 - **Code Formatting**: Pre-commit hook automatically formats Kotlin files with ktlint
 
+### Branching Strategy
+
+This project uses a **git-flow** branching model:
+
+- **`develop`** (default branch): Integration branch for active development
+  - Feature branches should target `develop`
+  - Continuous integration runs on all PRs to `develop`
+  - This is where new features are tested and integrated
+
+- **`main`** (release branch): Production-ready code
+  - Only receives PRs from `develop` when a new version is ready for release
+  - Each merge to `main` **automatically triggers a release**
+  - Do NOT commit directly to `main`
+
 ### Release Process
 
-1. Merge feature PR to `main`
-2. CI automatically builds signed release APK
-3. Download APK from Actions artifacts
-4. (Optional) Create git tag for formal release: `git tag -a v1.x.x -m "Release note"`
-5. Push tag to trigger GitHub Release: `git push origin v1.x.x`
+1. **Complete feature development** on feature branches targeting `develop`
+2. **Bump version** in `version.txt` (manually) - follow semantic versioning (MAJOR.MINOR.PATCH)
+3. **Create PR from `develop` → `main`** - this triggers the release workflow
+4. **Workflow automatically**:
+   - Builds a signed release APK
+   - Creates a GitHub Release with tag `v{version}`
+   - Uploads APK to the release
+5. **Download APK** from GitHub Releases or Actions artifacts
 
 ### Version Catalog
 
@@ -158,12 +175,23 @@ When working on features or changes:
 
 Before starting work, always reference ARCHITECTURE.md to understand the layered architecture and ensure changes align with established patterns.
 
-## Branching strategy
+## Feature Development Workflow
 
-Always update the repository with the latest changes.
+1. **Update repository**: `git pull origin develop` to get latest changes
+2. **Create feature branch**: `[issue-type]/task-xx-short-task-description` from `develop`
+3. **Make commits**: Small, meaningful commits with clear messages
+4. **Create PR**: Target `develop` branch (NOT `main`)
+5. **Review & Merge**: Don't merge yourself - allow manual review and merge
 
-Create a new feature branch for you to work called `[issue-type]/task-xx-short-task-description`
+**Example**:
+```bash
+git checkout develop
+git pull origin develop
+git checkout -b feature/task-42-add-match-history
+# ... make changes ...
+git commit -m "feat: add match history screen"
+git push origin feature/task-42-add-match-history
+# Create PR targeting develop
+```
 
-Make small meaningful commits to your feature branch so your work is easy to review.
-
-Once you are done **don't** merge your code, allow me to review it and I'll merge it manually.
+**Release Flow**: Once `develop` has completed features ready for release → bump version → create PR `develop` → `main` → automatic release
