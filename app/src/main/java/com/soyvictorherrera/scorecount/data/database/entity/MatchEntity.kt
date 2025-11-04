@@ -11,5 +11,6 @@ data class MatchEntity(
     @ColumnInfo(name = "player_two_name") val playerTwoName: String,
     @ColumnInfo(name = "player_one_score") val playerOneScore: Int,
     @ColumnInfo(name = "player_two_score") val playerTwoScore: Int,
-    @ColumnInfo(name = "date") val date: Long
+    @ColumnInfo(name = "date") val date: Long,
+    @ColumnInfo(name = "winner_id") val winnerId: Int? = null
 )
