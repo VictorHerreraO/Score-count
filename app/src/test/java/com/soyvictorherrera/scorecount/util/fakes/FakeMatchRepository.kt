@@ -18,6 +18,8 @@ class FakeMatchRepository : MatchRepository {
 
     override fun getMatchList(): Flow<List<Match>> = _matches
 
+    override fun getMatchById(id: String): Flow<Match?> = MutableStateFlow(_matches.value.firstOrNull { it.id == id })
+
     override suspend fun saveMatch(match: Match) {
         _matches.value = _matches.value + match
     }

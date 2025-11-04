@@ -10,6 +10,8 @@ import com.soyvictorherrera.scorecount.GameStateProto
 import com.soyvictorherrera.scorecount.data.database.AppDatabase
 import com.soyvictorherrera.scorecount.data.database.MIGRATION_1_2
 import com.soyvictorherrera.scorecount.data.database.dao.MatchDao
+import com.soyvictorherrera.scorecount.data.database.dao.PointDao
+import com.soyvictorherrera.scorecount.data.database.dao.SetDao
 import com.soyvictorherrera.scorecount.data.datasource.GameStateSerializer
 import dagger.Module
 import dagger.Provides
@@ -45,6 +47,14 @@ object DataModule {
     @Provides
     @Singleton
     fun provideMatchDao(database: AppDatabase): MatchDao = database.matchDao()
+
+    @Provides
+    @Singleton
+    fun provideSetDao(database: AppDatabase): SetDao = database.setDao()
+
+    @Provides
+    @Singleton
+    fun providePointDao(database: AppDatabase): PointDao = database.pointDao()
 
     @Provides
     @Singleton

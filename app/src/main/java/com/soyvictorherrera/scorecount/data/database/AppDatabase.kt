@@ -5,6 +5,8 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.soyvictorherrera.scorecount.data.database.dao.MatchDao
+import com.soyvictorherrera.scorecount.data.database.dao.PointDao
+import com.soyvictorherrera.scorecount.data.database.dao.SetDao
 import com.soyvictorherrera.scorecount.data.database.entity.MatchEntity
 import com.soyvictorherrera.scorecount.data.database.entity.PointEntity
 import com.soyvictorherrera.scorecount.data.database.entity.SetEntity
@@ -70,4 +72,8 @@ val MIGRATION_1_2 =
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun matchDao(): MatchDao
+
+    abstract fun setDao(): SetDao
+
+    abstract fun pointDao(): PointDao
 }
