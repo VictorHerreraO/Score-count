@@ -77,15 +77,17 @@ Use the appropriate template below based on the issue type. Fill every section w
 
 ## 4. Create the Issue
 
-Use the `gh` CLI to create the issue in the repository. Use a descriptive title with the appropriate prefix (`Feature`, `Bugfix`, `Research`) and paste the filled template into the body.
+Use the GitHub MCP tool `mcp__github__issue_write` to create the issue in the repository. Use a descriptive title with the appropriate prefix (`Feature`, `Bugfix`, `Research`) and paste the filled template into the body.
 
-```bash
-gh issue create --title "[Feature/Bugfix/Research]: [Provide a clear and descriptive title]" --body "$(cat <<'EOF'
-[Paste filled template here]
+```
+Use the mcp__github__issue_write tool with:
+- method: "create"
+- owner: Repository owner
+- repo: Repository name
+- title: "[Feature/Bugfix/Research]: [Provide a clear and descriptive title]"
+- body: [Paste filled template here]
 
 🤖 Generated with [Your-Name](link-to-your-official-page)
-EOF
-)"
 ```
 
 ## Important Notes

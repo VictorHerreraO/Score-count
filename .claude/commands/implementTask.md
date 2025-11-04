@@ -8,7 +8,7 @@ When the user asks you to implement a task, follow this rigorous process:
 
 ## 1. Review Task File
 
-Using `gh` CLI tool read the Github issue #$ARGUMENTS to understand requirements.
+Using the GitHub MCP tool `mcp__github__issue_read` with method='get', read the GitHub issue #$ARGUMENTS to understand requirements.
 
 Check if the task is still relevant given recent project changes.
 
