@@ -30,10 +30,13 @@ This command implements GitHub issues autonomously using a three-agent workflow 
 - `REJECT` → Task closed with detailed reasoning
 
 ### Phase 2: Planning (Analyzer Agent)
-1. Creates comprehensive implementation plan
-2. Identifies files to modify
-3. Estimates time and complexity
-4. Outputs `PLAN.md` for Builder
+1. Creates directive-based implementation plan (see `.claude/workflow/PLANNING_GUIDELINES.md`)
+2. Identifies files to modify and existing patterns to follow
+3. Provides high-level directives (WHAT to do), not full code (HOW to do it)
+4. Estimates time and complexity
+5. Outputs `PLAN.md` for Builder
+
+**Token Optimization**: Plans use directives and pattern references instead of full code implementations
 
 ### Phase 3: Building (Builder Agent)
 1. Reads `PLAN.md` and implements changes

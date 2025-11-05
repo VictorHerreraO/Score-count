@@ -92,16 +92,30 @@ Use the Task tool with `subagent_type=codebase-analyzer` to understand:
 
 Follow the template at `.claude/workflow/templates/PLAN.md.template`.
 
+**CRITICAL - Directive-Based Planning**:
+- **DO**: Provide high-level directives (WHAT to do)
+- **DON'T**: Write full code implementations (HOW to do it)
+- **REASON**: Builder writes the code. Writing it twice wastes tokens.
+
 **Your plan must include:**
 - Critical evaluation with APPROVE/REJECT decision
 - Problem statement and acceptance criteria
 - Risk assessment
 - Files to modify with specific line numbers (if possible)
-- Step-by-step implementation instructions
-- Testing strategy
+- **High-level implementation directives** (objectives, not code)
+- **Pattern references** (point to existing code to follow)
+- **Constraints** (critical requirements, not implementations)
+- **Targeted code snippets** (ONLY for complex/non-obvious logic)
+- Testing strategy (assertions to verify, not full test code)
 - Branch information
 - Time estimate
 - Concerns for Builder (edge cases, gotchas, decisions)
+
+**Token Optimization**:
+- Use references: "Follow pattern in X.kt:123-145" instead of copying code
+- Use directives: "Add validation for null input" instead of writing validation code
+- Use constraints: "Must maintain immutability" instead of showing immutable implementation
+- Code snippets: ONLY for algorithms/logic that's truly non-obvious
 
 ### 7. Write Output
 
@@ -124,12 +138,18 @@ Write your plan to `.claude/workflow/task-$TASK_ID/PLAN.md`
 
 ## Success Criteria
 
-Your PLAN.md should give Builder everything needed to implement without questions:
+Your PLAN.md should guide Builder without micromanaging:
 - Clear acceptance criteria
-- Specific files to modify
-- Step-by-step instructions
+- Specific files to modify (with line numbers when relevant)
+- High-level directives (WHAT to achieve, not HOW)
+- References to existing patterns to follow
+- Critical constraints and requirements
 - Edge cases identified
-- Testing approach defined
+- Testing assertions to verify (not full test implementations)
+- Code snippets ONLY for truly complex logic
+
+**Anti-pattern**: Writing full implementations that Builder just copies
+**Correct pattern**: Guiding Builder with directives and references
 
 ## Example Parameter Format
 
