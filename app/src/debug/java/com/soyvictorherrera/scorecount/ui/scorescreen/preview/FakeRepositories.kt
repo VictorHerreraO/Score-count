@@ -27,6 +27,8 @@ class FakeMatchRepository : MatchRepository {
 
     override fun getMatchList(): Flow<List<Match>> = flowOf(matches)
 
+    override fun getMatchById(id: String): Flow<Match?> = flowOf(matches.firstOrNull { it.id == id })
+
     override suspend fun saveMatch(match: Match) {
         matches.add(match)
     }

@@ -129,6 +129,8 @@ class MatchHistoryViewModelTest {
                             throw IOException("Database error")
                         }
 
+                    override fun getMatchById(id: String): Flow<Match?> = kotlinx.coroutines.flow.flowOf(null)
+
                     override suspend fun saveMatch(match: Match) {
                         // Not used in this test
                     }

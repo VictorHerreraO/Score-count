@@ -13,6 +13,8 @@ class MatchRepositoryImpl
     ) : MatchRepository {
         override fun getMatchList(): Flow<List<Match>> = dataSource.getMatchList()
 
+        override fun getMatchById(id: String): Flow<Match?> = dataSource.getMatchById(id)
+
         override suspend fun saveMatch(match: Match) {
             dataSource.saveMatch(match)
         }
