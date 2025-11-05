@@ -73,16 +73,36 @@
 
 ### Implementation Steps
 
-1. **Step 1**: {{Clear action item}}
-   - {{Expected change}}
-   - {{Files involved}}
+**IMPORTANT**: Use HIGH-LEVEL DIRECTIVES, not full code implementations. Builder will write the actual code.
 
-2. **Step 2**: {{Next action}}
-   - {{Details}}
+1. **Step 1**: {{Clear action item - WHAT to do, not HOW}}
+   - **Objective**: {{What should be achieved}}
+   - **Files**: {{Which files to modify}}
+   - **Pattern Reference**: {{Point to existing code pattern if applicable, e.g., "Follow StateFlow pattern from GameViewModel.kt:45-67"}}
+   - **Constraints**: {{Any critical constraints, e.g., "Must maintain immutability", "Use existing error handling pattern"}}
+
+2. **Step 2**: {{Next action - WHAT to do, not HOW}}
+   - **Objective**: {{Goal}}
+   - **Files**: {{Files involved}}
+   - **Pattern Reference**: {{Reference existing patterns}}
+   - **Constraints**: {{Critical constraints}}
+
+#### Code Snippets (Use ONLY for complex/non-obvious cases)
+
+**Only include code snippets if:**
+- Complex algorithm that's not obvious
+- Tricky edge case handling
+- Critical security/performance pattern
+- Non-standard integration
+
+{{CODE_SNIPPET_1}} (if needed)
+```kotlin
+// Only the non-obvious parts
+```
 
 ### Testing Strategy
-- **Unit Tests**: {{Which components need tests}}
-- **Integration Tests**: {{If needed}}
+- **Unit Tests**: {{Which components need tests - describe assertions, not full test code}}
+- **Integration Tests**: {{If needed - describe scenario, not full test code}}
 - **Manual Testing**: {{Steps to verify}}
 
 ---
