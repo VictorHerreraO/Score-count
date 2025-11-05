@@ -49,6 +49,18 @@ object ScoreCalculator {
             else -> return currentState // Invalid player ID
         }
 
+        // Create Point object for this scored point
+        val newPoint =
+            com.soyvictorherrera.scorecount.domain.model.Point(
+                sequence = currentState.currentSetPoints.size + 1,
+                scorerId = playerId,
+                player1Score = newP1Score,
+                player2Score = newP2Score
+            )
+
+        // Add point to current set
+        val updatedPoints = currentState.currentSetPoints + newPoint
+
         // Check if a player won the current set
         val p1CanWinSet = newP1Score >= settings.pointsToWinSet
         val p2CanWinSet = newP2Score >= settings.pointsToWinSet
@@ -75,6 +87,34 @@ object ScoreCalculator {
                 lastSetWinnerId = currentState.player2.id
             }
             setJustEnded = true
+        }
+
+        // Track sets and points
+        val newCompletedSets: List<com.soyvictorherrera.scorecount.domain.model.Set>
+        val newCurrentSetPoints: List<com.soyvictorherrera.scorecount.domain.model.Point>
+        val newSetNumber: Int
+
+        if (setJustEnded) {
+            // Create Set object with all points including winning point
+            val completedSet =
+                com.soyvictorherrera.scorecount.domain.model.Set(
+                    setNumber = currentState.currentSetNumber,
+                    points = updatedPoints,
+                    finalScore =
+                        com.soyvictorherrera.scorecount.domain.model.SetScore(
+                            player1Score = newP1Score,
+                            player2Score = newP2Score
+                        ),
+                    winnerId = lastSetWinnerId!!
+                )
+            newCompletedSets = currentState.completedSets + completedSet
+            newCurrentSetPoints = emptyList()
+            newSetNumber = currentState.currentSetNumber + 1
+        } else {
+            // Set not won, keep accumulating points
+            newCompletedSets = currentState.completedSets
+            newCurrentSetPoints = updatedPoints
+            newSetNumber = currentState.currentSetNumber
         }
 
         // Reset scores if set ended
@@ -109,7 +149,10 @@ object ScoreCalculator {
             player2SetsWon = newP2Sets,
             servingPlayerId = newServingPlayerId,
             isDeuce = isDeuce,
-            isFinished = gameIsFinished
+            isFinished = gameIsFinished,
+            currentSetPoints = newCurrentSetPoints,
+            completedSets = newCompletedSets,
+            currentSetNumber = newSetNumber
         )
     }
 
@@ -220,7 +263,10 @@ object ScoreCalculator {
             player1SetsWon = 0,
             player2SetsWon = 0,
             isDeuce = false,
-            isFinished = false
+            isFinished = false,
+            currentSetPoints = emptyList(),
+            completedSets = emptyList(),
+            currentSetNumber = 1
         )
     }
 

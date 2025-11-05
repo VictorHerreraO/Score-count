@@ -66,6 +66,12 @@ class ScoreViewModel
 
         private fun saveMatch(gameState: GameState) {
             viewModelScope.launch {
+                // Determine match winner
+                val winnerId =
+                    com.soyvictorherrera.scorecount.domain.calculator.ScoreCalculator.determineWinner(
+                        gameState
+                    )
+
                 val match =
                     Match(
                         id = "",
@@ -73,7 +79,9 @@ class ScoreViewModel
                         playerTwoName = gameState.player2.name,
                         playerOneScore = gameState.player1SetsWon,
                         playerTwoScore = gameState.player2SetsWon,
-                        date = System.currentTimeMillis()
+                        date = System.currentTimeMillis(),
+                        sets = gameState.completedSets,
+                        winnerId = winnerId
                     )
                 scoreUseCases.saveMatch(match)
             }
