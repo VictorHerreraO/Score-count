@@ -18,36 +18,32 @@ This command implements GitHub issues autonomously using a three-agent workflow 
 
 ## How It Works
 
-### Phase 1: Analysis (Analyzer Agent)
-1. Fetches task from GitHub using the GitHub MCP tool `mcp__github__issue_read` with method='get'
+### Phase 1: Research (Analyzer Agent - Haiku)
+1. Fetches task from GitHub using `mcp__github__issue_read`
 2. **Critically evaluates** whether task should be implemented
-3. If approved: Explores codebase and creates detailed plan
-4. Creates feature branch following project conventions
-5. Generates `PLAN.md` artifact
+3. If approved: Researches codebase (delegates to sub-agents)
+4. Finds relevant files and patterns
+5. Creates feature branch
+6. Generates `CONTEXT.md` artifact (NOT a detailed plan)
 
 **Decision Points:**
-- `APPROVE` → Proceed to Planning
-- `REJECT` → Task closed with detailed reasoning
+- `APPROVE` → Proceed to Building
+- `REJECT` → Task closed with brief reasoning
 
-### Phase 2: Planning (Analyzer Agent)
-1. Creates directive-based implementation plan (see `.claude/workflow/PLANNING_GUIDELINES.md`)
-2. Identifies files to modify and existing patterns to follow
-3. Provides high-level directives (WHAT to do), not full code (HOW to do it)
-4. Estimates time and complexity
-5. Outputs `PLAN.md` for Builder
+**Token Optimization**: Analyzer uses sub-agents for exploration, outputs concise context (max 150 lines, NO code blocks)
 
-**Token Optimization**: Plans use directives and pattern references instead of full code implementations
-
-### Phase 3: Building (Builder Agent)
-1. Reads `PLAN.md` and implements changes
-2. Runs tests: `./gradlew test`
-3. Runs lint: `./gradlew ktlintCheck` (auto-format if needed)
-4. Creates focused commits
-5. Generates `IMPLEMENTATION.md` artifact
+### Phase 2: Building (Builder Agent - Sonnet)
+1. Reads `CONTEXT.md` (research pointers, not detailed plan)
+2. **Explores files** and **makes implementation decisions** autonomously
+3. Implements changes following existing patterns
+4. Runs tests: `./gradlew test`
+5. Runs lint: `./gradlew ktlintCheck` (auto-format if needed)
+6. Creates focused commits
+7. Generates `IMPLEMENTATION.md` artifact
 
 **Decision Points:**
 - `COMPLETE_IMPLEMENTATION` → Proceed to Review
-- `REQUEST_PLAN_REVISION` → Back to Analyzer (max 3 iterations)
+- `REQUEST_CONTEXT_REVISION` → Back to Analyzer (max 3 iterations)
 - `ESCALATE` → Human intervention required
 
 ### Phase 4: Review (Reviewer Agent)
@@ -68,7 +64,7 @@ Each task maintains state in `.claude/workflow/task-{id}/`:
 ```
 task-33/
 ├── state.yml                  # Workflow state tracking
-├── PLAN.md                    # Analyzer output
+├── CONTEXT.md                 # Analyzer output (research)
 ├── IMPLEMENTATION.md          # Builder output
 ├── REVIEW.md                  # Reviewer output
 └── COMPLETION.md              # Workflow summary
@@ -76,11 +72,11 @@ task-33/
 
 ### State Machine
 ```
-INITIALIZED → ANALYZING → PLANNING → BUILDING → REVIEWING → COMPLETE
-                ↓            ↑           ↓
-            REJECTED     (iteration)  (iteration)
-                                         ↓
-                                    ESCALATED
+INITIALIZED → RESEARCHING → BUILDING → REVIEWING → COMPLETE
+                 ↓             ↑           ↓
+             REJECTED      (iteration)  (iteration)
+                                          ↓
+                                     ESCALATED
 ```
 
 ## Time Budget
@@ -120,33 +116,32 @@ Create state.yml tracking file with initial values.
 
 ### 2. Launch Analyzer Agent
 
-Use the Task tool to spawn the Analyzer agent (see `.claude/agents/analyzer.md`):
+Use the Task tool to spawn the Analyzer agent:
 
 ```
 Task tool parameters:
 - subagent_type: "general-purpose"
-- description: "Analyze and plan task #$TASK_ID"
+- model: "haiku"
+- description: "Research task #$TASK_ID"
 - prompt: "
-  You are running as the Analyzer agent (see .claude/agents/analyzer.md for your full instructions).
+  Run as Analyzer agent (.claude/agents/analyzer.md).
 
-  **Task ID**: $TASK_ID
-  **Workspace**: .claude/workflow/task-$TASK_ID
-  **Iteration**: {{1 if first time, else N}}
-  {{**Previous Feedback**: [Builder's concerns] if this is a revision}}
+  Task ID: $TASK_ID
+  Workspace: .claude/workflow/task-$TASK_ID
+  {{Iteration: N if revision}}
+  {{Previous Feedback: [Builder's request] if applicable}}
 
-  Follow your Analyzer agent instructions to:
-  1. Fetch and critically evaluate GitHub issue #$TASK_ID
-  2. Decide: APPROVE or REJECT
-  3. If APPROVE: Create comprehensive implementation plan
-  4. Write PLAN.md to .claude/workflow/task-$TASK_ID/PLAN.md
+  1. Fetch and evaluate issue #$TASK_ID
+  2. APPROVE or REJECT
+  3. If APPROVE: Research codebase, write CONTEXT.md
 
-  Remember: Your plan must give Builder everything needed to implement without questions.
+  Keep output concise. Use sub-agents for exploration.
 "
 ```
 
 ### 3. Process Analyzer Output
 
-Wait for Analyzer to complete, then read `.claude/workflow/task-$TASK_ID/PLAN.md`.
+Read `.claude/workflow/task-$TASK_ID/CONTEXT.md`.
 
 Check decision:
 - If `REJECT`: Update state to REJECTED, report to user, DONE
@@ -154,29 +149,28 @@ Check decision:
 
 ### 4. Spawn Builder Agent
 
-Use the Task tool to spawn the Builder agent (see `.claude/agents/builder.md`):
+Use the Task tool to spawn the Builder agent:
 
 ```
 Task tool parameters:
 - subagent_type: "general-purpose"
+- model: "sonnet"
 - description: "Implement task #$TASK_ID"
 - prompt: "
-  You are running as the Builder agent (see .claude/agents/builder.md for your full instructions).
+  Run as Builder agent (.claude/agents/builder.md).
 
-  **Task ID**: $TASK_ID
-  **Workspace**: .claude/workflow/task-$TASK_ID
-  **Iteration**: {{N}}/3
-  {{**Previous Feedback**: [Reviewer's concerns] if this is a revision}}
+  Task ID: $TASK_ID
+  Workspace: .claude/workflow/task-$TASK_ID
+  Iteration: {{N}}/3
+  {{Previous Feedback: [Reviewer's concerns] if revision}}
 
-  Follow your Builder agent instructions to:
-  1. Read PLAN.md from .claude/workflow/task-$TASK_ID/PLAN.md
-  2. Implement changes following the plan
-  3. Run tests and lint checks until all pass
-  4. Create focused commits locally (do not push)
-  5. Decide: COMPLETE_IMPLEMENTATION, REQUEST_PLAN_REVISION, or ESCALATE
-  6. Write IMPLEMENTATION.md to .claude/workflow/task-$TASK_ID/IMPLEMENTATION.md
+  1. Read CONTEXT.md (research pointers)
+  2. Explore files and make implementation decisions
+  3. Implement, test, lint (all must pass)
+  4. Create commits (local only)
+  5. Write IMPLEMENTATION.md
 
-  Remember: All tests must pass before completing. Don't skip quality checks.
+  You have autonomy. Make engineering decisions.
 "
 ```
 
@@ -185,38 +179,34 @@ Task tool parameters:
 Read `.claude/workflow/task-$TASK_ID/IMPLEMENTATION.md`.
 
 Check decision:
-- If `REQUEST_PLAN_REVISION`:
+- If `REQUEST_CONTEXT_REVISION`:
   - Increment `iteration_count.builder_to_analyzer`
-  - If < 3: Go back to step 2 (Analyzer revises plan)
+  - If < 3: Go back to step 2 (Analyzer provides more context)
   - If >= 3: ESCALATE (max iterations exceeded)
 - If `COMPLETE_IMPLEMENTATION`: Update state to REVIEWING, proceed to step 6
 - If `ESCALATE`: Update state to ESCALATED, create escalation report, DONE
 
 ### 6. Spawn Reviewer Agent
 
-Use the Task tool to spawn the Reviewer agent (see `.claude/agents/reviewer.md`):
+Use the Task tool to spawn the Reviewer agent:
 
 ```
 Task tool parameters:
 - subagent_type: "general-purpose"
-- description: "Review task #$TASK_ID implementation"
+- description: "Review task #$TASK_ID"
 - prompt: "
-  You are running as the Reviewer agent (see .claude/agents/reviewer.md for your full instructions).
+  Run as Reviewer agent (.claude/agents/reviewer.md).
 
-  **Task ID**: $TASK_ID
-  **Workspace**: .claude/workflow/task-$TASK_ID
-  **Iteration**: {{N}}/3
+  Task ID: $TASK_ID
+  Workspace: .claude/workflow/task-$TASK_ID
+  Iteration: {{N}}/3
 
-  Follow your Reviewer agent instructions to:
-  1. Read PLAN.md and IMPLEMENTATION.md from .claude/workflow/task-$TASK_ID/
-  2. Verify all acceptance criteria are met
-  3. Review code quality and commit quality
-  4. Decide: APPROVE, REQUEST_CHANGES, or ESCALATE
-  5. If APPROVE: Push branch and create PR using the GitHub MCP tool `mcp__github__create_pull_request`
-  6. Write REVIEW.md to .claude/workflow/task-$TASK_ID/REVIEW.md
-  7. Write COMPLETION.md to .claude/workflow/task-$TASK_ID/COMPLETION.md
-
-  Remember: If approving, you must push the branch and create the PR. Include PR URL in both REVIEW.md and COMPLETION.md.
+  1. Read CONTEXT.md and IMPLEMENTATION.md
+  2. Verify acceptance criteria met
+  3. Review code and commit quality
+  4. APPROVE, REQUEST_CHANGES, or ESCALATE
+  5. If APPROVE: Push branch, create PR (mcp__github__create_pull_request)
+  6. Write REVIEW.md and COMPLETION.md
 "
 ```
 
@@ -269,7 +259,7 @@ When escalating, create `.claude/workflow/task-$TASK_ID/ESCALATION.md`:
 {{Clear description of why escalation occurred}}
 
 ## Artifacts Available
-- PLAN.md {{exists|missing}}
+- CONTEXT.md {{exists|missing}}
 - IMPLEMENTATION.md {{exists|missing}}
 - REVIEW.md {{exists|missing}}
 

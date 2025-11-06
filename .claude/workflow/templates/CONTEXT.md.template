@@ -1,0 +1,78 @@
+# Task Context: #{{TASK_ID}} - {{TITLE}}
+
+## Decision: {{APPROVE|REJECT}}
+
+{{If REJECT: Brief reasoning (3-5 sentences) and STOP}}
+
+---
+
+## Task Summary
+
+**Issue**: #{{TASK_ID}}
+**Type**: {{feature|bugfix|chore|refactor}}
+**Complexity**: {{low|medium|high}}
+
+---
+
+## Acceptance Criteria
+
+{{From issue, minimal additions}}
+- [ ] Criterion 1
+- [ ] All tests pass
+- [ ] Lint passes
+
+---
+
+## Relevant Files
+
+{{File paths with line hints and brief purpose - NO CODE}}
+- `path/to/file.kt:45-67` - Brief purpose
+- `path/to/other.kt` - Brief purpose
+
+---
+
+## Existing Patterns
+
+{{References to code patterns Builder should follow - NO CODE}}
+- **Pattern name**: See file.kt:100-120
+- **Another pattern**: Used in other.kt:50-80
+
+---
+
+## Suggested Approaches
+
+{{2-3 brief options, recommend one}}
+
+**Option A**: {{One sentence description}}
+**Option B**: {{Alternative approach}}
+
+**Recommendation**: {{Which and why in one sentence}}
+
+---
+
+## Constraints
+
+{{Critical requirements - what must be preserved/maintained}}
+- Must maintain {{constraint}}
+- Backward compatible with {{system}}
+- {{Other non-negotiables}}
+
+---
+
+## Risks & Edge Cases
+
+{{Things to watch out for}}
+- **Risk**: {{Description}}
+- **Edge case**: {{Scenario to handle}}
+
+---
+
+## Notes for Builder
+
+{{Tricky areas, gotchas, or context that's not obvious}}
+
+---
+
+**Branch**: `{{branch-name}}`
+**Generated**: {{timestamp}}
+**Estimated effort**: {{X-Y}} minutes

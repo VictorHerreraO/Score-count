@@ -34,22 +34,22 @@ Before implementing, analyze:
 
 If the task fails this evaluation, respond with clear analysis and recommend closing/modifying it.
 
-## 3. Understand Architecture
+## 3. Research Context
 
-Use codebase-analyzer subagent to review `ARCHITECTURE.md` to understand:
-- Project structure (Domain/Data/UI layers)
-- Existing patterns and conventions
-- How to integrate changes properly
+Use codebase-analyzer subagent to:
+- Find relevant files and patterns
+- Understand affected architecture layers
+- Identify constraints and existing patterns
 
-## 4. Plan Implementation
+## 4. Plan Approach
 
-Create a detailed plan using TodoWrite:
-- Break down into specific, actionable steps
-- Using your codebase-analyzer subagent identify files to create/modify 
-- Note dependencies and order of work
-- Consider testing requirements
+Think through approach using TodoWrite:
+- Break down into implementation steps
+- Identify which files to explore/modify
+- Note dependencies and order
+- Consider testing approach
 
-**Ask questions before proceeding** if anything is unclear. Do not start until all questions are answered.
+**Ask questions if critical info missing**. Make decisions autonomously when context is sufficient.
 
 ## 5. Verify Dependencies
 
@@ -58,41 +58,37 @@ Check for latest library versions:
 - Don't assume your knowledge is current
 - Update `gradle/libs.versions.toml` if needed
 
-## 6. Implement
+## 6. Implement Autonomously
 
-Follow your plan systematically:
-- Work layer by layer (Domain → Data → UI)
-- Write tests alongside implementation
-- Update TodoWrite as you progress
+Implement systematically:
+- Explore referenced files to understand patterns
+- Make implementation decisions (naming, structure, approach)
+- Work incrementally, test as you go
+- Follow existing patterns found in codebase
 - Keep commits small and focused
 
 ## 7. Validate
 
-Ensure code quality:
+All checks must pass:
 ```bash
 ./gradlew clean build
 ./gradlew test
 ./gradlew lint
 ```
 
-**Iterate until all checks pass.** Do not consider the task complete if:
-- Build fails
-- Tests fail
-- Lint errors exist
+**No shortcuts.** Iterate until green.
 
 ## 8. Document
 
-Update relevant files:
-- `MEMORY.md` - Current state and next steps
-- `ARCHITECTURE.md` - Updated architecture
+Update if needed:
+- `MEMORY.md` - Next steps if relevant
 
 ## Guidelines
 
-- Be brutally honest and straight to the point
-- Push back on unnecessary work
-- Prioritize simplicity over complexity
-- Ensure code compiles and tests pass
-- Follow existing project patterns
-- Don't deviate from your plan without good reason
-- Use codebase-analyzer to review architecture and files
+- **Exercise autonomy** - make engineering decisions
+- **Push back** on unnecessary work
+- **Explore code** - don't expect everything documented
+- **Prioritize simplicity** over complexity
+- **All tests must pass** - no exceptions
+- **Use sub-agents** for heavy exploration
 
