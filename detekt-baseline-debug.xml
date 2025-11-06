@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CastNullableToNonNullableType:Theme.kt$as</ID>
+    <ID>DestructuringDeclarationWithTooManyEntries:ScoreCalculator.kt$ScoreCalculator$val (currentScores, currentServingPlayerId, playerIds, settings, setEnded, lastSetWinnerId) = params</ID>
+    <ID>InjectDispatcher:CoroutineModule.kt$CoroutineModule$Default</ID>
+    <ID>InjectDispatcher:CoroutineModule.kt$CoroutineModule$IO</ID>
+    <ID>InjectDispatcher:ScoreScreenPreviews.kt$Unconfined</ID>
+    <ID>InjectDispatcher:SettingsLocalDataSource.kt$SettingsLocalDataSource$IO</ID>
+    <ID>InjectDispatcher:SettingsScreenPreviews.kt$Unconfined</ID>
+    <ID>LongMethod:CentralControls.kt$@Composable fun CentralControls( gameState: GameState, gameSettings: GameSettings, callbacks: CentralControlsCallbacks, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:PlayerScoreCard.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun PlayerScoreCard( playerName: String, score: Int, isServing: Boolean, isFinished: Boolean, showPlayerName: Boolean, callbacks: PlayerScoreCardCallbacks, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:ScoreCalculator.kt$ScoreCalculator$fun incrementScore( currentState: GameState, settings: GameSettings, playerId: Int ): GameState</ID>
+    <ID>LongMethod:ScoreScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ScoreScreenPortrait( gameState: GameState, gameSettings: GameSettings, callbacks: ScoreScreenCallbacks )</ID>
+    <ID>LongParameterList:PlayerScoreCard.kt$( playerName: String, score: Int, isServing: Boolean, isFinished: Boolean, showPlayerName: Boolean, callbacks: PlayerScoreCardCallbacks, modifier: Modifier = Modifier )</ID>
+    <ID>TopLevelPropertyNaming:Color.kt$// Dark mode colors val DarkBackground = Color(0xFF1A1A2E) // --dark-bg</ID>
+    <ID>TopLevelPropertyNaming:Color.kt$// Light mode colors val LightBackground = Color(0xFFF8FAFC) // --bg</ID>
+    <ID>TopLevelPropertyNaming:Color.kt$val DarkAccentGreen = Color(0xFF34D399) // --accent-green</ID>
+    <ID>TopLevelPropertyNaming:Color.kt$val DarkButtonBg = Color(0xFF4A4E69) // --button-bg</ID>
+    <ID>TopLevelPropertyNaming:Color.kt$val DarkCardNormal = Color(0xFF282A40) // --dark-card</ID>
+    <ID>TopLevelPropertyNaming:Color.kt$val DarkCardServing = Color(0xFF363A59) // --dark-card-elevated</ID>
+    <ID>TopLevelPropertyNaming:Color.kt$val DarkOnSurface = Color(0xFFE0E0E0) // --light-text</ID>
+    <ID>TopLevelPropertyNaming:Color.kt$val DarkOnSurfaceVariant = Color(0xFFB0B0B0) // --muted-text</ID>
+    <ID>TopLevelPropertyNaming:Color.kt$val DarkPrimary = Color(0xFF8B5CF6) // --accent-purple</ID>
+    <ID>TopLevelPropertyNaming:Color.kt$val LightAccentGreen = Color(0xFF22C55E) // --accent-green</ID>
+    <ID>TopLevelPropertyNaming:Color.kt$val LightButtonBg = Color(0xFFBFDBFE) // --button-bg</ID>
+    <ID>TopLevelPropertyNaming:Color.kt$val LightCardNormal = Color(0xFFF1F5F9) // --card</ID>
+    <ID>TopLevelPropertyNaming:Color.kt$val LightCardServing = Color(0xFFEFF6FF) // --card-elevated</ID>
+    <ID>TopLevelPropertyNaming:Color.kt$val LightOnSurface = Color(0xFF1F2937) // Dark text for visibility on light background</ID>
+    <ID>TopLevelPropertyNaming:Color.kt$val LightOnSurfaceVariant = Color(0xFF6B7280) // Muted gray for secondary text</ID>
+    <ID>TopLevelPropertyNaming:Color.kt$val LightPrimary = Color(0xFF1E3A8A) // --accent-blue</ID>
+    <ID>TopLevelPropertyNaming:Theme.kt$private val DarkColorScheme = darkColorScheme( primary = DarkPrimary, secondary = DarkAccentGreen, background = DarkBackground, surface = DarkBackground, surfaceVariant = DarkCardServing, surfaceContainer = DarkCardNormal, onSurface = DarkOnSurface, onSurfaceVariant = DarkOnSurfaceVariant, onPrimary = Color.White, surfaceContainerHighest = DarkButtonBg )</ID>
+    <ID>TopLevelPropertyNaming:Theme.kt$private val LightColorScheme = lightColorScheme( primary = LightPrimary, secondary = LightAccentGreen, background = LightBackground, surface = LightBackground, surfaceVariant = LightCardServing, surfaceContainer = LightCardNormal, onSurface = LightOnSurface, onSurfaceVariant = LightOnSurfaceVariant, onPrimary = Color.White, surfaceContainerHighest = LightButtonBg )</ID>
+    <ID>TopLevelPropertyNaming:Type.kt$// Set of Material typography styles to start with val Typography = Typography( bodyLarge = TextStyle( fontFamily = FontFamily.Default, fontWeight = FontWeight.Normal, fontSize = 16.sp, lineHeight = 24.sp, letterSpacing = 0.5.sp ) /* Other default text styles to override titleLarge = TextStyle( fontFamily = FontFamily.Default, fontWeight = FontWeight.Normal, fontSize = 22.sp, lineHeight = 28.sp, letterSpacing = 0.sp ), labelSmall = TextStyle( fontFamily = FontFamily.Default, fontWeight = FontWeight.Medium, fontSize = 11.sp, lineHeight = 16.sp, letterSpacing = 0.5.sp ) */ )</ID>
+    <ID>UnsafeCallOnNullableType:ScoreCalculator.kt$ScoreCalculator$lastSetWinnerId!!</ID>
+  </CurrentIssues>
+</SmellBaseline>
