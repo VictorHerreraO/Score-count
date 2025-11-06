@@ -18,6 +18,19 @@ private data class ServerDeterminationParams(
 )
 
 /**
+ * Result of set completion processing.
+ */
+private data class SetCompletionResult(
+    val newP1Sets: Int,
+    val newP2Sets: Int,
+    val setEnded: Boolean,
+    val lastSetWinnerId: Int?,
+    val newCompletedSets: List<com.soyvictorherrera.scorecount.domain.model.Set>,
+    val newCurrentSetPoints: List<com.soyvictorherrera.scorecount.domain.model.Point>,
+    val newSetNumber: Int
+)
+
+/**
  * Pure business logic for score calculation.
  * Contains all game rules for table tennis scoring, server rotation, and match progression.
  * This class has no dependencies and is fully testable.
@@ -39,120 +52,60 @@ object ScoreCalculator {
         // Cannot score if game is already finished
         if (currentState.isFinished) return currentState
 
-        // Increment the score for the player who scored
-        var newP1Score = currentState.player1.score
-        var newP2Score = currentState.player2.score
+        // Update scores
+        val (newP1Score, newP2Score) =
+            updateScores(currentState, playerId)
+                ?: return currentState // Invalid player ID
 
-        when (playerId) {
-            currentState.player1.id -> newP1Score++
-            currentState.player2.id -> newP2Score++
-            else -> return currentState // Invalid player ID
-        }
+        // Create and add point
+        val updatedPoints = addPointToSet(currentState, playerId, newP1Score, newP2Score)
 
-        // Create Point object for this scored point
-        val newPoint =
-            com.soyvictorherrera.scorecount.domain.model.Point(
-                sequence = currentState.currentSetPoints.size + 1,
-                scorerId = playerId,
-                player1Score = newP1Score,
-                player2Score = newP2Score
+        // Check for set completion
+        val setResult =
+            processSetCompletion(
+                currentState,
+                settings,
+                newP1Score,
+                newP2Score,
+                updatedPoints
             )
 
-        // Add point to current set
-        val updatedPoints = currentState.currentSetPoints + newPoint
-
-        // Check if a player won the current set
-        val p1CanWinSet = newP1Score >= settings.pointsToWinSet
-        val p2CanWinSet = newP2Score >= settings.pointsToWinSet
-        val scoreDiff = abs(newP1Score - newP2Score)
-
-        val p1WinsSet = p1CanWinSet && (!settings.winByTwo || scoreDiff >= 2)
-        val p2WinsSet = p2CanWinSet && (!settings.winByTwo || scoreDiff >= 2)
-
-        var newP1Sets = currentState.player1SetsWon
-        var newP2Sets = currentState.player2SetsWon
-        var setJustEnded = false
-        var lastSetWinnerId: Int? = null
-
-        // Determine deuce state
-        var isDeuce = calculateDeuceState(newP1Score, newP2Score, settings)
-
-        // Handle set completion
-        if (p1WinsSet || p2WinsSet) {
-            if (p1WinsSet) {
-                newP1Sets++
-                lastSetWinnerId = currentState.player1.id
-            } else {
-                newP2Sets++
-                lastSetWinnerId = currentState.player2.id
-            }
-            setJustEnded = true
-        }
-
-        // Track sets and points
-        val newCompletedSets: List<com.soyvictorherrera.scorecount.domain.model.Set>
-        val newCurrentSetPoints: List<com.soyvictorherrera.scorecount.domain.model.Point>
-        val newSetNumber: Int
-
-        if (setJustEnded) {
-            // Create Set object with all points including winning point
-            val completedSet =
-                com.soyvictorherrera.scorecount.domain.model.Set(
-                    setNumber = currentState.currentSetNumber,
-                    points = updatedPoints,
-                    finalScore =
-                        com.soyvictorherrera.scorecount.domain.model.SetScore(
-                            player1Score = newP1Score,
-                            player2Score = newP2Score
-                        ),
-                    winnerId = lastSetWinnerId!!
-                )
-            newCompletedSets = currentState.completedSets + completedSet
-            newCurrentSetPoints = emptyList()
-            newSetNumber = currentState.currentSetNumber + 1
-        } else {
-            // Set not won, keep accumulating points
-            newCompletedSets = currentState.completedSets
-            newCurrentSetPoints = updatedPoints
-            newSetNumber = currentState.currentSetNumber
-        }
-
-        // Reset scores if set ended
-        if (setJustEnded) {
-            newP1Score = 0
-            newP2Score = 0
-            // Recalculate deuce state based on reset scores (should be false at 0-0)
-            isDeuce = calculateDeuceState(newP1Score, newP2Score, settings)
-        }
+        // Determine final scores and deuce state after potential set reset
+        val (finalP1Score, finalP2Score, isDeuce) =
+            calculateFinalScores(
+                newP1Score,
+                newP2Score,
+                setResult.setEnded,
+                settings
+            )
 
         // Check if match is finished
-        val setsToWinMatch = (settings.numberOfSets / 2) + 1
-        val gameIsFinished = newP1Sets >= setsToWinMatch || newP2Sets >= setsToWinMatch
+        val gameIsFinished = isMatchFinished(setResult.newP1Sets, setResult.newP2Sets, settings)
 
         // Determine next server
         val newServingPlayerId =
             determineNextServer(
                 ServerDeterminationParams(
-                    currentScores = Pair(newP1Score, newP2Score),
+                    currentScores = Pair(finalP1Score, finalP2Score),
                     currentServingPlayerId = currentState.servingPlayerId ?: currentState.player1.id,
                     playerIds = Pair(currentState.player1.id, currentState.player2.id),
                     settings = settings,
-                    setEnded = setJustEnded,
-                    lastSetWinnerId = lastSetWinnerId
+                    setEnded = setResult.setEnded,
+                    lastSetWinnerId = setResult.lastSetWinnerId
                 )
             )
 
         return currentState.copy(
-            player1 = currentState.player1.copy(score = newP1Score),
-            player2 = currentState.player2.copy(score = newP2Score),
-            player1SetsWon = newP1Sets,
-            player2SetsWon = newP2Sets,
+            player1 = currentState.player1.copy(score = finalP1Score),
+            player2 = currentState.player2.copy(score = finalP2Score),
+            player1SetsWon = setResult.newP1Sets,
+            player2SetsWon = setResult.newP2Sets,
             servingPlayerId = newServingPlayerId,
             isDeuce = isDeuce,
             isFinished = gameIsFinished,
-            currentSetPoints = newCurrentSetPoints,
-            completedSets = newCompletedSets,
-            currentSetNumber = newSetNumber
+            currentSetPoints = setResult.newCurrentSetPoints,
+            completedSets = setResult.newCompletedSets,
+            currentSetNumber = setResult.newSetNumber
         )
     }
 
@@ -357,5 +310,142 @@ object ScoreCalculator {
         } else {
             currentServingPlayerId
         }
+    }
+
+    /**
+     * Update scores after a player scores a point.
+     * Returns null if playerId is invalid.
+     */
+    private fun updateScores(
+        currentState: GameState,
+        playerId: Int
+    ): Pair<Int, Int>? {
+        var newP1Score = currentState.player1.score
+        var newP2Score = currentState.player2.score
+
+        when (playerId) {
+            currentState.player1.id -> newP1Score++
+            currentState.player2.id -> newP2Score++
+            else -> return null
+        }
+
+        return Pair(newP1Score, newP2Score)
+    }
+
+    /**
+     * Create a Point object and add it to the current set's points.
+     */
+    private fun addPointToSet(
+        currentState: GameState,
+        playerId: Int,
+        newP1Score: Int,
+        newP2Score: Int
+    ): List<com.soyvictorherrera.scorecount.domain.model.Point> {
+        val newPoint =
+            com.soyvictorherrera.scorecount.domain.model.Point(
+                sequence = currentState.currentSetPoints.size + 1,
+                scorerId = playerId,
+                player1Score = newP1Score,
+                player2Score = newP2Score
+            )
+        return currentState.currentSetPoints + newPoint
+    }
+
+    /**
+     * Process set completion logic including checking if a set is won
+     * and creating the completed set object.
+     */
+    private fun processSetCompletion(
+        currentState: GameState,
+        settings: GameSettings,
+        newP1Score: Int,
+        newP2Score: Int,
+        updatedPoints: List<com.soyvictorherrera.scorecount.domain.model.Point>
+    ): SetCompletionResult {
+        val p1CanWinSet = newP1Score >= settings.pointsToWinSet
+        val p2CanWinSet = newP2Score >= settings.pointsToWinSet
+        val scoreDiff = abs(newP1Score - newP2Score)
+
+        val p1WinsSet = p1CanWinSet && (!settings.winByTwo || scoreDiff >= 2)
+        val p2WinsSet = p2CanWinSet && (!settings.winByTwo || scoreDiff >= 2)
+
+        var newP1Sets = currentState.player1SetsWon
+        var newP2Sets = currentState.player2SetsWon
+        var setJustEnded = false
+        var lastSetWinnerId: Int? = null
+
+        if (p1WinsSet || p2WinsSet) {
+            if (p1WinsSet) {
+                newP1Sets++
+                lastSetWinnerId = currentState.player1.id
+            } else {
+                newP2Sets++
+                lastSetWinnerId = currentState.player2.id
+            }
+            setJustEnded = true
+        }
+
+        val newCompletedSets: List<com.soyvictorherrera.scorecount.domain.model.Set>
+        val newCurrentSetPoints: List<com.soyvictorherrera.scorecount.domain.model.Point>
+        val newSetNumber: Int
+
+        if (setJustEnded) {
+            val completedSet =
+                com.soyvictorherrera.scorecount.domain.model.Set(
+                    setNumber = currentState.currentSetNumber,
+                    points = updatedPoints,
+                    finalScore =
+                        com.soyvictorherrera.scorecount.domain.model.SetScore(
+                            player1Score = newP1Score,
+                            player2Score = newP2Score
+                        ),
+                    winnerId = lastSetWinnerId!!
+                )
+            newCompletedSets = currentState.completedSets + completedSet
+            newCurrentSetPoints = emptyList()
+            newSetNumber = currentState.currentSetNumber + 1
+        } else {
+            newCompletedSets = currentState.completedSets
+            newCurrentSetPoints = updatedPoints
+            newSetNumber = currentState.currentSetNumber
+        }
+
+        return SetCompletionResult(
+            newP1Sets = newP1Sets,
+            newP2Sets = newP2Sets,
+            setEnded = setJustEnded,
+            lastSetWinnerId = lastSetWinnerId,
+            newCompletedSets = newCompletedSets,
+            newCurrentSetPoints = newCurrentSetPoints,
+            newSetNumber = newSetNumber
+        )
+    }
+
+    /**
+     * Calculate final scores and deuce state after potential set reset.
+     * Returns Triple(p1Score, p2Score, isDeuce).
+     */
+    private fun calculateFinalScores(
+        p1Score: Int,
+        p2Score: Int,
+        setEnded: Boolean,
+        settings: GameSettings
+    ): Triple<Int, Int, Boolean> =
+        if (setEnded) {
+            Triple(0, 0, false)
+        } else {
+            Triple(p1Score, p2Score, calculateDeuceState(p1Score, p2Score, settings))
+        }
+
+    /**
+     * Check if the match is finished based on sets won.
+     */
+    private fun isMatchFinished(
+        p1Sets: Int,
+        p2Sets: Int,
+        settings: GameSettings
+    ): Boolean {
+        val setsToWinMatch = (settings.numberOfSets / 2) + 1
+        return p1Sets >= setsToWinMatch || p2Sets >= setsToWinMatch
     }
 }

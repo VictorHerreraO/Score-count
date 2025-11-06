@@ -7,9 +7,9 @@
     <ID>InjectDispatcher:CoroutineModule.kt$CoroutineModule$Default</ID>
     <ID>InjectDispatcher:CoroutineModule.kt$CoroutineModule$IO</ID>
     <ID>InjectDispatcher:SettingsLocalDataSource.kt$SettingsLocalDataSource$IO</ID>
+    <ID>LargeClass:ScoreCalculatorTest.kt$ScoreCalculatorTest</ID>
     <ID>LongMethod:CentralControls.kt$@Composable fun CentralControls( gameState: GameState, gameSettings: GameSettings, callbacks: CentralControlsCallbacks, modifier: Modifier = Modifier )</ID>
     <ID>LongMethod:PlayerScoreCard.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun PlayerScoreCard( playerName: String, score: Int, isServing: Boolean, isFinished: Boolean, showPlayerName: Boolean, callbacks: PlayerScoreCardCallbacks, modifier: Modifier = Modifier )</ID>
-    <ID>LongMethod:ScoreCalculator.kt$ScoreCalculator$fun incrementScore( currentState: GameState, settings: GameSettings, playerId: Int ): GameState</ID>
     <ID>LongMethod:ScoreScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ScoreScreenPortrait( gameState: GameState, gameSettings: GameSettings, callbacks: ScoreScreenCallbacks )</ID>
     <ID>LongParameterList:PlayerScoreCard.kt$( playerName: String, score: Int, isServing: Boolean, isFinished: Boolean, showPlayerName: Boolean, callbacks: PlayerScoreCardCallbacks, modifier: Modifier = Modifier )</ID>
     <ID>TopLevelPropertyNaming:Color.kt$// Dark mode colors val DarkBackground = Color(0xFF1A1A2E) // --dark-bg</ID>
