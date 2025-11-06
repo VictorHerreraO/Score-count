@@ -139,6 +139,9 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
+    // Charting library (selected after evaluation - see docs/match_details_screen/CHART_LIBRARY_DECISION.md)
+    implementation(libs.mpandroidchart)
+
     // Test dependencies
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
