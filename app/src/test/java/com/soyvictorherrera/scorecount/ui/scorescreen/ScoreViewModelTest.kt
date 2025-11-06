@@ -3,6 +3,9 @@ package com.soyvictorherrera.scorecount.ui.scorescreen
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.domain.model.Player
+import com.soyvictorherrera.scorecount.domain.model.Point
+import com.soyvictorherrera.scorecount.domain.model.Set
+import com.soyvictorherrera.scorecount.domain.model.SetScore
 import com.soyvictorherrera.scorecount.domain.usecase.DecrementScoreUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.IncrementScoreUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.ManualSwitchServeUseCase
@@ -18,6 +21,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -284,5 +288,104 @@ class ScoreViewModelTest {
             // Then - No match should be saved to the isolated repository (because there was no transition)
             val savedMatches = isolatedMatchRepository.getMatchList().first()
             assertEquals(0, savedMatches.size)
+        }
+
+    @Test
+    fun `saveMatch includes all sets and points from gameState`() =
+        runTest {
+            // Create completed sets with points
+            val set1Points =
+                listOf(
+                    Point(1, 1, 1, 0),
+                    Point(2, 2, 1, 1),
+                    Point(3, 1, 2, 1)
+                )
+            val set1 =
+                Set(
+                    setNumber = 1,
+                    points = set1Points,
+                    finalScore = SetScore(11, 9),
+                    winnerId = 1
+                )
+
+            val set2Points =
+                listOf(
+                    Point(1, 2, 0, 1),
+                    Point(2, 1, 1, 1),
+                    Point(3, 2, 1, 2)
+                )
+            val set2 =
+                Set(
+                    setNumber = 2,
+                    points = set2Points,
+                    finalScore = SetScore(9, 11),
+                    winnerId = 2
+                )
+
+            val completedSets = listOf(set1, set2)
+
+            // Create finished game state with sets
+            val finishedState =
+                GameState(
+                    player1 = Player(1, "Player 1", 0),
+                    player2 = Player(2, "Player 2", 0),
+                    servingPlayerId = 1,
+                    player1SetsWon = 3,
+                    player2SetsWon = 1,
+                    isDeuce = false,
+                    isFinished = true,
+                    completedSets = completedSets,
+                    currentSetPoints = emptyList(),
+                    currentSetNumber = 5
+                )
+
+            // Set initial state to not finished
+            fakeScoreRepository.setState(finishedState.copy(isFinished = false))
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            // Emit finished state to trigger auto-save
+            fakeScoreRepository.setState(finishedState)
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            // Verify saveMatch was called with correct data
+            val savedMatches = fakeMatchRepository.getMatchList().first()
+            assertEquals(1, savedMatches.size)
+            val savedMatch = savedMatches[0]
+            assertNotNull(savedMatch)
+            assertEquals(2, savedMatch.sets.size)
+            assertEquals(3, savedMatch.sets[0].points.size)
+            assertEquals(3, savedMatch.sets[1].points.size)
+            assertEquals(1, savedMatch.winnerId)
+        }
+
+    @Test
+    fun `saveMatch includes correct winnerId`() =
+        runTest {
+            val finishedState =
+                GameState(
+                    player1 = Player(1, "Player 1", 0),
+                    player2 = Player(2, "Player 2", 0),
+                    servingPlayerId = 1,
+                    player1SetsWon = 1,
+                    player2SetsWon = 3,
+                    isDeuce = false,
+                    isFinished = true,
+                    completedSets = emptyList(),
+                    currentSetPoints = emptyList(),
+                    currentSetNumber = 4
+                )
+
+            // Set initial state to not finished
+            fakeScoreRepository.setState(finishedState.copy(isFinished = false))
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            fakeScoreRepository.setState(finishedState)
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            val savedMatches = fakeMatchRepository.getMatchList().first()
+            assertEquals(1, savedMatches.size)
+            val savedMatch = savedMatches[0]
+            assertNotNull(savedMatch)
+            assertEquals(2, savedMatch.winnerId) // Player 2 won 3-1
         }
 }

@@ -3,6 +3,9 @@ package com.soyvictorherrera.scorecount.domain.calculator
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.domain.model.Player
+import com.soyvictorherrera.scorecount.domain.model.Point
+import com.soyvictorherrera.scorecount.domain.model.Set
+import com.soyvictorherrera.scorecount.domain.model.SetScore
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -760,5 +763,209 @@ class ScoreCalculatorTest {
             reset.servingPlayerId,
             "Winner should serve when winnerServesNextGame is true"
         )
+    }
+
+    // Point tracking tests
+    @Test
+    fun `incrementScore creates first point with sequence 1`() {
+        val newState = ScoreCalculator.incrementScore(initialState, defaultSettings, player1.id)
+
+        assertEquals(1, newState.currentSetPoints.size)
+        val point = newState.currentSetPoints[0]
+        assertEquals(1, point.sequence)
+        assertEquals(player1.id, point.scorerId)
+        assertEquals(1, point.player1Score)
+        assertEquals(0, point.player2Score)
+    }
+
+    @Test
+    fun `incrementScore creates sequential point sequences`() {
+        var state = initialState
+
+        // Player 1 scores (1-0)
+        state = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
+        // Player 2 scores (1-1)
+        state = ScoreCalculator.incrementScore(state, defaultSettings, player2.id)
+        // Player 1 scores (2-1)
+        state = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
+
+        assertEquals(3, state.currentSetPoints.size)
+        assertEquals(1, state.currentSetPoints[0].sequence)
+        assertEquals(2, state.currentSetPoints[1].sequence)
+        assertEquals(3, state.currentSetPoints[2].sequence)
+    }
+
+    @Test
+    fun `incrementScore tracks cumulative scores correctly`() {
+        var state = initialState
+
+        // Player 1 scores (1-0)
+        state = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
+        assertEquals(1, state.currentSetPoints[0].player1Score)
+        assertEquals(0, state.currentSetPoints[0].player2Score)
+
+        // Player 2 scores (1-1)
+        state = ScoreCalculator.incrementScore(state, defaultSettings, player2.id)
+        assertEquals(1, state.currentSetPoints[1].player1Score)
+        assertEquals(1, state.currentSetPoints[1].player2Score)
+
+        // Player 2 scores again (1-2)
+        state = ScoreCalculator.incrementScore(state, defaultSettings, player2.id)
+        assertEquals(1, state.currentSetPoints[2].player1Score)
+        assertEquals(2, state.currentSetPoints[2].player2Score)
+    }
+
+    @Test
+    fun `incrementScore creates Set when set is won`() {
+        val state =
+            initialState.copy(
+                player1 = player1.copy(score = 10),
+                player2 = player2.copy(score = 9)
+            )
+        // Manually add 19 points to simulate the game up to this point
+        val points =
+            (1..19).map { seq ->
+                Point(
+                    sequence = seq,
+                    scorerId = if (seq <= 10) player1.id else player2.id,
+                    player1Score = minOf(seq, 10),
+                    player2Score = maxOf(0, seq - 10)
+                )
+            }
+        val stateWithPoints = state.copy(currentSetPoints = points)
+
+        // Player 1 wins set (11-9)
+        val newState = ScoreCalculator.incrementScore(stateWithPoints, defaultSettings, player1.id)
+
+        // Verify set was completed
+        assertEquals(1, newState.completedSets.size)
+        val completedSet = newState.completedSets[0]
+        assertEquals(1, completedSet.setNumber)
+        assertEquals(20, completedSet.points.size)
+        assertEquals(11, completedSet.finalScore.player1Score)
+        assertEquals(9, completedSet.finalScore.player2Score)
+        assertEquals(player1.id, completedSet.winnerId)
+
+        // Verify current set was reset
+        assertEquals(0, newState.currentSetPoints.size)
+        assertEquals(2, newState.currentSetNumber)
+    }
+
+    @Test
+    fun `incrementScore tracks multiple sets correctly`() {
+        var state = initialState
+
+        // Play set 1 - Player 1 wins 11-0
+        repeat(11) { state = ScoreCalculator.incrementScore(state, defaultSettings, player1.id) }
+
+        assertEquals(1, state.completedSets.size)
+        assertEquals(1, state.completedSets[0].setNumber)
+        assertEquals(11, state.completedSets[0].points.size)
+        assertEquals(player1.id, state.completedSets[0].winnerId)
+        assertEquals(2, state.currentSetNumber)
+        assertEquals(0, state.currentSetPoints.size)
+
+        // Play set 2 - Player 2 wins 11-0
+        repeat(11) { state = ScoreCalculator.incrementScore(state, defaultSettings, player2.id) }
+
+        assertEquals(2, state.completedSets.size)
+        assertEquals(2, state.completedSets[1].setNumber)
+        assertEquals(11, state.completedSets[1].points.size)
+        assertEquals(player2.id, state.completedSets[1].winnerId)
+        assertEquals(3, state.currentSetNumber)
+        assertEquals(0, state.currentSetPoints.size)
+    }
+
+    @Test
+    fun `incrementScore tracks points correctly in deuce`() {
+        val state =
+            initialState.copy(
+                player1 = player1.copy(score = 10),
+                player2 = player2.copy(score = 10),
+                isDeuce = true
+            )
+        // Simulate 20 points to get to 10-10
+        val points =
+            (1..20).map { seq ->
+                Point(
+                    sequence = seq,
+                    scorerId = if (seq % 2 == 1) player1.id else player2.id,
+                    player1Score = (seq + 1) / 2,
+                    player2Score = seq / 2
+                )
+            }
+        val stateWithPoints = state.copy(currentSetPoints = points)
+
+        // Player 1 scores (11-10)
+        var newState = ScoreCalculator.incrementScore(stateWithPoints, defaultSettings, player1.id)
+        assertEquals(21, newState.currentSetPoints.size)
+        assertEquals(11, newState.player1.score)
+        assertEquals(10, newState.player2.score)
+
+        // Player 2 scores (11-11)
+        newState = ScoreCalculator.incrementScore(newState, defaultSettings, player2.id)
+        assertEquals(22, newState.currentSetPoints.size)
+
+        // Player 1 scores (12-11)
+        newState = ScoreCalculator.incrementScore(newState, defaultSettings, player1.id)
+        assertEquals(23, newState.currentSetPoints.size)
+
+        // Player 1 wins (13-11)
+        newState = ScoreCalculator.incrementScore(newState, defaultSettings, player1.id)
+
+        // Set should be complete with 24 points
+        assertEquals(1, newState.completedSets.size)
+        assertEquals(24, newState.completedSets[0].points.size)
+        assertEquals(13, newState.completedSets[0].finalScore.player1Score)
+        assertEquals(11, newState.completedSets[0].finalScore.player2Score)
+    }
+
+    @Test
+    fun `resetGame initializes point tracking fields`() {
+        val state =
+            ScoreCalculator.resetGame(
+                player1Id = 1,
+                player2Id = 2,
+                player1Name = "Player 1",
+                player2Name = "Player 2",
+                settings = defaultSettings
+            )
+
+        assertEquals(0, state.currentSetPoints.size)
+        assertEquals(0, state.completedSets.size)
+        assertEquals(1, state.currentSetNumber)
+    }
+
+    @Test
+    fun `incrementScore creates final set when match ends`() {
+        val state =
+            initialState.copy(
+                player1SetsWon = 2,
+                player2SetsWon = 0,
+                player1 = player1.copy(score = 10),
+                player2 = player2.copy(score = 0),
+                currentSetNumber = 3,
+                completedSets =
+                    listOf(
+                        Set(1, emptyList(), SetScore(11, 0), player1.id),
+                        Set(2, emptyList(), SetScore(11, 0), player1.id)
+                    )
+            )
+
+        // Simulate 10 points for this set
+        val points = (1..10).map { seq -> Point(seq, player1.id, seq, 0) }
+        val stateWithPoints = state.copy(currentSetPoints = points)
+
+        // Player 1 wins final point and match (11-0)
+        val newState = ScoreCalculator.incrementScore(stateWithPoints, defaultSettings, player1.id)
+
+        // Verify match is finished
+        assertTrue(newState.isFinished)
+
+        // Verify third set was created
+        assertEquals(3, newState.completedSets.size)
+        assertEquals(3, newState.completedSets[2].setNumber)
+        assertEquals(11, newState.completedSets[2].points.size)
+        assertEquals(player1.id, newState.completedSets[2].winnerId)
     }
 }
