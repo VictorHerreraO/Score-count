@@ -16,6 +16,7 @@ room = "2.8.2"
 kotlinx-coroutines-test = "1.10.2"
 ktlint-gradle = "13.1.0"
 detekt = "1.23.8"
+mpandroidchart = "v3.1.0"
 
 junit = "4.13.2"
 junitVersion = "1.1.4"
@@ -71,6 +72,9 @@ hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.r
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+
+# Charting library (selected after evaluation - see docs/match_details_screen/CHART_LIBRARY_DECISION.md)
+mpandroidchart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "mpandroidchart" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
