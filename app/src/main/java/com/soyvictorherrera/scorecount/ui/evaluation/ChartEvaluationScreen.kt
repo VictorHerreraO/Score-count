@@ -26,7 +26,7 @@ fun ChartEvaluationScreen(onBackClick: () -> Unit = {}) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Chart Library Evaluation") },
+                title = { Text("MPAndroidChart - Selected Library") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
@@ -61,16 +61,6 @@ fun ChartEvaluationScreen(onBackClick: () -> Unit = {}) {
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            // NOTE: Vico demo temporarily disabled due to API complexity
-            // Will evaluate based on documentation and code structure
-            item {
-                ComposeChartsDemo(
-                    set = testData.generateCloseGame(),
-                    player1 = testData.player1,
-                    player2 = testData.player2,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
 
             // Section: Deuce Game (15-13)
             item {
@@ -81,15 +71,6 @@ fun ChartEvaluationScreen(onBackClick: () -> Unit = {}) {
             }
             item {
                 MpAndroidChartDemo(
-                    set = testData.generateDeuceGame(),
-                    player1 = testData.player1,
-                    player2 = testData.player2,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            // NOTE: Vico demo temporarily disabled due to API complexity
-            item {
-                ComposeChartsDemo(
                     set = testData.generateDeuceGame(),
                     player1 = testData.player1,
                     player2 = testData.player2,
@@ -112,15 +93,6 @@ fun ChartEvaluationScreen(onBackClick: () -> Unit = {}) {
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            // NOTE: Vico demo temporarily disabled due to API complexity
-            item {
-                ComposeChartsDemo(
-                    set = testData.generateLandslideGame(),
-                    player1 = testData.player1,
-                    player2 = testData.player2,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
 
             // Section: Empty Set (error handling)
             item {
@@ -131,15 +103,6 @@ fun ChartEvaluationScreen(onBackClick: () -> Unit = {}) {
             }
             item {
                 MpAndroidChartDemo(
-                    set = testData.generateEmptySet(),
-                    player1 = testData.player1,
-                    player2 = testData.player2,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            // NOTE: Vico demo temporarily disabled due to API complexity
-            item {
-                ComposeChartsDemo(
                     set = testData.generateEmptySet(),
                     player1 = testData.player1,
                     player2 = testData.player2,
