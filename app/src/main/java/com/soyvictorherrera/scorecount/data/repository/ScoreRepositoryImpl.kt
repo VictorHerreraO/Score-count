@@ -20,4 +20,14 @@ class ScoreRepositoryImpl
         override suspend fun updateGameState(newState: GameState) {
             localDataSource.updateState(newState)
         }
+
+        override suspend fun undoLastChange() {
+            localDataSource.undoLastChange()
+        }
+
+        override fun hasUndoHistory(): StateFlow<Boolean> = localDataSource.hasUndoHistory
+
+        override suspend fun clearHistory() {
+            localDataSource.clearHistory()
+        }
     }
