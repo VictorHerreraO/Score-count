@@ -10,5 +10,6 @@ data class CentralControlsCallbacks(
     val onSwitchServe: () -> Unit,
     val onStartNewGame: () -> Unit,
     val onNavigateToHistory: () -> Unit,
-    val onNavigateToSettings: () -> Unit
+    val onNavigateToSettings: () -> Unit,
+    val onUndo: () -> Unit
 )

@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +34,7 @@ import com.soyvictorherrera.scorecount.domain.model.GameState
 fun CentralControls(
     gameState: GameState,
     gameSettings: GameSettings,
+    hasUndoHistory: Boolean,
     callbacks: CentralControlsCallbacks,
     modifier: Modifier = Modifier
 ) {
@@ -99,6 +101,19 @@ fun CentralControls(
                     Text(stringResource(R.string.action_new_game))
                 }
             } else {
+                OutlinedButton(
+                    onClick = callbacks.onUndo,
+                    enabled = hasUndoHistory,
+                    shape = MaterialTheme.shapes.extraLarge,
+                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Undo,
+                        contentDescription = stringResource(id = R.string.action_undo)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.action_undo))
+                }
                 OutlinedButton(
                     onClick = callbacks.onReset,
                     shape = MaterialTheme.shapes.extraLarge,

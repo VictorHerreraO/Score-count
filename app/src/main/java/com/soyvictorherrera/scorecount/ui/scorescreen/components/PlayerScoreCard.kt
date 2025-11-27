@@ -1,7 +1,6 @@
 package com.soyvictorherrera.scorecount.ui.scorescreen.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,8 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -60,62 +57,40 @@ fun PlayerScoreCard(
                 defaultElevation = if (isServing) 4.dp else 1.dp
             )
     ) {
-        Box(
+        Column(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Column(
-                modifier = Modifier.align(Alignment.Center),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (showPlayerName) {
-                        Text(
-                            playerName,
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    if (isServing) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Icon(
-                            Icons.Default.SportsTennis,
-                            contentDescription = stringResource(id = R.string.cd_serving),
-                            tint = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (showPlayerName) {
+                    Text(
+                        playerName,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
-                Text(
-                    text = score.toString(),
-                    fontSize = 96.sp,
-                    fontWeight = FontWeight.Bold,
-                    lineHeight = 96.sp,
-                    letterSpacing = (-4).sp,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                if (isServing) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        Icons.Default.SportsTennis,
+                        contentDescription = stringResource(id = R.string.cd_serving),
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
             }
-            Row(
-                modifier =
-                    Modifier
-                        .align(Alignment.BottomEnd),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                SmallIconButton(
-                    onClick = callbacks.onDecrement,
-                    icon = Icons.Filled.Remove,
-                    description = stringResource(id = R.string.cd_decrement),
-                    enabled = !isFinished
-                )
-                SmallIconButton(
-                    onClick = callbacks.onIncrement,
-                    icon = Icons.Filled.Add,
-                    description = stringResource(id = R.string.cd_increment),
-                    enabled = !isFinished
-                )
-            }
+            Text(
+                text = score.toString(),
+                fontSize = 96.sp,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 96.sp,
+                letterSpacing = (-4).sp,
+                color = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }

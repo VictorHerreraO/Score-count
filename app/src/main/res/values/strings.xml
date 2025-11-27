@@ -31,10 +31,12 @@
     <string name="action_switch_serve">Switch Serve</string>
     <string name="action_new_game">New Game</string>
     <string name="action_switch">Switch</string>
+    <string name="action_undo">Undo</string>
     <string name="cd_decrement">Decrement</string>
     <string name="cd_increment">Increment</string>
     <string name="cd_history">History</string>
     <string name="cd_settings">Settings</string>
+    <string name="cd_undo">Undo last score change</string>
     <string name="sets_separator">:</string>
     <string name="deuce_indicator_text">DEUCE</string>
     <string name="cd_serving">Serving</string>

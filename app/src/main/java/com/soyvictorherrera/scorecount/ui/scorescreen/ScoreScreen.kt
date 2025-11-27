@@ -46,6 +46,7 @@ fun ScoreScreen(
 ) {
     val gameState by viewModel.gameState.collectAsState()
     val gameSettings by viewModel.gameSettings.collectAsState()
+    val hasUndoHistory by viewModel.hasUndoHistory.collectAsState()
     val configuration = LocalConfiguration.current
 
     val callbacks =
@@ -56,7 +57,8 @@ fun ScoreScreen(
             onSwitchServe = viewModel::manualSwitchServe,
             onStartNewGame = viewModel::resetGame,
             onNavigateToHistory = onNavigateToHistory,
-            onNavigateToSettings = onNavigateToSettings
+            onNavigateToSettings = onNavigateToSettings,
+            onUndo = viewModel::undoLastChange
         )
 
     ScoreCountTheme {
@@ -65,6 +67,7 @@ fun ScoreScreen(
                 ScoreScreenLandscape(
                     gameState = gameState,
                     gameSettings = gameSettings,
+                    hasUndoHistory = hasUndoHistory,
                     callbacks = callbacks
                 )
             }
@@ -72,6 +75,7 @@ fun ScoreScreen(
                 ScoreScreenPortrait(
                     gameState = gameState,
                     gameSettings = gameSettings,
+                    hasUndoHistory = hasUndoHistory,
                     callbacks = callbacks
                 )
             }
@@ -84,6 +88,7 @@ fun ScoreScreen(
 fun ScoreScreenPortrait(
     gameState: GameState,
     gameSettings: GameSettings,
+    hasUndoHistory: Boolean,
     callbacks: ScoreScreenCallbacks
 ) {
     Scaffold(
@@ -128,9 +133,11 @@ fun ScoreScreenPortrait(
             BottomBarActions(
                 isFinished = gameState.isFinished,
                 showSwitchServe = gameSettings.markServe,
+                hasUndoHistory = hasUndoHistory,
                 onReset = callbacks.onReset,
                 onSwitchServe = callbacks.onSwitchServe,
-                onStartNewGame = callbacks.onStartNewGame
+                onStartNewGame = callbacks.onStartNewGame,
+                onUndo = callbacks.onUndo
             )
         }
     ) { paddingValues ->
@@ -218,6 +225,7 @@ fun ScoreScreenPortrait(
 fun ScoreScreenLandscape(
     gameState: GameState,
     gameSettings: GameSettings,
+    hasUndoHistory: Boolean,
     callbacks: ScoreScreenCallbacks
 ) {
     Scaffold { paddingValues ->
@@ -248,13 +256,15 @@ fun ScoreScreenLandscape(
                 modifier = Modifier.padding(horizontal = 4.dp),
                 gameState = gameState,
                 gameSettings = gameSettings,
+                hasUndoHistory = hasUndoHistory,
                 callbacks =
                     CentralControlsCallbacks(
                         onReset = callbacks.onReset,
                         onSwitchServe = callbacks.onSwitchServe,
                         onStartNewGame = callbacks.onStartNewGame,
                         onNavigateToHistory = callbacks.onNavigateToHistory,
-                        onNavigateToSettings = callbacks.onNavigateToSettings
+                        onNavigateToSettings = callbacks.onNavigateToSettings,
+                        onUndo = callbacks.onUndo
                     )
             )
 
