@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -103,6 +102,8 @@ fun ScoreScreenPortrait(
                     }
                 },
                 actions = {
+                    /*
+                    // TODO: hide until history revamp is completed
                     IconButton(onClick = callbacks.onNavigateToHistory) {
                         Icon(
                             Icons.Default.History,
@@ -112,6 +113,7 @@ fun ScoreScreenPortrait(
                                 )
                         )
                     }
+                     */
                     IconButton(onClick = callbacks.onNavigateToSettings) {
                         Icon(
                             Icons.Default.Settings,

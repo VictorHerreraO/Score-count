@@ -10,11 +10,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,12 +49,15 @@ fun CentralControls(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            /*
+            // TODO: hide until history revamp is completed
             IconButton(onClick = callbacks.onNavigateToHistory) {
                 Icon(
                     Icons.Default.History,
                     contentDescription = stringResource(id = R.string.cd_history)
                 )
             }
+             */
             IconButton(onClick = callbacks.onNavigateToSettings) {
                 Icon(
                     Icons.Default.Settings,
@@ -108,7 +110,7 @@ fun CentralControls(
                     contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
                 ) {
                     Icon(
-                        Icons.Default.Undo,
+                        Icons.AutoMirrored.Filled.Undo,
                         contentDescription = stringResource(id = R.string.action_undo)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
