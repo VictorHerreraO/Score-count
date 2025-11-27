@@ -26,6 +26,7 @@ class ScoreViewModel
         // Directly expose StateFlows from repositories - no need for intermediate copying
         val gameState: StateFlow<GameState> = scoreRepository.getGameState()
         val gameSettings: StateFlow<GameSettings> = settingsRepository.getSettings()
+        val hasUndoHistory: StateFlow<Boolean> = scoreRepository.hasUndoHistory()
 
         init {
             // Monitor game state changes to auto-save matches
@@ -61,6 +62,12 @@ class ScoreViewModel
         fun resetGame() {
             viewModelScope.launch {
                 scoreUseCases.reset()
+            }
+        }
+
+        fun undoLastChange() {
+            viewModelScope.launch {
+                scoreUseCases.undo()
             }
         }
 

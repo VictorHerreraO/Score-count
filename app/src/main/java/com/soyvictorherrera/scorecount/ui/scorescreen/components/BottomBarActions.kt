@@ -2,14 +2,13 @@ package com.soyvictorherrera.scorecount.ui.scorescreen.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,9 +26,11 @@ import com.soyvictorherrera.scorecount.R
 fun BottomBarActions(
     isFinished: Boolean,
     showSwitchServe: Boolean,
+    hasUndoHistory: Boolean,
     onReset: () -> Unit,
     onSwitchServe: () -> Unit,
-    onStartNewGame: () -> Unit
+    onStartNewGame: () -> Unit,
+    onUndo: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -42,7 +43,7 @@ fun BottomBarActions(
                     .fillMaxWidth()
                     .padding(16.dp)
                     .navigationBarsPadding(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (isFinished) {
@@ -54,6 +55,16 @@ fun BottomBarActions(
                 }
             } else {
                 OutlinedButton(
+                    onClick = onUndo,
+                    enabled = hasUndoHistory,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Icon(
+                        Icons.Default.Undo,
+                        contentDescription = stringResource(id = R.string.action_undo)
+                    )
+                }
+                OutlinedButton(
                     onClick = onReset,
                     modifier = Modifier.weight(1f),
                 ) {
@@ -61,8 +72,6 @@ fun BottomBarActions(
                         Icons.Default.RestartAlt,
                         contentDescription = stringResource(id = R.string.action_reset)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.action_reset))
                 }
                 if (showSwitchServe) {
                     OutlinedButton(
@@ -73,8 +82,6 @@ fun BottomBarActions(
                             Icons.Default.SwapHoriz,
                             contentDescription = stringResource(id = R.string.action_switch_serve)
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.action_switch_serve))
                     }
                 }
             }

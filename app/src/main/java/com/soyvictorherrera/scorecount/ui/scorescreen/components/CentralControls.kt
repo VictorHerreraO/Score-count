@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SwapHoriz
@@ -33,6 +33,7 @@ import com.soyvictorherrera.scorecount.domain.model.GameState
 fun CentralControls(
     gameState: GameState,
     gameSettings: GameSettings,
+    hasUndoHistory: Boolean,
     callbacks: CentralControlsCallbacks,
     modifier: Modifier = Modifier
 ) {
@@ -48,12 +49,15 @@ fun CentralControls(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            /*
+            // TODO: hide until history revamp is completed
             IconButton(onClick = callbacks.onNavigateToHistory) {
                 Icon(
                     Icons.Default.History,
                     contentDescription = stringResource(id = R.string.cd_history)
                 )
             }
+             */
             IconButton(onClick = callbacks.onNavigateToSettings) {
                 Icon(
                     Icons.Default.Settings,
@@ -99,6 +103,19 @@ fun CentralControls(
                     Text(stringResource(R.string.action_new_game))
                 }
             } else {
+                OutlinedButton(
+                    onClick = callbacks.onUndo,
+                    enabled = hasUndoHistory,
+                    shape = MaterialTheme.shapes.extraLarge,
+                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.Undo,
+                        contentDescription = stringResource(id = R.string.action_undo)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.action_undo))
+                }
                 OutlinedButton(
                     onClick = callbacks.onReset,
                     shape = MaterialTheme.shapes.extraLarge,
