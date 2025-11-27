@@ -2,11 +2,9 @@ package com.soyvictorherrera.scorecount.ui.scorescreen.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.SwapHoriz
@@ -65,8 +63,6 @@ fun BottomBarActions(
                         Icons.Default.Undo,
                         contentDescription = stringResource(id = R.string.action_undo)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.action_undo))
                 }
                 OutlinedButton(
                     onClick = onReset,
@@ -76,8 +72,6 @@ fun BottomBarActions(
                         Icons.Default.RestartAlt,
                         contentDescription = stringResource(id = R.string.action_reset)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.action_reset))
                 }
                 if (showSwitchServe) {
                     OutlinedButton(
@@ -88,8 +82,6 @@ fun BottomBarActions(
                             Icons.Default.SwapHoriz,
                             contentDescription = stringResource(id = R.string.action_switch_serve)
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.action_switch_serve))
                     }
                 }
             }
