@@ -10,6 +10,7 @@ import com.soyvictorherrera.scorecount.domain.usecase.ManualSwitchServeUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.ResetGameUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.SaveMatchUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.ScoreUseCases
+import com.soyvictorherrera.scorecount.domain.usecase.UndoScoreUseCase
 import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreScreen
 import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreViewModel
 import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
@@ -80,7 +81,8 @@ private fun createPreviewViewModel(finished: Boolean = false): ScoreViewModel {
             decrement = DecrementScoreUseCase(fakeScoreRepo, fakeSettingsRepo),
             switchServe = ManualSwitchServeUseCase(fakeScoreRepo),
             reset = ResetGameUseCase(fakeScoreRepo, fakeSettingsRepo),
-            saveMatch = SaveMatchUseCase(fakeMatchRepo)
+            saveMatch = SaveMatchUseCase(fakeMatchRepo),
+            undo = UndoScoreUseCase(fakeScoreRepo)
         )
 
     return ScoreViewModel(

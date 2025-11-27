@@ -8,6 +8,7 @@ import com.soyvictorherrera.scorecount.util.fakes.FakeSettingsRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -308,5 +309,42 @@ class ScoreUseCasesTest {
             assertEquals(0, savedState?.player2?.score)
             assertEquals(0, savedState?.player1SetsWon)
             assertEquals(0, savedState?.player2SetsWon)
+        }
+
+    @Test
+    fun `ResetGameUseCase clears undo history`() =
+        runTest {
+            // Given - Repository with undo history
+            val useCase = ResetGameUseCase(fakeScoreRepository, fakeSettingsRepository)
+            val initialState =
+                GameState(
+                    player1 = Player(id = 1, name = "Alice", score = 5),
+                    player2 = Player(id = 2, name = "Bob", score = 3),
+                    servingPlayerId = 1
+                )
+            fakeScoreRepository.setState(initialState)
+            fakeScoreRepository.clearHistory() // Clear any history from setState
+
+            // Create some undo history
+            fakeScoreRepository.updateGameState(
+                initialState.copy(player1 = initialState.player1.copy(score = 6))
+            )
+            fakeScoreRepository.updateGameState(
+                initialState.copy(player1 = initialState.player1.copy(score = 7))
+            )
+            assertTrue(fakeScoreRepository.hasUndoHistory().value)
+
+            // When - Reset is called
+            useCase()
+
+            // Then - Old history is cleared, but reset itself creates new history
+            // (the state before reset is added to history when updateGameState is called)
+            assertTrue(fakeScoreRepository.hasUndoHistory().value)
+
+            // Verify we can undo the reset
+            fakeScoreRepository.undoLastChange()
+            val undoneState = fakeScoreRepository.getGameState().value
+            // After undo, scores should be back to what they were before reset
+            assertEquals(7, undoneState.player1.score)
         }
 }

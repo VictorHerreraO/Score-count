@@ -9,6 +9,7 @@ import com.soyvictorherrera.scorecount.domain.usecase.ManualSwitchServeUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.ResetGameUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.SaveMatchUseCase
 import com.soyvictorherrera.scorecount.domain.usecase.ScoreUseCases
+import com.soyvictorherrera.scorecount.domain.usecase.UndoScoreUseCase
 import com.soyvictorherrera.scorecount.util.fakes.FakeMatchRepository
 import com.soyvictorherrera.scorecount.util.fakes.FakeScoreRepository
 import com.soyvictorherrera.scorecount.util.fakes.FakeSettingsRepository
@@ -18,6 +19,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -45,6 +48,7 @@ class ScoreViewModelTest {
         val manualSwitchServeUseCase = ManualSwitchServeUseCase(fakeScoreRepository)
         val resetGameUseCase = ResetGameUseCase(fakeScoreRepository, fakeSettingsRepository)
         saveMatchUseCase = SaveMatchUseCase(fakeMatchRepository)
+        val undoScoreUseCase = UndoScoreUseCase(fakeScoreRepository)
 
         // Create ScoreUseCases container
         val scoreUseCases =
@@ -53,7 +57,8 @@ class ScoreViewModelTest {
                 decrement = decrementScoreUseCase,
                 switchServe = manualSwitchServeUseCase,
                 reset = resetGameUseCase,
-                saveMatch = saveMatchUseCase
+                saveMatch = saveMatchUseCase,
+                undo = undoScoreUseCase
             )
 
         viewModel =
@@ -257,13 +262,16 @@ class ScoreViewModelTest {
             val resetGameUseCase = ResetGameUseCase(fakeScoreRepository, fakeSettingsRepository)
             val isolatedSaveMatchUseCase = SaveMatchUseCase(isolatedMatchRepository)
 
+            val undoScoreUseCase = UndoScoreUseCase(fakeScoreRepository)
+
             val isolatedScoreUseCases =
                 ScoreUseCases(
                     increment = incrementScoreUseCase,
                     decrement = decrementScoreUseCase,
                     switchServe = manualSwitchServeUseCase,
                     reset = resetGameUseCase,
-                    saveMatch = isolatedSaveMatchUseCase
+                    saveMatch = isolatedSaveMatchUseCase,
+                    undo = undoScoreUseCase
                 )
 
             @Suppress("UNUSED_VARIABLE")
@@ -284,5 +292,57 @@ class ScoreViewModelTest {
             // Then - No match should be saved to the isolated repository (because there was no transition)
             val savedMatches = isolatedMatchRepository.getMatchList().first()
             assertEquals(0, savedMatches.size)
+        }
+
+    @Test
+    fun `undoLastChange calls undo use case`() =
+        runTest {
+            // Given
+            val initialState =
+                GameState(
+                    player1 = Player(id = 1, name = "Alice", score = 0),
+                    player2 = Player(id = 2, name = "Bob", score = 0),
+                    servingPlayerId = 1
+                )
+            fakeScoreRepository.setState(initialState)
+            fakeScoreRepository.clearHistory()
+
+            // Make a change to create history
+            fakeScoreRepository.updateGameState(
+                initialState.copy(player1 = initialState.player1.copy(score = 1))
+            )
+
+            // When
+            viewModel.undoLastChange()
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            // Then
+            assertEquals(initialState, fakeScoreRepository.getGameState().value)
+        }
+
+    @Test
+    fun `hasUndoHistory exposes repository state flow`() =
+        runTest {
+            // Given
+            val initialState =
+                GameState(
+                    player1 = Player(id = 1, name = "Alice", score = 0),
+                    player2 = Player(id = 2, name = "Bob", score = 0),
+                    servingPlayerId = 1
+                )
+            fakeScoreRepository.setState(initialState)
+            fakeScoreRepository.clearHistory()
+
+            // When - No history initially
+            assertFalse(viewModel.hasUndoHistory.value)
+
+            // When - State change creates history
+            fakeScoreRepository.updateGameState(
+                initialState.copy(player1 = initialState.player1.copy(score = 1))
+            )
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            // Then - Has undo history
+            assertTrue(viewModel.hasUndoHistory.value)
         }
 }

@@ -36,10 +36,21 @@ class FakeScoreRepository(
     initialState: GameState
 ) : ScoreRepository {
     private val _gameState = MutableStateFlow(initialState)
+    private val _hasUndoHistory = MutableStateFlow(false)
 
     override fun getGameState(): StateFlow<GameState> = _gameState.asStateFlow()
 
     override suspend fun updateGameState(newState: GameState) {
         _gameState.value = newState
+    }
+
+    override suspend fun undoLastChange() {
+        // No-op for preview
+    }
+
+    override fun hasUndoHistory(): StateFlow<Boolean> = _hasUndoHistory.asStateFlow()
+
+    override suspend fun clearHistory() {
+        // No-op for preview
     }
 }
