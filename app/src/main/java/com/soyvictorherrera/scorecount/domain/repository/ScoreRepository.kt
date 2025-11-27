@@ -21,4 +21,22 @@ interface ScoreRepository {
      * This is the single write method - all state changes go through here.
      */
     suspend fun updateGameState(newState: GameState)
+
+    /**
+     * Undo the last state change and restore the previous state.
+     * Has no effect if there is no history to undo.
+     */
+    suspend fun undoLastChange()
+
+    /**
+     * Get whether undo is available (history is not empty).
+     * Returns a StateFlow that emits true when there are states in history.
+     */
+    fun hasUndoHistory(): StateFlow<Boolean>
+
+    /**
+     * Clear the undo history.
+     * Called when starting a new game or resetting.
+     */
+    suspend fun clearHistory()
 }

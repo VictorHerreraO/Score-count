@@ -18,6 +18,9 @@ class ResetGameUseCase
         private val settingsRepository: SettingsRepository
     ) {
         suspend operator fun invoke(lastGameWinnerId: Int? = null) {
+            // Clear undo history first
+            scoreRepository.clearHistory()
+
             val currentState = scoreRepository.getGameState().first()
             val settings = settingsRepository.getSettings().first()
 

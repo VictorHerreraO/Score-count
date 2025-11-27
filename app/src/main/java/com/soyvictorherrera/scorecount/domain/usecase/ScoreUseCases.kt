@@ -15,5 +15,6 @@ data class ScoreUseCases
         val decrement: DecrementScoreUseCase,
         val switchServe: ManualSwitchServeUseCase,
         val reset: ResetGameUseCase,
-        val saveMatch: SaveMatchUseCase
+        val saveMatch: SaveMatchUseCase,
+        val undo: UndoScoreUseCase
     )
