@@ -1,7 +1,9 @@
 package com.soyvictorherrera.scorecount.ui.scorescreen.preview
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.domain.model.Player
 import com.soyvictorherrera.scorecount.domain.usecase.DecrementScoreUseCase
@@ -16,7 +18,7 @@ import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreViewModel
 import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
 import kotlinx.coroutines.Dispatchers
 
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 fun ScoreScreenPreview() {
     val previewViewModel = createPreviewViewModel()
@@ -30,7 +32,17 @@ fun ScoreScreenPreview() {
     }
 }
 
-@Preview(showBackground = true, device = "spec:width=411dp,height=891dp,dpi=420,orientation=landscape")
+@Preview(
+    name = "Light",
+    showBackground = true,
+    device = "spec:width=411dp,height=891dp,dpi=420,orientation=landscape"
+)
+@Preview(
+    name = "Dark",
+    showBackground = true,
+    device = "spec:width=411dp,height=891dp,dpi=420,orientation=landscape",
+    uiMode = UI_MODE_NIGHT_YES
+)
 @Composable
 fun ScoreScreenLandscapePreview() {
     val previewViewModel = createPreviewViewModel()
@@ -44,7 +56,7 @@ fun ScoreScreenLandscapePreview() {
     }
 }
 
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 fun ScoreScreenFinishedPreview() {
     val previewViewModel = createPreviewViewModel(finished = true)
@@ -59,7 +71,7 @@ fun ScoreScreenFinishedPreview() {
 }
 
 private fun createPreviewViewModel(finished: Boolean = false): ScoreViewModel {
-    val dummyP1 = Player(id = 1, name = "Player 1", score = if (finished) 0 else 10)
+    val dummyP1 = Player(id = 1, name = "Player 1", score = if (finished) 0 else 9)
     val dummyP2 = Player(id = 2, name = "Player 2", score = if (finished) 0 else 10)
     val previewGameState =
         GameState(
