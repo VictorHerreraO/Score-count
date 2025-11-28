@@ -35,6 +35,7 @@ import com.soyvictorherrera.scorecount.ui.scorescreen.components.CentralControls
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.DeuceIndicator
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCard
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCardCallbacks
+import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCardState
 import com.soyvictorherrera.scorecount.ui.theme.ScoreCountTheme
 
 @Composable
@@ -189,10 +190,14 @@ fun ScoreScreenPortrait(
             }
 
             PlayerScoreCard(
-                playerName = gameState.player1.name,
-                score = gameState.player1.score,
-                isServing = gameSettings.markServe && gameState.servingPlayerId == gameState.player1.id,
-                isFinished = gameState.isFinished,
+                state =
+                    PlayerScoreCardState(
+                        playerName = gameState.player1.name,
+                        score = gameState.player1.score,
+                        isServing = gameSettings.markServe && gameState.servingPlayerId == gameState.player1.id,
+                        isFinished = gameState.isFinished,
+                        isWinning = gameState.player1.score > gameState.player2.score
+                    ),
                 showPlayerName = gameSettings.showNames,
                 callbacks =
                     PlayerScoreCardCallbacks(
@@ -207,10 +212,14 @@ fun ScoreScreenPortrait(
             }
 
             PlayerScoreCard(
-                playerName = gameState.player2.name,
-                score = gameState.player2.score,
-                isServing = gameSettings.markServe && gameState.servingPlayerId == gameState.player2.id,
-                isFinished = gameState.isFinished,
+                state =
+                    PlayerScoreCardState(
+                        playerName = gameState.player2.name,
+                        score = gameState.player2.score,
+                        isServing = gameSettings.markServe && gameState.servingPlayerId == gameState.player2.id,
+                        isFinished = gameState.isFinished,
+                        isWinning = gameState.player1.score < gameState.player2.score
+                    ),
                 showPlayerName = gameSettings.showNames,
                 callbacks =
                     PlayerScoreCardCallbacks(
@@ -241,10 +250,14 @@ fun ScoreScreenLandscape(
             verticalAlignment = Alignment.CenterVertically
         ) {
             PlayerScoreCard(
-                playerName = gameState.player1.name,
-                score = gameState.player1.score,
-                isServing = gameSettings.markServe && gameState.servingPlayerId == gameState.player1.id,
-                isFinished = gameState.isFinished,
+                state =
+                    PlayerScoreCardState(
+                        playerName = gameState.player1.name,
+                        score = gameState.player1.score,
+                        isServing = gameSettings.markServe && gameState.servingPlayerId == gameState.player1.id,
+                        isFinished = gameState.isFinished,
+                        isWinning = gameState.player1.score > gameState.player2.score
+                    ),
                 showPlayerName = gameSettings.showNames,
                 callbacks =
                     PlayerScoreCardCallbacks(
@@ -271,10 +284,14 @@ fun ScoreScreenLandscape(
             )
 
             PlayerScoreCard(
-                playerName = gameState.player2.name,
-                score = gameState.player2.score,
-                isServing = gameSettings.markServe && gameState.servingPlayerId == gameState.player2.id,
-                isFinished = gameState.isFinished,
+                state =
+                    PlayerScoreCardState(
+                        playerName = gameState.player2.name,
+                        score = gameState.player2.score,
+                        isServing = gameSettings.markServe && gameState.servingPlayerId == gameState.player2.id,
+                        isFinished = gameState.isFinished,
+                        isWinning = gameState.player1.score < gameState.player2.score
+                    ),
                 showPlayerName = gameSettings.showNames,
                 callbacks =
                     PlayerScoreCardCallbacks(

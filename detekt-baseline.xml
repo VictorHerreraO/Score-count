@@ -4,9 +4,9 @@
   <CurrentIssues>
     <ID>DestructuringDeclarationWithTooManyEntries:ScoreCalculator.kt$ScoreCalculator$val (currentScores, currentServingPlayerId, playerIds, settings, setEnded, lastSetWinnerId) = params</ID>
     <ID>LongMethod:CentralControls.kt$@Composable fun CentralControls( gameState: GameState, gameSettings: GameSettings, hasUndoHistory: Boolean, callbacks: CentralControlsCallbacks, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:ScoreScreen.kt$@Composable fun ScoreScreenLandscape( gameState: GameState, gameSettings: GameSettings, hasUndoHistory: Boolean, callbacks: ScoreScreenCallbacks )</ID>
     <ID>LongMethod:ScoreScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ScoreScreenPortrait( gameState: GameState, gameSettings: GameSettings, hasUndoHistory: Boolean, callbacks: ScoreScreenCallbacks )</ID>
     <ID>LongParameterList:BottomBarActions.kt$( isFinished: Boolean, showSwitchServe: Boolean, hasUndoHistory: Boolean, onReset: () -&gt; Unit, onSwitchServe: () -&gt; Unit, onStartNewGame: () -&gt; Unit, onUndo: () -&gt; Unit )</ID>
-    <ID>LongParameterList:PlayerScoreCard.kt$( playerName: String, score: Int, isServing: Boolean, isFinished: Boolean, showPlayerName: Boolean, callbacks: PlayerScoreCardCallbacks, modifier: Modifier = Modifier )</ID>
     <ID>TopLevelPropertyNaming:Color.kt$// Dark mode colors val DarkBackground = Color(0xFF1A1A2E) // --dark-bg</ID>
     <ID>TopLevelPropertyNaming:Color.kt$// Light mode colors val LightBackground = Color(0xFFF8FAFC) // --bg</ID>
     <ID>TopLevelPropertyNaming:Color.kt$val DarkAccentGreen = Color(0xFF34D399) // --accent-green</ID>
