@@ -40,6 +40,7 @@
     <string name="sets_separator">:</string>
     <string name="deuce_indicator_text">DEUCE</string>
     <string name="cd_serving">Serving</string>
+    <string name="cd_winning">Winning</string>
 
     <!-- Match History -->
     <string name="match_list_item_headline">%1$s vs. %2$s</string>
