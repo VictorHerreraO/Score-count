@@ -29,6 +29,8 @@
     <string name="serving_rule_winner_serves_description">The winner of a game serves first in the next game</string>
     <string name="serving_rule_loser_serves">Loser serves</string>
     <string name="serving_rule_loser_serves_description">The loser of a game serves first in the next game</string>
+    <string name="serving_rule_alternate">Alternate</string>
+    <string name="serving_rule_alternate_description">Players alternate serving between games</string>
     <string name="bottom_sheet_select">Select</string>
 
     <!-- Score screen -->

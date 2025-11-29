@@ -15,7 +15,8 @@ private data class ServerDeterminationParams(
     val playerIds: Pair<Int, Int>,
     val settings: GameSettings,
     val setEnded: Boolean,
-    val lastSetWinnerId: Int?
+    val lastSetWinnerId: Int?,
+    val completedGames: Int = 0
 )
 
 /**
@@ -99,7 +100,8 @@ object ScoreCalculator {
                     playerIds = Pair(currentState.player1.id, currentState.player2.id),
                     settings = settings,
                     setEnded = setJustEnded,
-                    lastSetWinnerId = lastSetWinnerId
+                    lastSetWinnerId = lastSetWinnerId,
+                    completedGames = newP1Sets + newP2Sets
                 )
             )
 
@@ -193,7 +195,8 @@ object ScoreCalculator {
         player1Name: String,
         player2Name: String,
         settings: GameSettings,
-        lastGameWinnerId: Int? = null
+        lastGameWinnerId: Int? = null,
+        completedGames: Int = 0
     ): GameState {
         val firstServer =
             when {
@@ -202,6 +205,11 @@ object ScoreCalculator {
                 settings.servingRule == ServingRule.WINNER_SERVES -> lastGameWinnerId
                 settings.servingRule == ServingRule.LOSER_SERVES -> {
                     if (lastGameWinnerId == player1Id) player2Id else player1Id
+                }
+                settings.servingRule == ServingRule.ALTERNATE -> {
+                    // Alternate between players based on completed games
+                    // Game 1 (completedGames=0): player1, Game 2 (completedGames=1): player2, etc.
+                    if (completedGames % 2 == 0) player1Id else player2Id
                 }
                 else -> player1Id // Fallback (should never happen with enum)
             }
@@ -266,33 +274,37 @@ object ScoreCalculator {
      * @return The ID of the player who should serve next
      */
     private fun determineNextServer(params: ServerDeterminationParams): Int {
-        val (currentScores, currentServingPlayerId, playerIds, settings, setEnded, lastSetWinnerId) = params
-        val (p1Id, p2Id) = playerIds
+        val (p1Id, p2Id) = params.playerIds
 
         // If a set just ended, determine server for the new set
-        if (setEnded) {
+        if (params.setEnded) {
             return when {
-                lastSetWinnerId == null -> currentServingPlayerId // Shouldn't happen, but safe fallback
-                settings.servingRule == ServingRule.PLAYER_ONE_SERVES -> p1Id
-                settings.servingRule == ServingRule.WINNER_SERVES -> lastSetWinnerId
-                settings.servingRule == ServingRule.LOSER_SERVES -> {
-                    if (lastSetWinnerId == p1Id) p2Id else p1Id
+                params.lastSetWinnerId == null -> params.currentServingPlayerId // Shouldn't happen, but safe fallback
+                params.settings.servingRule == ServingRule.PLAYER_ONE_SERVES -> p1Id
+                params.settings.servingRule == ServingRule.WINNER_SERVES -> params.lastSetWinnerId
+                params.settings.servingRule == ServingRule.LOSER_SERVES -> {
+                    if (params.lastSetWinnerId == p1Id) p2Id else p1Id
                 }
-                else -> currentServingPlayerId // Fallback
+                params.settings.servingRule == ServingRule.ALTERNATE -> {
+                    // Alternate between players based on completed games
+                    // Game 1 (completedGames=0): p1, Game 2 (completedGames=1): p2, etc.
+                    if (params.completedGames % 2 == 0) p1Id else p2Id
+                }
+                else -> params.currentServingPlayerId // Fallback
             }
         }
 
         // Determine if we're in deuce (at or above pointsToWinSet - 1)
         val atDeuce =
-            currentScores.first >= settings.pointsToWinSet - 1 &&
-                currentScores.second >= settings.pointsToWinSet - 1
+            params.currentScores.first >= params.settings.pointsToWinSet - 1 &&
+                params.currentScores.second >= params.settings.pointsToWinSet - 1
 
         // Determine serve rotation interval
         val serveInterval =
-            if (atDeuce && settings.serveChangeAfterDeuce > 0) {
-                settings.serveChangeAfterDeuce
+            if (atDeuce && params.settings.serveChangeAfterDeuce > 0) {
+                params.settings.serveChangeAfterDeuce
             } else {
-                settings.serveRotationAfterPoints
+                params.settings.serveRotationAfterPoints
             }
 
         // Check if it's time to rotate server
@@ -300,10 +312,10 @@ object ScoreCalculator {
         // servingPlayerId indicates who will serve the NEXT point
         // Example with interval=2: P1 serves points 1-2, P2 serves points 3-4, P1 serves points 5-6
         // After point 2 is scored (total=2), we rotate so P2 will serve point 3
-        val totalPointsInCurrentSet = currentScores.first + currentScores.second
+        val totalPointsInCurrentSet = params.currentScores.first + params.currentScores.second
 
         if (serveInterval <= 0) {
-            return currentServingPlayerId
+            return params.currentServingPlayerId
         }
 
         // Rotate when we've completed a serve interval (total points is a multiple of interval)
@@ -313,9 +325,9 @@ object ScoreCalculator {
                 totalPointsInCurrentSet % serveInterval == 0
 
         return if (shouldRotate) {
-            if (currentServingPlayerId == p1Id) p2Id else p1Id
+            if (params.currentServingPlayerId == p1Id) p2Id else p1Id
         } else {
-            currentServingPlayerId
+            params.currentServingPlayerId
         }
     }
 }

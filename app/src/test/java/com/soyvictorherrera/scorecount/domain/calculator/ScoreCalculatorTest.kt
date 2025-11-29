@@ -792,4 +792,114 @@ class ScoreCalculatorTest {
             "Winner should serve when servingRule is WINNER_SERVES"
         )
     }
+
+    @Test
+    fun `reset with servingRule ALTERNATE game 1 player1 serves`() {
+        val settings = defaultSettings.copy(servingRule = ServingRule.ALTERNATE)
+
+        // Game 1 (completedGames = 0): Player 1 should serve
+        val reset =
+            ScoreCalculator.resetGame(
+                player1Id = player1.id,
+                player2Id = player2.id,
+                player1Name = player1.name,
+                player2Name = player2.name,
+                settings = settings,
+                lastGameWinnerId = null,
+                completedGames = 0
+            )
+
+        assertEquals(
+            player1.id,
+            reset.servingPlayerId,
+            "Player 1 should serve in game 1 with ALTERNATE rule"
+        )
+    }
+
+    @Test
+    fun `reset with servingRule ALTERNATE game 2 player2 serves`() {
+        val settings = defaultSettings.copy(servingRule = ServingRule.ALTERNATE)
+
+        // Game 2 (completedGames = 1): Player 2 should serve
+        val reset =
+            ScoreCalculator.resetGame(
+                player1Id = player1.id,
+                player2Id = player2.id,
+                player1Name = player1.name,
+                player2Name = player2.name,
+                settings = settings,
+                lastGameWinnerId = player1.id,
+                completedGames = 1
+            )
+
+        assertEquals(
+            player2.id,
+            reset.servingPlayerId,
+            "Player 2 should serve in game 2 with ALTERNATE rule"
+        )
+    }
+
+    @Test
+    fun `reset with servingRule ALTERNATE game 3 player1 serves`() {
+        val settings = defaultSettings.copy(servingRule = ServingRule.ALTERNATE)
+
+        // Game 3 (completedGames = 2): Player 1 should serve again
+        val reset =
+            ScoreCalculator.resetGame(
+                player1Id = player1.id,
+                player2Id = player2.id,
+                player1Name = player1.name,
+                player2Name = player2.name,
+                settings = settings,
+                lastGameWinnerId = player2.id,
+                completedGames = 2
+            )
+
+        assertEquals(
+            player1.id,
+            reset.servingPlayerId,
+            "Player 1 should serve in game 3 with ALTERNATE rule"
+        )
+    }
+
+    @Test
+    fun `alternate serves next set when servingRule is ALTERNATE`() {
+        val settings = defaultSettings.copy(servingRule = ServingRule.ALTERNATE)
+
+        // Game 1 ends, game 2 starts (completedGames = 1): Player 2 serves
+        val state1 =
+            initialState.copy(
+                player1 = player1.copy(score = 11),
+                player2 = player2.copy(score = 5),
+                servingPlayerId = player1.id
+            )
+
+        val result1 = ScoreCalculator.incrementScore(state1, settings, player1.id)
+        assertEquals(
+            player2.id,
+            result1.servingPlayerId,
+            "Player 2 should serve second game (completedGames=1 after first game ends)"
+        )
+        assertEquals(1, result1.player1SetsWon, "Player 1 should have won first set")
+
+        // Game 2 ends, game 3 starts (completedGames = 2): Player 1 serves
+        val state2 = result1.copy(player1 = player1.copy(score = 11), player2 = player2.copy(score = 5))
+        val result2 = ScoreCalculator.incrementScore(state2, settings, player1.id)
+        assertEquals(
+            player1.id,
+            result2.servingPlayerId,
+            "Player 1 should serve third game (completedGames=2 after second game ends)"
+        )
+        assertEquals(2, result2.player1SetsWon, "Player 1 should have won second set")
+
+        // Game 3 ends, game 4 starts (completedGames = 3): Player 2 serves
+        val state3 = result2.copy(player1 = player1.copy(score = 5), player2 = player2.copy(score = 11))
+        val result3 = ScoreCalculator.incrementScore(state3, settings, player2.id)
+        assertEquals(
+            player2.id,
+            result3.servingPlayerId,
+            "Player 2 should serve fourth game (completedGames=3 after third game ends)"
+        )
+        assertEquals(1, result3.player2SetsWon, "Player 2 should have won third set")
+    }
 }

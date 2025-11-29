@@ -19,7 +19,12 @@ enum class ServingRule {
     /**
      * The loser of the previous game serves at the start of the next game.
      */
-    LOSER_SERVES;
+    LOSER_SERVES,
+
+    /**
+     * Players alternate serving between games (Player 1, then Player 2, then Player 1, etc.).
+     */
+    ALTERNATE;
 
     companion object {
         /**
@@ -35,6 +40,7 @@ fun ServingRule.toDisplayStringRes(): Int =
         ServingRule.PLAYER_ONE_SERVES -> R.string.serving_rule_player_one_serves
         ServingRule.WINNER_SERVES -> R.string.serving_rule_winner_serves
         ServingRule.LOSER_SERVES -> R.string.serving_rule_loser_serves
+        ServingRule.ALTERNATE -> R.string.serving_rule_alternate
     }
 
 fun ServingRule.toDescriptionStringRes(): Int =
@@ -42,4 +48,5 @@ fun ServingRule.toDescriptionStringRes(): Int =
         ServingRule.PLAYER_ONE_SERVES -> R.string.serving_rule_player_one_serves_description
         ServingRule.WINNER_SERVES -> R.string.serving_rule_winner_serves_description
         ServingRule.LOSER_SERVES -> R.string.serving_rule_loser_serves_description
+        ServingRule.ALTERNATE -> R.string.serving_rule_alternate_description
     }

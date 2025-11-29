@@ -27,6 +27,9 @@ class ResetGameUseCase
             // Determine who should serve: use provided winner or auto-determine
             val winnerId = lastGameWinnerId ?: ScoreCalculator.determineWinner(currentState)
 
+            // Calculate total completed games for ALTERNATE serving rule
+            val completedGames = currentState.player1SetsWon + currentState.player2SetsWon
+
             val newState =
                 ScoreCalculator.resetGame(
                     player1Id = currentState.player1.id,
@@ -34,7 +37,8 @@ class ResetGameUseCase
                     player1Name = currentState.player1.name,
                     player2Name = currentState.player2.name,
                     settings = settings,
-                    lastGameWinnerId = winnerId
+                    lastGameWinnerId = winnerId,
+                    completedGames = completedGames
                 )
 
             scoreRepository.updateGameState(newState)
