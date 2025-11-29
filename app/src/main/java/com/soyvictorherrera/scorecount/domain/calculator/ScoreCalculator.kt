@@ -200,18 +200,19 @@ object ScoreCalculator {
     ): GameState {
         val firstServer =
             when {
-                lastGameWinnerId == null -> player1Id // Initial game, player 1 serves
+                // Check serving rule first before null check
                 settings.servingRule == ServingRule.PLAYER_ONE_SERVES -> player1Id
-                settings.servingRule == ServingRule.WINNER_SERVES -> lastGameWinnerId
-                settings.servingRule == ServingRule.LOSER_SERVES -> {
-                    if (lastGameWinnerId == player1Id) player2Id else player1Id
-                }
                 settings.servingRule == ServingRule.ALTERNATE -> {
                     // Alternate between players based on completed games
                     // Game 1 (completedGames=0): player1, Game 2 (completedGames=1): player2, etc.
                     if (completedGames % 2 == 0) player1Id else player2Id
                 }
-                else -> player1Id // Fallback (should never happen with enum)
+                settings.servingRule == ServingRule.WINNER_SERVES && lastGameWinnerId != null -> lastGameWinnerId
+                settings.servingRule == ServingRule.LOSER_SERVES && lastGameWinnerId != null -> {
+                    if (lastGameWinnerId == player1Id) player2Id else player1Id
+                }
+                // Fallback for initial game when no winner is set (WINNER_SERVES or LOSER_SERVES)
+                else -> player1Id
             }
 
         return GameState(
