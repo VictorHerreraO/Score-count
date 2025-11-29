@@ -3,6 +3,7 @@ package com.soyvictorherrera.scorecount.domain.usecase
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.domain.model.Player
+import com.soyvictorherrera.scorecount.domain.model.ServingRule
 import com.soyvictorherrera.scorecount.util.fakes.FakeScoreRepository
 import com.soyvictorherrera.scorecount.util.fakes.FakeSettingsRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -240,10 +241,10 @@ class ScoreUseCasesTest {
         }
 
     @Test
-    fun `ResetGameUseCase with last winner serves first if winnerServesNextGame is true`() =
+    fun `ResetGameUseCase with last winner serves first if servingRule is WINNER_SERVES`() =
         runTest {
             // Given
-            val settings = GameSettings(winnerServesNextGame = true)
+            val settings = GameSettings(servingRule = ServingRule.WINNER_SERVES)
             fakeSettingsRepository.setSettings(settings)
 
             val useCase = ResetGameUseCase(fakeScoreRepository, fakeSettingsRepository)
@@ -264,10 +265,10 @@ class ScoreUseCasesTest {
         }
 
     @Test
-    fun `ResetGameUseCase with last winner does not serve if winnerServesNextGame is false`() =
+    fun `ResetGameUseCase with loser serves if servingRule is LOSER_SERVES`() =
         runTest {
             // Given
-            val settings = GameSettings(winnerServesNextGame = false)
+            val settings = GameSettings(servingRule = ServingRule.LOSER_SERVES)
             fakeSettingsRepository.setSettings(settings)
 
             val useCase = ResetGameUseCase(fakeScoreRepository, fakeSettingsRepository)
@@ -282,7 +283,7 @@ class ScoreUseCasesTest {
             // When - Player 2 won last game
             useCase(lastGameWinnerId = 2)
 
-            // Then - Always resets to Player 1 (initial state), not based on winner
+            // Then - Loser (Player 1) serves next game
             val newState = fakeScoreRepository.getGameState().value
             assertEquals(1, newState.servingPlayerId)
         }

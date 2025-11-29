@@ -2,6 +2,7 @@ package com.soyvictorherrera.scorecount.domain.calculator
 
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
+import com.soyvictorherrera.scorecount.domain.model.ServingRule
 import kotlin.math.abs
 
 /**
@@ -195,12 +196,14 @@ object ScoreCalculator {
         lastGameWinnerId: Int? = null
     ): GameState {
         val firstServer =
-            if (settings.winnerServesNextGame && lastGameWinnerId != null) {
-                // Winner serves next game
-                lastGameWinnerId
-            } else {
-                // Always reset to player 1 (initial state)
-                player1Id
+            when {
+                lastGameWinnerId == null -> player1Id // Initial game, player 1 serves
+                settings.servingRule == ServingRule.PLAYER_ONE_SERVES -> player1Id
+                settings.servingRule == ServingRule.WINNER_SERVES -> lastGameWinnerId
+                settings.servingRule == ServingRule.LOSER_SERVES -> {
+                    if (lastGameWinnerId == player1Id) player2Id else player1Id
+                }
+                else -> player1Id // Fallback (should never happen with enum)
             }
 
         return GameState(
@@ -268,11 +271,14 @@ object ScoreCalculator {
 
         // If a set just ended, determine server for the new set
         if (setEnded) {
-            return if (settings.winnerServesNextGame && lastSetWinnerId != null) {
-                lastSetWinnerId
-            } else {
-                // Alternate server from who served last in the previous set
-                if (currentServingPlayerId == p1Id) p2Id else p1Id
+            return when {
+                lastSetWinnerId == null -> currentServingPlayerId // Shouldn't happen, but safe fallback
+                settings.servingRule == ServingRule.PLAYER_ONE_SERVES -> p1Id
+                settings.servingRule == ServingRule.WINNER_SERVES -> lastSetWinnerId
+                settings.servingRule == ServingRule.LOSER_SERVES -> {
+                    if (lastSetWinnerId == p1Id) p2Id else p1Id
+                }
+                else -> currentServingPlayerId // Fallback
             }
         }
 

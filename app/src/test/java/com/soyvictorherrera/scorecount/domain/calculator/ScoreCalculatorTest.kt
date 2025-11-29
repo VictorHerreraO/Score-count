@@ -3,6 +3,7 @@ package com.soyvictorherrera.scorecount.domain.calculator
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.domain.model.Player
+import com.soyvictorherrera.scorecount.domain.model.ServingRule
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -27,7 +28,7 @@ class ScoreCalculatorTest {
                 numberOfSets = 5,
                 serveRotationAfterPoints = 2,
                 serveChangeAfterDeuce = 1,
-                winnerServesNextGame = true
+                servingRule = ServingRule.WINNER_SERVES
             )
 
         initialState =
@@ -173,7 +174,8 @@ class ScoreCalculatorTest {
     }
 
     @Test
-    fun `winner serves next set when winnerServesNextGame is true`() {
+    fun `winner serves next set when servingRule is WINNER_SERVES`() {
+        val settings = defaultSettings.copy(servingRule = ServingRule.WINNER_SERVES)
         val state =
             initialState.copy(
                 player1 = player1.copy(score = 10),
@@ -181,15 +183,15 @@ class ScoreCalculatorTest {
                 servingPlayerId = player1.id
             )
 
-        val newState = ScoreCalculator.incrementScore(state, defaultSettings, player1.id)
+        val newState = ScoreCalculator.incrementScore(state, settings, player1.id)
 
         // Player 1 won the set, should serve first in next set
         assertEquals(player1.id, newState.servingPlayerId)
     }
 
     @Test
-    fun `loser serves next set when winnerServesNextGame is false`() {
-        val settings = defaultSettings.copy(winnerServesNextGame = false)
+    fun `loser serves next set when servingRule is LOSER_SERVES`() {
+        val settings = defaultSettings.copy(servingRule = ServingRule.LOSER_SERVES)
         val state =
             initialState.copy(
                 player1 = player1.copy(score = 10),
@@ -201,6 +203,35 @@ class ScoreCalculatorTest {
 
         // Player 1 won, but loser (P2) should serve next set
         assertEquals(player2.id, newState.servingPlayerId)
+    }
+
+    @Test
+    fun `player 1 serves next set when servingRule is PLAYER_ONE_SERVES`() {
+        val settings = defaultSettings.copy(servingRule = ServingRule.PLAYER_ONE_SERVES)
+        val state =
+            initialState.copy(
+                player1 = player1.copy(score = 10),
+                player2 = player2.copy(score = 5),
+                servingPlayerId = player2.id // Player 2 was serving
+            )
+
+        val newState = ScoreCalculator.incrementScore(state, settings, player1.id)
+
+        // Player 1 won, but Player 1 always serves next set regardless
+        assertEquals(player1.id, newState.servingPlayerId)
+
+        // Test when player 2 wins
+        val state2 =
+            initialState.copy(
+                player1 = player1.copy(score = 5),
+                player2 = player2.copy(score = 10),
+                servingPlayerId = player1.id
+            )
+
+        val newState2 = ScoreCalculator.incrementScore(state2, settings, player2.id)
+
+        // Player 2 won, but Player 1 still serves next set
+        assertEquals(player1.id, newState2.servingPlayerId)
     }
 
     @Test
@@ -377,8 +408,8 @@ class ScoreCalculatorTest {
     }
 
     @Test
-    fun `resetGame ignores lastGameWinnerId when winnerServesNextGame is false`() {
-        val settings = defaultSettings.copy(winnerServesNextGame = false)
+    fun `resetGame uses loser when servingRule is LOSER_SERVES`() {
+        val settings = defaultSettings.copy(servingRule = ServingRule.LOSER_SERVES)
 
         val newState =
             ScoreCalculator.resetGame(
@@ -390,7 +421,7 @@ class ScoreCalculatorTest {
                 lastGameWinnerId = 2
             )
 
-        assertEquals(1, newState.servingPlayerId) // Defaults to player 1
+        assertEquals(1, newState.servingPlayerId) // Loser serves
     }
 
     @Test
@@ -679,7 +710,7 @@ class ScoreCalculatorTest {
                 player2Id = player2.id,
                 player1Name = player1.name,
                 player2Name = player2.name,
-                settings = defaultSettings.copy(winnerServesNextGame = false)
+                settings = defaultSettings.copy(servingRule = ServingRule.PLAYER_ONE_SERVES)
             )
         assertEquals(player1.id, reset1.servingPlayerId, "First reset should set server to Player 1")
 
@@ -690,7 +721,7 @@ class ScoreCalculatorTest {
                 player2Id = player2.id,
                 player1Name = player1.name,
                 player2Name = player2.name,
-                settings = defaultSettings.copy(winnerServesNextGame = false)
+                settings = defaultSettings.copy(servingRule = ServingRule.PLAYER_ONE_SERVES)
             )
         assertEquals(player1.id, reset2.servingPlayerId, "Second reset should set server to Player 1")
 
@@ -701,14 +732,14 @@ class ScoreCalculatorTest {
                 player2Id = player2.id,
                 player1Name = player1.name,
                 player2Name = player2.name,
-                settings = defaultSettings.copy(winnerServesNextGame = false)
+                settings = defaultSettings.copy(servingRule = ServingRule.PLAYER_ONE_SERVES)
             )
         assertEquals(player1.id, reset3.servingPlayerId, "Third reset should set server to Player 1")
     }
 
     @Test
     fun `reset from Player 1 serving maintains Player 1 as server`() {
-        val settings = defaultSettings.copy(winnerServesNextGame = false)
+        val settings = defaultSettings.copy(servingRule = ServingRule.PLAYER_ONE_SERVES)
 
         // Reset when Player 1 is already serving
         val reset =
@@ -725,7 +756,7 @@ class ScoreCalculatorTest {
 
     @Test
     fun `reset from Player 2 serving resets to Player 1`() {
-        val settings = defaultSettings.copy(winnerServesNextGame = false)
+        val settings = defaultSettings.copy(servingRule = ServingRule.PLAYER_ONE_SERVES)
 
         // Reset regardless of who was serving before
         val reset =
@@ -741,8 +772,8 @@ class ScoreCalculatorTest {
     }
 
     @Test
-    fun `reset with winnerServesNextGame true uses lastGameWinnerId`() {
-        val settings = defaultSettings.copy(winnerServesNextGame = true)
+    fun `reset with servingRule WINNER_SERVES uses lastGameWinnerId`() {
+        val settings = defaultSettings.copy(servingRule = ServingRule.WINNER_SERVES)
 
         // Player 2 won last game, should serve next
         val reset =
@@ -758,7 +789,7 @@ class ScoreCalculatorTest {
         assertEquals(
             player2.id,
             reset.servingPlayerId,
-            "Winner should serve when winnerServesNextGame is true"
+            "Winner should serve when servingRule is WINNER_SERVES"
         )
     }
 }
