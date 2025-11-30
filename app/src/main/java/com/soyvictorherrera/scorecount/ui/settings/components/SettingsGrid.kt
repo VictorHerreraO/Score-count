@@ -1,6 +1,7 @@
 package com.soyvictorherrera.scorecount.ui.settings.components
 
 import android.content.res.Configuration
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,15 +13,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -54,28 +56,32 @@ fun SettingsGrid(
 
 @Composable
 fun ToggleSettingCard(item: SettingItemData.ToggleItem) {
-    Card(
+    OutlinedCard(
         onClick = { item.onToggle(!item.isChecked) },
         modifier =
             Modifier
                 .fillMaxWidth()
-                .height(120.dp),
+                .height(120.dp)
+                .alpha(
+                    alpha =
+                        when {
+                            item.isChecked -> 1f
+                            else -> 0.7f
+                        }
+                ),
         shape = MaterialTheme.shapes.medium,
         colors =
-            CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+            CardDefaults.outlinedCardColors(
                 contentColor =
                     if (item.isChecked) {
                         MaterialTheme.colorScheme.primary
                     } else {
                         MaterialTheme.colorScheme.onSurfaceVariant
-                            .copy(
-                                alpha = 0.7f
-                            )
                     }
-            )
+            ),
+        border = toggleSettingCard(item.isChecked),
     ) {
-        Box(modifier = Modifier.Companion.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier =
                     Modifier
@@ -88,15 +94,6 @@ fun ToggleSettingCard(item: SettingItemData.ToggleItem) {
                     item.icon,
                     contentDescription = stringResource(item.textRes),
                     modifier = Modifier.Companion.size(36.dp),
-                    tint =
-                        if (item.isChecked) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                                .copy(
-                                    alpha = 0.7f
-                                )
-                        }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -107,4 +104,15 @@ fun ToggleSettingCard(item: SettingItemData.ToggleItem) {
             }
         }
     }
+}
+
+@Composable
+private fun toggleSettingCard(isChecked: Boolean): BorderStroke {
+    val color =
+        if (isChecked) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        }
+    return remember(color) { BorderStroke(width = 1.dp, color = color) }
 }
