@@ -4,6 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
@@ -11,9 +13,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 /**
  * Generic bottom sheet picker for settings with radio button options.
@@ -42,15 +48,33 @@ fun <T> BottomSheetPicker(
     getOptionLabel: (T) -> String,
     getOptionDescription: ((T) -> String)? = null
 ) {
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    val onOptionClick: (T) -> Unit =
+        remember {
+            {
+                onOptionSelected(it)
+                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                    if (!sheetState.isVisible) {
+                        onDismiss()
+                    }
+                }
+            }
+        }
+
     if (visible) {
         ModalBottomSheet(
-            onDismissRequest = onDismiss
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            onDismissRequest = onDismiss,
+            sheetState = sheetState,
         ) {
             Column(
                 modifier =
                     Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
+                        .verticalScroll(state = rememberScrollState())
             ) {
                 // Title
                 Text(
@@ -64,7 +88,6 @@ fun <T> BottomSheetPicker(
                 // Options
                 options.forEach { option ->
                     val isSelected = option == selectedOption
-
                     ListItem(
                         headlineContent = { Text(getOptionLabel(option)) },
                         supportingContent =
@@ -80,11 +103,7 @@ fun <T> BottomSheetPicker(
                                 }
                             )
                         },
-                        modifier =
-                            Modifier.clickable {
-                                onOptionSelected(option)
-                                onDismiss()
-                            }
+                        modifier = Modifier.clickable { onOptionClick(option) }
                     )
                 }
             }
