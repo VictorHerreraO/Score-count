@@ -27,6 +27,10 @@ class ResetGameUseCase
             // Determine who should serve: use provided winner or auto-determine
             val winnerId = lastGameWinnerId ?: ScoreCalculator.determineWinner(currentState)
 
+            // resetGame always creates a new match with sets reset to 0-0,
+            // so completedGames should always be 0 for a fresh match start
+            val completedGames = 0
+
             val newState =
                 ScoreCalculator.resetGame(
                     player1Id = currentState.player1.id,
@@ -34,7 +38,8 @@ class ResetGameUseCase
                     player1Name = currentState.player1.name,
                     player2Name = currentState.player2.name,
                     settings = settings,
-                    lastGameWinnerId = winnerId
+                    lastGameWinnerId = winnerId,
+                    completedGames = completedGames
                 )
 
             scoreRepository.updateGameState(newState)

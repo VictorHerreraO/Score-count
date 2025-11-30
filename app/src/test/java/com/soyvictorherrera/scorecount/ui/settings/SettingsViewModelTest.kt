@@ -1,6 +1,7 @@
 package com.soyvictorherrera.scorecount.ui.settings
 
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
+import com.soyvictorherrera.scorecount.domain.model.ServingRule
 import com.soyvictorherrera.scorecount.util.fakes.FakeSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -228,16 +229,51 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun `updateWinnerServesNextGame updates settings and saves`() =
+    fun `updateServingRule updates settings and saves`() =
         runTest {
-            val initialSettings = viewModel.settings.first()
-            val newValue = !initialSettings.winnerServesNextGame
+            val newRule = ServingRule.LOSER_SERVES
 
-            viewModel.updateWinnerServesNextGame(newValue)
+            viewModel.updateServingRule(newRule)
             testDispatcher.scheduler.advanceUntilIdle()
 
             val updatedSettings = viewModel.settings.first()
-            assertEquals(newValue, updatedSettings.winnerServesNextGame)
+            assertEquals(newRule, updatedSettings.servingRule)
             assertEquals(updatedSettings, fakeSettingsRepository.getSavedSettings())
+        }
+
+    @Test
+    fun `updateServingRule cycles through all options correctly`() =
+        runTest {
+            // Test PLAYER_ONE_SERVES
+            viewModel.updateServingRule(ServingRule.PLAYER_ONE_SERVES)
+            testDispatcher.scheduler.advanceUntilIdle()
+            assertEquals(ServingRule.PLAYER_ONE_SERVES, viewModel.settings.first().servingRule)
+
+            // Test WINNER_SERVES
+            viewModel.updateServingRule(ServingRule.WINNER_SERVES)
+            testDispatcher.scheduler.advanceUntilIdle()
+            assertEquals(ServingRule.WINNER_SERVES, viewModel.settings.first().servingRule)
+
+            // Test LOSER_SERVES
+            viewModel.updateServingRule(ServingRule.LOSER_SERVES)
+            testDispatcher.scheduler.advanceUntilIdle()
+            assertEquals(ServingRule.LOSER_SERVES, viewModel.settings.first().servingRule)
+        }
+
+    @Test
+    fun `servingRulePicker visibility state management works correctly`() =
+        runTest {
+            // Initially hidden
+            assertEquals(false, viewModel.servingRulePickerVisible.first())
+
+            // Show picker
+            viewModel.showServingRulePicker()
+            testDispatcher.scheduler.advanceUntilIdle()
+            assertEquals(true, viewModel.servingRulePickerVisible.first())
+
+            // Hide picker
+            viewModel.hideServingRulePicker()
+            testDispatcher.scheduler.advanceUntilIdle()
+            assertEquals(false, viewModel.servingRulePickerVisible.first())
         }
 }

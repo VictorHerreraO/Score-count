@@ -17,6 +17,8 @@ import androidx.lifecycle.viewModelScope
 import com.soyvictorherrera.scorecount.R
 import com.soyvictorherrera.scorecount.di.DefaultDispatcher
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
+import com.soyvictorherrera.scorecount.domain.model.ServingRule
+import com.soyvictorherrera.scorecount.domain.model.toDisplayStringRes
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -52,6 +54,13 @@ sealed class SettingItemData {
         val isChecked: Boolean,
         val onToggle: (Boolean) -> Unit
     ) : SettingItemData()
+
+    data class PickerSetting(
+        val textRes: Int,
+        val icon: ImageVector,
+        val currentValueLabelRes: Int,
+        val onClick: () -> Unit
+    ) : SettingItemData()
 }
 
 @HiltViewModel
@@ -64,8 +73,19 @@ class SettingsViewModel
         private val _settings = MutableStateFlow(GameSettings()) // Initialize with default settings
         val settings: StateFlow<GameSettings> = _settings.asStateFlow()
 
+        private val _servingRulePickerVisible = MutableStateFlow(false)
+        val servingRulePickerVisible: StateFlow<Boolean> = _servingRulePickerVisible.asStateFlow()
+
         init {
             loadSettings()
+        }
+
+        fun showServingRulePicker() {
+            _servingRulePickerVisible.value = true
+        }
+
+        fun hideServingRulePicker() {
+            _servingRulePickerVisible.value = false
         }
 
         private fun loadSettings() {
@@ -140,8 +160,8 @@ class SettingsViewModel
             }
         }
 
-        fun updateWinnerServesNextGame(serves: Boolean) {
-            _settings.value = _settings.value.copy(winnerServesNextGame = serves)
+        fun updateServingRule(rule: ServingRule) {
+            _settings.value = _settings.value.copy(servingRule = rule)
             saveSettings()
         }
 
@@ -221,12 +241,11 @@ class SettingsViewModel
                     onDecrement = { updateServeRotationAfterPoints(currentSettings.serveRotationAfterPoints - 1) },
                     valueRange = 1..10
                 ),
-                SettingItemData.SwitchSetting(
-                    textRes = R.string.setting_winner_serves,
-                    subtitleRes = R.string.setting_winner_serves_subtitle,
+                SettingItemData.PickerSetting(
+                    textRes = R.string.setting_serving_rule,
                     icon = Icons.Filled.Person,
-                    isChecked = currentSettings.winnerServesNextGame,
-                    onToggle = { updateWinnerServesNextGame(it) }
+                    currentValueLabelRes = currentSettings.servingRule.toDisplayStringRes(),
+                    onClick = { showServingRulePicker() }
                 )
             )
     }

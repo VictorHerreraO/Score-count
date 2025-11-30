@@ -29,6 +29,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.soyvictorherrera.scorecount.R
+import com.soyvictorherrera.scorecount.domain.model.ServingRule
+import com.soyvictorherrera.scorecount.domain.model.toDescriptionStringRes
+import com.soyvictorherrera.scorecount.domain.model.toDisplayStringRes
+import com.soyvictorherrera.scorecount.ui.settings.components.BottomSheetPicker
+import com.soyvictorherrera.scorecount.ui.settings.components.PickerSettingItem
 import com.soyvictorherrera.scorecount.ui.settings.components.SettingsGrid
 import com.soyvictorherrera.scorecount.ui.settings.components.StepperSettingItem
 import com.soyvictorherrera.scorecount.ui.settings.components.SwitchSettingItem
@@ -40,6 +45,7 @@ fun SettingsScreen(
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val settings by settingsViewModel.settings.collectAsState()
+    val servingRulePickerVisible by settingsViewModel.servingRulePickerVisible.collectAsState()
 
     // Recompose these lists whenever settings change
     val gameControls = settingsViewModel.getGameControls(settings)
@@ -84,6 +90,41 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(16.dp)) // Add some padding at the bottom
         }
     }
+
+    // Bottom Sheet for Serving Rule Selection
+    ServingRulePicker(
+        visible = servingRulePickerVisible,
+        selectedRule = settings.servingRule,
+        onDismiss = { settingsViewModel.hideServingRulePicker() },
+        onRuleSelected = { settingsViewModel.updateServingRule(it) }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ServingRulePicker(
+    visible: Boolean,
+    selectedRule: ServingRule,
+    onDismiss: () -> Unit,
+    onRuleSelected: (ServingRule) -> Unit
+) {
+    val servingRuleLabels = ServingRule.entries.associateWith { stringResource(it.toDisplayStringRes()) }
+    val servingRuleDescriptions = ServingRule.entries.associateWith { stringResource(it.toDescriptionStringRes()) }
+
+    BottomSheetPicker(
+        visible = visible,
+        onDismiss = onDismiss,
+        title = stringResource(R.string.setting_serving_rule),
+        options = ServingRule.entries,
+        selectedOption = selectedRule,
+        onOptionSelected = onRuleSelected,
+        getOptionLabel = { rule ->
+            servingRuleLabels[rule] ?: ""
+        },
+        getOptionDescription = { rule ->
+            servingRuleDescriptions[rule] ?: ""
+        }
+    )
 }
 
 @Composable
@@ -102,6 +143,7 @@ fun SettingsList(items: List<SettingItemData>) {
             when (item) {
                 is SettingItemData.StepperItem -> StepperSettingItem(item)
                 is SettingItemData.SwitchSetting -> SwitchSettingItem(item)
+                is SettingItemData.PickerSetting -> PickerSettingItem(item)
                 else -> {} // Should not happen in this list
             }
         }

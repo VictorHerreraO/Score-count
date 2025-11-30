@@ -2,7 +2,7 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>DestructuringDeclarationWithTooManyEntries:ScoreCalculator.kt$ScoreCalculator$val (currentScores, currentServingPlayerId, playerIds, settings, setEnded, lastSetWinnerId) = params</ID>
+    <ID>LargeClass:ScoreCalculatorTest.kt$ScoreCalculatorTest</ID>
     <ID>LongMethod:CentralControls.kt$@Composable fun CentralControls( gameState: GameState, gameSettings: GameSettings, hasUndoHistory: Boolean, callbacks: CentralControlsCallbacks, modifier: Modifier = Modifier )</ID>
     <ID>LongMethod:ScoreScreen.kt$@Composable fun ScoreScreenLandscape( gameState: GameState, gameSettings: GameSettings, hasUndoHistory: Boolean, callbacks: ScoreScreenCallbacks )</ID>
     <ID>LongMethod:ScoreScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ScoreScreenPortrait( gameState: GameState, gameSettings: GameSettings, hasUndoHistory: Boolean, callbacks: ScoreScreenCallbacks )</ID>

@@ -1,11 +1,14 @@
 package com.soyvictorherrera.scorecount.data.datasource
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
+import com.soyvictorherrera.scorecount.domain.model.ServingRule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -24,6 +27,10 @@ class SettingsLocalDataSource
     ) {
         private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+        companion object {
+            private const val TAG = "SettingsLocalDataSource"
+        }
+
         private object PreferencesKeys {
             val KEY_SHOW_TITLE = booleanPreferencesKey("show_title")
             val KEY_SHOW_NAMES = booleanPreferencesKey("show_names")
@@ -35,6 +42,10 @@ class SettingsLocalDataSource
             val KEY_NUMBER_OF_SETS = intPreferencesKey("number_of_sets")
             val KEY_SERVE_ROTATION_AFTER_POINTS = intPreferencesKey("serve_rotation_after_points")
             val KEY_SERVE_CHANGE_AFTER_DEUCE = intPreferencesKey("serve_change_after_deuce")
+            val KEY_SERVING_RULE = stringPreferencesKey("serving_rule")
+
+            // Keep old key for migration
+            @Deprecated("Use KEY_SERVING_RULE instead")
             val KEY_WINNER_SERVES_NEXT_GAME = booleanPreferencesKey("winner_serves_next_game")
             val KEY_KEEP_SCREEN_ON = booleanPreferencesKey("keep_screen_on")
         }
@@ -57,8 +68,30 @@ class SettingsLocalDataSource
                                 ?: default.serveRotationAfterPoints,
                         serveChangeAfterDeuce =
                             preferences[PreferencesKeys.KEY_SERVE_CHANGE_AFTER_DEUCE] ?: default.serveChangeAfterDeuce,
-                        winnerServesNextGame =
-                            preferences[PreferencesKeys.KEY_WINNER_SERVES_NEXT_GAME] ?: default.winnerServesNextGame,
+                        servingRule =
+                            run {
+                                // First try to read new string-based serving rule
+                                val storedRule = preferences[PreferencesKeys.KEY_SERVING_RULE]
+                                if (storedRule != null) {
+                                    try {
+                                        ServingRule.valueOf(storedRule)
+                                    } catch (e: IllegalArgumentException) {
+                                        // Invalid stored value, gracefully fall back to default
+                                        Log.w(TAG, "Invalid serving rule stored: $storedRule, using default", e)
+                                        default.servingRule
+                                    }
+                                } else {
+                                    // Migration: check old boolean preference
+                                    val oldWinnerServes = preferences[PreferencesKeys.KEY_WINNER_SERVES_NEXT_GAME]
+                                    if (oldWinnerServes != null) {
+                                        // Migrate: true -> WINNER_SERVES, false -> LOSER_SERVES
+                                        // (closest semantic match to old boolean)
+                                        if (oldWinnerServes) ServingRule.WINNER_SERVES else ServingRule.LOSER_SERVES
+                                    } else {
+                                        default.servingRule
+                                    }
+                                }
+                            },
                         keepScreenOn = preferences[PreferencesKeys.KEY_KEEP_SCREEN_ON] ?: default.keepScreenOn
                     )
                 }.stateIn(
@@ -79,7 +112,9 @@ class SettingsLocalDataSource
                 preferences[PreferencesKeys.KEY_NUMBER_OF_SETS] = settings.numberOfSets
                 preferences[PreferencesKeys.KEY_SERVE_ROTATION_AFTER_POINTS] = settings.serveRotationAfterPoints
                 preferences[PreferencesKeys.KEY_SERVE_CHANGE_AFTER_DEUCE] = settings.serveChangeAfterDeuce
-                preferences[PreferencesKeys.KEY_WINNER_SERVES_NEXT_GAME] = settings.winnerServesNextGame
+                preferences[PreferencesKeys.KEY_SERVING_RULE] = settings.servingRule.name
+                // Remove old key if it exists (cleanup migration)
+                preferences.remove(PreferencesKeys.KEY_WINNER_SERVES_NEXT_GAME)
                 preferences[PreferencesKeys.KEY_KEEP_SCREEN_ON] = settings.keepScreenOn
             }
         }
