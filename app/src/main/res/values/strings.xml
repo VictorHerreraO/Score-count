@@ -54,4 +54,5 @@
     <!-- Match History -->
     <string name="match_list_item_headline">%1$s vs. %2$s</string>
     <string name="match_list_item_supporting_text">%1$s | %2$d - %3$d</string>
+    <string name="serving">Serving</string>
 </resources>
