@@ -26,6 +26,7 @@ lifecycle-viewmodel-compose = "2.9.4"
 ksp-version = "2.2.20-2.0.4"
 navigation-compose = "2.9.5"
 material3 = "1.4.0"
+material3-adaptive = "1.2.0"
 ui-tooling = "1.9.3"
 ui-tooling-preview = "1.6.7"
 ui-test-junit4 = "1.9.2"
@@ -51,6 +52,7 @@ androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graph
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "ui-tooling-preview" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+androidx-compose-material3-adaptive = { module = "androidx.compose.material3.adaptive:adaptive", version.ref = "material3-adaptive"}
 androidx-compose-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core" }
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }

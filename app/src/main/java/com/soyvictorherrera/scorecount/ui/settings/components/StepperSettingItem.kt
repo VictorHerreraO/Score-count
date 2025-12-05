@@ -42,7 +42,7 @@ fun StepperSettingItem(item: SettingItemData.StepperItem) {
                 }
                 Text(
                     text = item.value.toString(),
-                    modifier = Modifier.Companion.width(30.dp), // Fixed width for number
+                    modifier = Modifier.width(30.dp), // Fixed width for number
                     textAlign = TextAlign.Companion.Center,
                     style = MaterialTheme.typography.bodyLarge
                 )

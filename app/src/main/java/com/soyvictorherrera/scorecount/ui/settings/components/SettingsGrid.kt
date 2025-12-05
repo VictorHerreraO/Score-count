@@ -43,7 +43,7 @@ fun SettingsGrid(
         maxItemsInEachRow = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else 2
     ) {
         items.forEach { item ->
-            Box(Modifier.Companion.weight(1f)) {
+            Box(Modifier.weight(1f)) {
                 // Use weight to ensure items take equal space up to maxItemsInEachRow
                 when (item) {
                     is SettingItemData.ToggleItem -> ToggleSettingCard(item)
@@ -93,7 +93,7 @@ fun ToggleSettingCard(item: SettingItemData.ToggleItem) {
                 Icon(
                     item.icon,
                     contentDescription = stringResource(item.textRes),
-                    modifier = Modifier.Companion.size(36.dp),
+                    modifier = Modifier.size(36.dp),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
