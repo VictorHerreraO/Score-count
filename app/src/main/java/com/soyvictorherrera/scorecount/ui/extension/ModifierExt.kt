@@ -19,7 +19,7 @@ import androidx.compose.ui.draw.alpha
  */
 fun Modifier.shimmering(minAlpha: Float = .25f): Modifier =
     composed {
-        val infiniteTransition = rememberInfiniteTransition()
+        val infiniteTransition = rememberInfiniteTransition(label = "shimmer")
 
         val value by infiniteTransition.animateFloat(
             initialValue = minAlpha,
@@ -28,7 +28,8 @@ fun Modifier.shimmering(minAlpha: Float = .25f): Modifier =
                 infiniteRepeatable(
                     animation = tween(1000),
                     repeatMode = RepeatMode.Reverse
-                )
+                ),
+            label = "shimmerAlpha"
         )
 
         alpha(value)

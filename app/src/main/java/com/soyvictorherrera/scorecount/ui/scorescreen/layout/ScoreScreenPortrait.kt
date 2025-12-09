@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,7 +25,6 @@ import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCard
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCardCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCardState
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScoreScreenPortrait(
     gameState: GameState,
@@ -35,46 +33,6 @@ fun ScoreScreenPortrait(
     callbacks: ScoreScreenCallbacks
 ) {
     Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = {
-//                    if (gameSettings.showTitle) {
-//                        Text(
-//                            stringResource(R.string.score_table_tennis_title),
-//                            fontWeight = FontWeight.Companion.Bold
-//                        )
-//                    }
-//                },
-//                actions = {
-//                    /*
-//                    // TODO: hide until history revamp is completed
-//                    IconButton(onClick = callbacks.onNavigateToHistory) {
-//                        Icon(
-//                            Icons.Default.History,
-//                            contentDescription =
-//                                stringResource(
-//                                    id = R.string.cd_history
-//                                )
-//                        )
-//                    }
-//                     */
-//                    IconButton(onClick = callbacks.onNavigateToSettings) {
-//                        Icon(
-//                            Icons.Default.Settings,
-//                            contentDescription =
-//                                stringResource(
-//                                    id = R.string.cd_settings
-//                                )
-//                        )
-//                    }
-//                },
-//                colors =
-//                    TopAppBarDefaults.topAppBarColors(
-//                        containerColor = MaterialTheme.colorScheme.surface,
-//                        titleContentColor = MaterialTheme.colorScheme.onSurface
-//                    )
-//            )
-//        },
         bottomBar = {
             BottomBarActions(
                 isFinished = gameState.isFinished,
@@ -103,9 +61,9 @@ fun ScoreScreenPortrait(
             if (gameSettings.showSets) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.Companion.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(horizontalAlignment = Alignment.Companion.CenterHorizontally) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         if (gameSettings.showNames) {
                             Text(
                                 text = gameState.player1.name,
@@ -121,7 +79,7 @@ fun ScoreScreenPortrait(
                         text = stringResource(id = R.string.sets_separator),
                         style = MaterialTheme.typography.headlineSmall
                     )
-                    Column(horizontalAlignment = Alignment.Companion.CenterHorizontally) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         if (gameSettings.showNames) {
                             Text(
                                 text = gameState.player2.name,
