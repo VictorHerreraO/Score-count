@@ -1,90 +1,139 @@
 package com.soyvictorherrera.scorecount.ui.scorescreen.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.RestartAlt
-import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material.icons.filled.Undo
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.soyvictorherrera.scorecount.R
+import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
+
+private object BottomBarActionsDefaults {
+    const val MAX_BOTTOM_BAR_ACTIONS = 3
+
+    val gameBarActions: List<GameBarAction> =
+        listOf(
+            GameBarAction.UNDO,
+            GameBarAction.SWITCH_SERVE,
+            GameBarAction.RESET,
+            GameBarAction.SETTINGS,
+        )
+}
 
 @Composable
 fun BottomBarActions(
     isFinished: Boolean,
     showSwitchServe: Boolean,
     hasUndoHistory: Boolean,
-    onReset: () -> Unit,
-    onSwitchServe: () -> Unit,
-    onStartNewGame: () -> Unit,
-    onUndo: () -> Unit
+    callbacks: BottomBarActionsCallbacks,
 ) {
-    Surface(
+    val barState = rememberBottomBarState(isFinished, showSwitchServe)
+    var showOverflowMenu by rememberSaveable { mutableStateOf(false) }
+    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val showExpandedButton = windowSizeClass.isWidthAtLeastBreakpoint(widthDpBreakpoint = WIDTH_DP_MEDIUM_LOWER_BOUND)
+
+    Box(
         modifier = Modifier.fillMaxWidth(),
-        shadowElevation = 4.dp,
-        color = MaterialTheme.colorScheme.surface
+        contentAlignment = Alignment.TopCenter
     ) {
+        HorizontalDivider(modifier = Modifier.fillMaxWidth())
+
         Row(
             modifier =
                 Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                    .widthIn(max = WIDTH_DP_MEDIUM_LOWER_BOUND.dp)
+                    .padding(all = 16.dp)
                     .navigationBarsPadding(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (isFinished) {
-                Button(
-                    onClick = onStartNewGame,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.action_start_new_game))
-                }
-            } else {
-                OutlinedButton(
-                    onClick = onUndo,
-                    enabled = hasUndoHistory,
+            barState.visibleActions.forEach { action ->
+                val showText =
+                    showExpandedButton ||
+                        (barState.visibleActions.size < BottomBarActionsDefaults.MAX_BOTTOM_BAR_ACTIONS)
+
+                GameBarActionButton(
+                    action = action,
+                    showText = showText,
                     modifier = Modifier.weight(1f),
+                    isActionEnabled = {
+                        when (it) {
+                            GameBarAction.UNDO -> hasUndoHistory
+                            else -> true
+                        }
+                    }
                 ) {
-                    Icon(
-                        Icons.Default.Undo,
-                        contentDescription = stringResource(id = R.string.action_undo)
-                    )
-                }
-                OutlinedButton(
-                    onClick = onReset,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Icon(
-                        Icons.Default.RestartAlt,
-                        contentDescription = stringResource(id = R.string.action_reset)
-                    )
-                }
-                if (showSwitchServe) {
-                    OutlinedButton(
-                        onClick = onSwitchServe,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Icon(
-                            Icons.Default.SwapHoriz,
-                            contentDescription = stringResource(id = R.string.action_switch_serve)
-                        )
+                    when (it) {
+                        GameBarAction.OVERFLOW -> showOverflowMenu = true
+                        else -> callbacks.forAction(action = it)
                     }
                 }
             }
         }
+    }
+
+    OverflowGameActionPicker(
+        isVisible = showOverflowMenu,
+        onDismiss = { showOverflowMenu = false },
+        actions = barState.overflowActions,
+        onActionSelected = { action -> callbacks.forAction(action) }
+    )
+}
+
+@Composable
+private fun rememberBottomBarState(
+    isFinished: Boolean,
+    showSwitchServe: Boolean,
+): GameBarState =
+    remember(isFinished, showSwitchServe) {
+        if (isFinished) {
+            GameBarState(
+                actions = listOf(GameBarAction.START_NEW_GAME),
+                maxActions = BottomBarActionsDefaults.MAX_BOTTOM_BAR_ACTIONS
+            )
+        } else {
+            GameBarState(
+                actions =
+                    BottomBarActionsDefaults
+                        .gameBarActions
+                        .toMutableList()
+                        .apply {
+                            if (!showSwitchServe) {
+                                remove(element = GameBarAction.SWITCH_SERVE)
+                            }
+                        },
+                maxActions = BottomBarActionsDefaults.MAX_BOTTOM_BAR_ACTIONS
+            )
+        }
+    }
+
+/**
+ * A helper function to map a [GameBarAction] to its corresponding callback function
+ * defined in the [BottomBarActionsCallbacks] class. This simplifies the `onClick`
+ * logic within the composable.
+ *
+ * @param action The [GameBarAction] that was triggered by the user.
+ */
+private fun BottomBarActionsCallbacks.forAction(action: GameBarAction) {
+    when (action) {
+        // Should not happen
+        GameBarAction.OVERFLOW -> Unit
+        GameBarAction.RESET -> onReset()
+        GameBarAction.SETTINGS -> onSettings()
+        GameBarAction.START_NEW_GAME -> onStartNewGame()
+        GameBarAction.SWITCH_SERVE -> onSwitchServe()
+        GameBarAction.UNDO -> onUndo()
     }
 }

@@ -36,9 +36,21 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(settings.keepScreenOn) {
                 val keepScreenOn = settings.keepScreenOn
                 if (keepScreenOn) {
-                    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    window.apply {
+                        addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        attributes =
+                            attributes.also {
+                                it.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+                            }
+                    }
                 } else {
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    window.apply {
+                        clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        attributes =
+                            attributes.also {
+                                it.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                            }
+                    }
                 }
             }
 
