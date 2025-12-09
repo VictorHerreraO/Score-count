@@ -63,7 +63,7 @@ fun PlayerScoreCard(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            if (state.isServing) {
+            if (!state.isFinished && state.isServing) {
                 ServeIndicator(
                     modifier =
                         Modifier

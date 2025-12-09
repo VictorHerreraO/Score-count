@@ -1,12 +1,13 @@
 package com.soyvictorherrera.scorecount.ui.scorescreen.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,16 +44,17 @@ fun BottomBarActions(
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val showExpandedButton = windowSizeClass.isWidthAtLeastBreakpoint(widthDpBreakpoint = WIDTH_DP_MEDIUM_LOWER_BOUND)
 
-    Surface(
+    Box(
         modifier = Modifier.fillMaxWidth(),
-        shadowElevation = 4.dp,
-        color = MaterialTheme.colorScheme.surface
+        contentAlignment = Alignment.TopCenter
     ) {
+        HorizontalDivider(modifier = Modifier.fillMaxWidth())
+
         Row(
             modifier =
                 Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                    .widthIn(max = WIDTH_DP_MEDIUM_LOWER_BOUND.dp)
+                    .padding(all = 16.dp)
                     .navigationBarsPadding(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
