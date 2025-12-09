@@ -3,7 +3,7 @@ package com.soyvictorherrera.scorecount.ui.settings.preview
 import android.annotation.SuppressLint
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.repository.SettingsRepository
 import com.soyvictorherrera.scorecount.ui.settings.SettingsScreen
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 @SuppressLint("ViewModelConstructorInComposable")
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 fun SettingsScreenPreview() {
     ScoreCountTheme {
