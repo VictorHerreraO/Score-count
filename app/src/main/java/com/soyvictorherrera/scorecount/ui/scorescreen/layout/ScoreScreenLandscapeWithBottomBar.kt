@@ -24,7 +24,6 @@ import com.soyvictorherrera.scorecount.ui.scorescreen.components.BottomBarAction
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.BottomBarActionsCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.DeuceIndicator
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCard
-import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCardCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCardState
 
 @Composable
@@ -71,11 +70,7 @@ fun ScoreScreenLandscapeWithBottomBar(
                         isFinished = gameState.isFinished
                     ),
                 showPlayerName = gameSettings.showNames,
-                callbacks =
-                    PlayerScoreCardCallbacks(
-                        onIncrement = { callbacks.onIncrement(gameState.player1.id) },
-                        onDecrement = { callbacks.onDecrement(gameState.player1.id) }
-                    ),
+                onIncrement = { callbacks.onIncrement(gameState.player1.id) },
                 modifier = Modifier.weight(1f)
             )
 
@@ -102,11 +97,7 @@ fun ScoreScreenLandscapeWithBottomBar(
                         isFinished = gameState.isFinished
                     ),
                 showPlayerName = gameSettings.showNames,
-                callbacks =
-                    PlayerScoreCardCallbacks(
-                        onIncrement = { callbacks.onIncrement(gameState.player2.id) },
-                        onDecrement = { callbacks.onDecrement(gameState.player2.id) }
-                    ),
+                onIncrement = { callbacks.onIncrement(gameState.player2.id) },
                 modifier = Modifier.weight(1f)
             )
         }

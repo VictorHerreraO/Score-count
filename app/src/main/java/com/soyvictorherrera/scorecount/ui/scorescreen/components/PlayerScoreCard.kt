@@ -36,11 +36,11 @@ import com.soyvictorherrera.scorecount.ui.extension.shimmering
 fun PlayerScoreCard(
     state: PlayerScoreCardState,
     showPlayerName: Boolean,
-    callbacks: PlayerScoreCardCallbacks,
+    onIncrement: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     OutlinedCard(
-        onClick = callbacks.onIncrement,
+        onClick = onIncrement,
         enabled = !state.isFinished,
         shape = MaterialTheme.shapes.extraLarge,
         modifier =

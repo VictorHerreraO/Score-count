@@ -15,7 +15,6 @@ import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreScreenCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.CentralControls
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.CentralControlsCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCard
-import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCardCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCardState
 
 @Composable
@@ -44,11 +43,7 @@ fun ScoreScreenLandscape(
                         isFinished = gameState.isFinished
                     ),
                 showPlayerName = gameSettings.showNames,
-                callbacks =
-                    PlayerScoreCardCallbacks(
-                        onIncrement = { callbacks.onIncrement(gameState.player1.id) },
-                        onDecrement = { callbacks.onDecrement(gameState.player1.id) }
-                    ),
+                onIncrement = { callbacks.onIncrement(gameState.player1.id) },
                 modifier = Modifier.weight(1f)
             )
 
@@ -77,11 +72,7 @@ fun ScoreScreenLandscape(
                         isFinished = gameState.isFinished
                     ),
                 showPlayerName = gameSettings.showNames,
-                callbacks =
-                    PlayerScoreCardCallbacks(
-                        onIncrement = { callbacks.onIncrement(gameState.player2.id) },
-                        onDecrement = { callbacks.onDecrement(gameState.player2.id) }
-                    ),
+                onIncrement = { callbacks.onIncrement(gameState.player2.id) },
                 modifier = Modifier.weight(1f)
             )
         }
