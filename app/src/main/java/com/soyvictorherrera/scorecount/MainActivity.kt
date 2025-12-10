@@ -1,9 +1,12 @@
 package com.soyvictorherrera.scorecount
 
 import android.os.Bundle
+import android.util.Log
+import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,6 +27,9 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    // Mutable reference to ScoreViewModel, set by ScoreScreen composable
+    private var scoreViewModel: ScoreViewModel? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Install splash screen before super.onCreate()
         installSplashScreen()
@@ -58,9 +64,16 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = Screen.ScoreScreen.route) {
                     composable(Screen.ScoreScreen.route) {
-                        val scoreViewModel: ScoreViewModel = hiltViewModel()
+                        val viewModel: ScoreViewModel = hiltViewModel()
+
+                        // Store reference to ViewModel for S Pen key event handling
+                        DisposableEffect(viewModel) {
+                            scoreViewModel = viewModel
+                            onDispose { scoreViewModel = null }
+                        }
+
                         ScoreScreen(
-                            viewModel = scoreViewModel,
+                            viewModel = viewModel,
                             onNavigateToHistory = { navController.navigate(Screen.MatchHistoryScreen.route) },
                             onNavigateToSettings = { navController.navigate(Screen.SettingsScreen.route) }
                         )
@@ -80,5 +93,33 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onKeyDown(
+        keyCode: Int,
+        event: KeyEvent?
+    ): Boolean {
+        // Only handle S Pen events when ScoreViewModel is available (i.e., on ScoreScreen)
+        val viewModel = scoreViewModel
+        if (viewModel != null) {
+            return when (keyCode) {
+                KeyEvent.KEYCODE_PAGE_DOWN -> {
+                    // Single click: increment player 1
+                    viewModel.incrementScore(playerId = 1)
+                    Log.d("MainActivity", "S Pen single click: Player 1 score incremented")
+                    true
+                }
+                KeyEvent.KEYCODE_PAGE_UP -> {
+                    // Double click: increment player 2
+                    viewModel.incrementScore(playerId = 2)
+                    Log.d("MainActivity", "S Pen double click: Player 2 score incremented")
+                    true
+                }
+                else -> super.onKeyDown(keyCode, event)
+            }
+        }
+
+        // Not on ScoreScreen or no ViewModel - pass through
+        return super.onKeyDown(keyCode, event)
     }
 }
