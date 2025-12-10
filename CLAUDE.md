@@ -167,3 +167,25 @@ Create a new feature branch for you to work called `[issue-type]/task-xx-short-t
 Make small meaningful commits to your feature branch so your work is easy to review.
 
 Once you are done **don't** merge your code, allow me to review it and I'll merge it manually.
+
+### Multi-Issue Epics (Feature Branches)
+
+For large features spanning multiple GitHub issues (e.g., epics), use an integration branch:
+
+**Pattern:** `feature/[feature-name]-integration`
+
+**Example:** `feature/spen-integration` (S Pen Air Actions Integration)
+
+**Workflow:**
+1. Create integration branch: `git checkout -b feature/spen-integration`
+2. Push to remote: `git push origin feature/spen-integration`
+3. Implement issues in order, making small commits to this branch
+4. Document in MEMORY.md: branch name, epic issue, and related issues
+5. When complete, create single PR from integration branch to `develop`
+6. After review and approval, merge to `develop` and eventually `main`
+
+**Benefits:**
+- Keeps all related work on one branch
+- Prevents conflicts from parallel development
+- Clean separation from ongoing work on `develop`
+- All commits easily associated with the epic
