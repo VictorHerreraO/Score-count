@@ -57,4 +57,8 @@
     <string name="match_list_item_headline">%1$s vs. %2$s</string>
     <string name="match_list_item_supporting_text">%1$s | %2$d - %3$d</string>
     <string name="serving">Serving</string>
+
+    <!-- S Pen Air Actions -->
+    <string name="spen_action_increment_player1">Increment Player 1 Score</string>
+    <string name="spen_action_increment_player2">Increment Player 2 Score</string>
 </resources>

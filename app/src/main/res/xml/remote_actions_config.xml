@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Samsung S Pen Air Actions Configuration
+    Maps S Pen button gestures to Android key events for score tracking
+
+    Gestures:
+    - Single click (click) → PAGE_DOWN → Increment Player 1 score
+    - Double click (double_click) → PAGE_UP → Increment Player 2 score
+
+    Reference: Samsung Air Actions API
+    https://developer.samsung.com/galaxy-spen-remote/air-actions.html
+-->
+<RemoteActions version="1.2">
+    <Action
+        id="increment_player1"
+        label="@string/spen_action_increment_player1">
+        <ActionTarget
+            component="activity"
+            action="click"
+            template="key_event"
+            keycode="PAGE_DOWN" />
+    </Action>
+
+    <Action
+        id="increment_player2"
+        label="@string/spen_action_increment_player2">
+        <ActionTarget
+            component="activity"
+            action="double_click"
+            template="key_event"
+            keycode="PAGE_UP" />
+    </Action>
+</RemoteActions>
