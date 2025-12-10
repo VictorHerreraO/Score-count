@@ -189,3 +189,117 @@ For large features spanning multiple GitHub issues (e.g., epics), use an integra
 - Prevents conflicts from parallel development
 - Clean separation from ongoing work on `develop`
 - All commits easily associated with the epic
+
+#### ⚠️ CRITICAL: Task-Specific Branches for Epic Issues
+
+**ALWAYS follow this pattern for each issue within an epic:**
+
+1. **Create a task-specific branch** off the integration branch:
+   ```bash
+   git checkout feature/spen-integration
+   git checkout -b feat/task-101-short-description
+   ```
+
+2. **Make commits to the task-specific branch** (NOT the integration branch)
+
+3. **Create a PR from task branch → integration branch** for review
+   ```
+   feat/task-101-short-description → feature/spen-integration
+   ```
+
+4. **Wait for human review and approval** before merging
+
+5. **Only merge to integration branch after approval**
+
+**NEVER:**
+- ❌ Push commits directly to integration branches (`feature/spen-integration`)
+- ❌ Skip the PR review step
+- ❌ Merge your own PRs without human review
+- ❌ Bypass the branching strategy, even for small changes
+
+**Reason:** Integration branches aggregate reviewed work. Pushing directly breaks review workflow and prevents human oversight.
+
+---
+
+## /autoImplement Workflow Orchestration
+
+When running the `/autoImplement` command to implement tasks, you MUST follow the complete orchestration workflow. **Do not short-circuit the process.**
+
+### The Full Workflow
+
+The `/autoImplement` command triggers a three-agent workflow:
+
+1. **Analyzer Agent**
+   - Fetches and critically evaluates GitHub issue
+   - Creates implementation plan (PLAN.md)
+   - Decision: APPROVE or REJECT
+   - *Your role: Spawn and wait for completion*
+
+2. **Builder Agent**
+   - Reads PLAN.md
+   - Implements code changes
+   - Runs tests and quality checks
+   - Creates commits
+   - *Your role: Spawn and wait for completion*
+
+3. **Reviewer Agent**
+   - Reads PLAN.md and IMPLEMENTATION.md
+   - Reviews code and acceptance criteria
+   - **Creates PR using GitHub MCP tools**
+   - Writes REVIEW.md and COMPLETION.md
+   - *Your role: Spawn and wait for completion*
+
+### ⚠️ CRITICAL: Follow the Complete Workflow
+
+**ALWAYS:**
+- ✅ Spawn the Analyzer agent
+- ✅ Wait for PLAN.md
+- ✅ Spawn the Builder agent (with Analyzer feedback if revisions needed)
+- ✅ Wait for IMPLEMENTATION.md
+- ✅ Spawn the Reviewer agent (with Builder feedback if revisions needed)
+- ✅ Wait for REVIEW.md and PR creation
+
+**NEVER:**
+- ❌ Skip spawning the Reviewer agent
+- ❌ Create PRs manually if Reviewer agent should do it
+- ❌ Write REVIEW.md or COMPLETION.md yourself
+- ❌ Do implementation work yourself if Builder agent exists
+- ❌ Short-circuit the workflow to save time
+
+**Reason:** The orchestration process ensures proper handoffs, reviews, and quality gates. Skipping steps removes oversight and accountability.
+
+### Orchestration Checklist
+
+When running `/autoImplement`:
+
+- [ ] **Phase 1**: Spawn Analyzer → Wait for PLAN.md
+  - [ ] Read PLAN.md to verify critical evaluation
+  - [ ] Check decision: APPROVE or REJECT
+
+- [ ] **Phase 2**: Spawn Builder (if APPROVED) → Wait for IMPLEMENTATION.md
+  - [ ] Builder implements per plan
+  - [ ] Builder runs tests and quality checks
+  - [ ] Builder creates commits
+
+- [ ] **Phase 3**: Spawn Reviewer (if implementation complete) → Wait for PR
+  - [ ] Reviewer verifies acceptance criteria
+  - [ ] Reviewer reviews code quality
+  - [ ] Reviewer creates PR with GitHub MCP tool
+  - [ ] Reviewer writes REVIEW.md and COMPLETION.md
+
+- [ ] **Phase 4**: Process Results
+  - [ ] Review the created PR
+  - [ ] Merge to appropriate branch per human decision
+  - [ ] Update MEMORY.md if needed
+
+### What Triggers Each Agent
+
+| Agent | Spawned When | Output | Decision |
+|-------|----------|--------|----------|
+| Analyzer | Task needs analysis | PLAN.md | APPROVE / REJECT |
+| Builder | PLAN approved | IMPLEMENTATION.md | COMPLETE / REQUEST_REVISION / ESCALATE |
+| Reviewer | Implementation complete | REVIEW.md + PR | APPROVE / REQUEST_CHANGES / ESCALATE |
+
+---
+
+## Remember your branching strategy when working on github issues or given new tasks that don't have an issue at all
