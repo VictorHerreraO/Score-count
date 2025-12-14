@@ -35,7 +35,13 @@ Welcome to Score-Count! This application provides a simple and intuitive way to 
 
 ## Screenshots
 
+### Phone
+
 <img src="asset/portrait-light.png" width="200"/> <img src="asset/landscape-dark.png" width="600"/>
+
+### Tablet
+
+<img src="asset/portrait-light-landscape.png" width="200"/> <img src="asset/landscape-dark-tablet.png" width="600"/>
 
 ## Tech Stack & Architecture
 
