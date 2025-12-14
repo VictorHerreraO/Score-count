@@ -1,6 +1,10 @@
 package com.soyvictorherrera.scorecount.ui.scorescreen.layout
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -54,7 +58,6 @@ fun ScoreScreenPortrait(
                     .padding(horizontal = 16.dp)
                     .contentVerticalPadding(hasTopBar = gameSettings.showSets),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             PlayerScoreCard(
                 state =
@@ -69,8 +72,12 @@ fun ScoreScreenPortrait(
                 modifier = Modifier.weight(1f)
             )
 
-            if (gameSettings.markDeuce && gameState.isDeuce) {
-                DeuceIndicator(modifier = Modifier.fillMaxWidth())
+            AnimatedVisibility(
+                visible = gameSettings.markDeuce && gameState.isDeuce,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                DeuceIndicator(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp))
             }
 
             PlayerScoreCard(
