@@ -1,9 +1,9 @@
 package com.soyvictorherrera.scorecount.ui.scorescreen.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -19,12 +19,18 @@ import com.soyvictorherrera.scorecount.R
 fun DeuceIndicator(modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.secondary,
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.onSecondary)
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.secondary
     ) {
         Box(
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
+            modifier =
+                Modifier
+                    .padding(2.dp)
+                    .border(
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSecondary),
+                        shape = MaterialTheme.shapes.medium
+                    )
         ) {
             Text(
                 text = stringResource(id = R.string.deuce_indicator_text),
