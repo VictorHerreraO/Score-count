@@ -1,33 +1,40 @@
 package com.soyvictorherrera.scorecount.ui.scorescreen.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material.icons.filled.RestartAlt
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.soyvictorherrera.scorecount.R
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
+
+private object CentralBarActionsDefaults {
+    const val MAX_CENTRAL_BAR_ACTIONS = 3
+
+    val gameBarActions: List<GameBarAction> =
+        listOf(
+            GameBarAction.SWITCH_SERVE,
+            GameBarAction.UNDO,
+            GameBarAction.SETTINGS,
+            GameBarAction.RESET,
+        )
+}
 
 @Composable
 fun CentralControls(
@@ -42,107 +49,81 @@ fun CentralControls(
             modifier
                 .fillMaxHeight()
                 .width(IntrinsicSize.Max),
-        // This forces the column to be as wide as its widest child (the buttons)
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        var showOverflowMenu by rememberSaveable { mutableStateOf(false) }
+        val barState =
+            rememberCentralBarState(
+                isFinished = gameState.isFinished,
+                showSwitchServe = gameSettings.markServe,
+            )
+
+        AnimatedVisibility(
+            visible = gameSettings.markDeuce && gameState.isDeuce,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically(),
         ) {
-            /*
-            // TODO: hide until history revamp is completed
-            IconButton(onClick = callbacks.onNavigateToHistory) {
-                Icon(
-                    Icons.Default.History,
-                    contentDescription = stringResource(id = R.string.cd_history)
-                )
-            }
-             */
-            IconButton(onClick = callbacks.onNavigateToSettings) {
-                Icon(
-                    Icons.Default.Settings,
-                    contentDescription = stringResource(id = R.string.cd_settings)
-                )
-            }
+            DeuceIndicator(
+                modifier = Modifier.fillMaxWidth()
+            )
         }
 
-        Column(
-            modifier = Modifier.fillMaxWidth(), // This column will now respect the parent's constrained width
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            if (gameSettings.showSets) {
-                SetsIndicator(
-                    player1Name = "P1",
-                    player2Name = "P2",
-                    player1Sets = gameState.player1SetsWon,
-                    player2Sets = gameState.player2SetsWon
-                )
-            }
-            if (gameSettings.markDeuce && gameState.isDeuce) {
-                // This will fill the width defined by the parent, which is the same as the buttons'
-                DeuceIndicator(modifier = Modifier.fillMaxWidth())
-            }
-        }
+        Spacer(modifier = Modifier.weight(weight = 1f))
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            if (gameState.isFinished) {
-                Button(
-                    onClick = callbacks.onStartNewGame,
-                    shape = MaterialTheme.shapes.extraLarge,
-                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
-                ) {
-                    Icon(
-                        Icons.Default.RestartAlt,
-                        contentDescription = stringResource(id = R.string.action_new_game)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.action_new_game))
-                }
-            } else {
-                OutlinedButton(
-                    onClick = callbacks.onUndo,
-                    enabled = hasUndoHistory,
-                    shape = MaterialTheme.shapes.extraLarge,
-                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.Undo,
-                        contentDescription = stringResource(id = R.string.action_undo)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.action_undo))
-                }
-                OutlinedButton(
-                    onClick = callbacks.onReset,
-                    shape = MaterialTheme.shapes.extraLarge,
-                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
-                ) {
-                    Icon(
-                        Icons.Default.RestartAlt,
-                        contentDescription = stringResource(id = R.string.action_reset)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.action_reset))
-                }
-                if (gameSettings.markServe) {
-                    OutlinedButton(
-                        onClick = callbacks.onSwitchServe,
-                        shape = MaterialTheme.shapes.extraLarge,
-                        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.SwapHoriz,
-                            contentDescription = stringResource(id = R.string.action_switch)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.action_switch))
+        // Render in reverse order so highest-priority actions appear at the bottom (closest to score cards)
+        barState.visibleActions.reversed().forEach { action ->
+            GameBarActionButton(
+                action = action,
+                modifier = Modifier.fillMaxWidth(),
+                isActionEnabled = {
+                    when (it) {
+                        GameBarAction.UNDO -> hasUndoHistory
+                        else -> true
                     }
                 }
+            ) {
+                when (it) {
+                    GameBarAction.OVERFLOW -> showOverflowMenu = true
+
+                    else -> callbacks.forAction(action = it)
+                }
             }
         }
+
+        OverflowGameActionPicker(
+            isVisible = showOverflowMenu,
+            onDismiss = { showOverflowMenu = false },
+            actions = barState.overflowActions.reversed(),
+            onActionSelected = { action -> callbacks.forAction(action) }
+        )
     }
 }
+
+@Composable
+private fun rememberCentralBarState(
+    isFinished: Boolean,
+    showSwitchServe: Boolean,
+    maxBarActions: Int = CentralBarActionsDefaults.MAX_CENTRAL_BAR_ACTIONS
+): GameBarState =
+    remember(isFinished, showSwitchServe) {
+        if (isFinished) {
+            GameBarState(
+                actions = listOf(GameBarAction.START_NEW_GAME),
+                maxActions = maxBarActions
+            )
+        } else {
+            GameBarState(
+                actions =
+                    CentralBarActionsDefaults
+                        .gameBarActions
+                        .toMutableList()
+                        .apply {
+                            if (!showSwitchServe) {
+                                remove(element = GameBarAction.SWITCH_SERVE)
+                            }
+                        },
+                maxActions = maxBarActions
+            )
+        }
+    }

@@ -13,3 +13,15 @@ data class CentralControlsCallbacks(
     val onNavigateToSettings: () -> Unit,
     val onUndo: () -> Unit
 )
+
+fun CentralControlsCallbacks.forAction(action: GameBarAction) {
+    when (action) {
+        // Should not happen
+        GameBarAction.OVERFLOW -> Unit
+        GameBarAction.RESET -> onReset()
+        GameBarAction.SETTINGS -> onNavigateToSettings()
+        GameBarAction.START_NEW_GAME -> onStartNewGame()
+        GameBarAction.SWITCH_SERVE -> onSwitchServe()
+        GameBarAction.UNDO -> onUndo()
+    }
+}

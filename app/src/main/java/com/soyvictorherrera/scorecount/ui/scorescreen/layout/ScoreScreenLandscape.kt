@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -14,9 +16,12 @@ import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreScreenCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.CentralControls
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.CentralControlsCallbacks
+import com.soyvictorherrera.scorecount.ui.scorescreen.components.GameSets
+import com.soyvictorherrera.scorecount.ui.scorescreen.components.HorizontalMatchScore
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCard
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCardState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScoreScreenLandscape(
     gameState: GameState,
@@ -24,13 +29,39 @@ fun ScoreScreenLandscape(
     hasUndoHistory: Boolean,
     callbacks: ScoreScreenCallbacks
 ) {
-    Scaffold { paddingValues ->
+    Scaffold(
+        topBar = {
+            if (gameSettings.showSets) {
+                CenterAlignedTopAppBar(
+                    title = {
+                        HorizontalMatchScore(
+                            gameState = gameState,
+                            dividerContent = {
+                                GameSets(
+                                    matchNumber = gameState.currentSet,
+                                    numberOfSets = gameSettings.numberOfSets,
+                                )
+                            }
+                        )
+                    }
+                )
+            }
+        }
+    ) { paddingValues ->
+        val verticalPadding =
+            if (gameSettings.showSets) {
+                Modifier.padding(bottom = 16.dp)
+            } else {
+                Modifier.padding(vertical = 16.dp)
+            }
+
         Row(
             modifier =
                 Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp),
+                    .padding(horizontal = 16.dp)
+                    .then(other = verticalPadding),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {

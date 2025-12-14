@@ -9,5 +9,10 @@ data class GameState(
     val isDeuce: Boolean = false,
     val isFinished: Boolean = false
 ) {
-    val currentSet = 1 + (player1SetsWon + player2SetsWon)
+    val currentSet =
+        if (isFinished) {
+            player1SetsWon + player2SetsWon
+        } else {
+            1 + player1SetsWon + player2SetsWon
+        }
 }
