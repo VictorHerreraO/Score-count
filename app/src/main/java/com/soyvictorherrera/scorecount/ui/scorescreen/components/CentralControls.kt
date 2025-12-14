@@ -41,7 +41,7 @@ fun CentralControls(
     gameState: GameState,
     gameSettings: GameSettings,
     hasUndoHistory: Boolean,
-    callbacks: CentralControlsCallbacks,
+    callbacks: GameBarActionsCallbacks,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -86,7 +86,7 @@ fun CentralControls(
                 when (it) {
                     GameBarAction.OVERFLOW -> showOverflowMenu = true
 
-                    else -> callbacks.forAction(action = it)
+                    else -> callbacks.handleAction(action = it)
                 }
             }
         }
@@ -95,7 +95,7 @@ fun CentralControls(
             isVisible = showOverflowMenu,
             onDismiss = { showOverflowMenu = false },
             actions = barState.overflowActions.reversed(),
-            onActionSelected = { action -> callbacks.forAction(action) }
+            onActionSelected = { action -> callbacks.handleAction(action) }
         )
     }
 }
@@ -115,14 +115,13 @@ private fun rememberCentralBarState(
         } else {
             GameBarState(
                 actions =
-                    CentralBarActionsDefaults
-                        .gameBarActions
-                        .toMutableList()
-                        .apply {
-                            if (!showSwitchServe) {
-                                remove(element = GameBarAction.SWITCH_SERVE)
-                            }
-                        },
+                    if (showSwitchServe) {
+                        CentralBarActionsDefaults.gameBarActions
+                    } else {
+                        CentralBarActionsDefaults.gameBarActions.filterNot {
+                            it == GameBarAction.SWITCH_SERVE
+                        }
+                    },
                 maxActions = maxBarActions
             )
         }

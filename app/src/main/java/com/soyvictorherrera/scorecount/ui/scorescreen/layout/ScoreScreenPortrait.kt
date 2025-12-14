@@ -19,8 +19,8 @@ import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreScreenCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.BottomBarActions
-import com.soyvictorherrera.scorecount.ui.scorescreen.components.BottomBarActionsCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.DeuceIndicator
+import com.soyvictorherrera.scorecount.ui.scorescreen.components.GameBarActionsCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCard
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCardState
 
@@ -38,12 +38,13 @@ fun ScoreScreenPortrait(
                 showSwitchServe = gameSettings.markServe,
                 hasUndoHistory = hasUndoHistory,
                 callbacks =
-                    BottomBarActionsCallbacks(
+                    GameBarActionsCallbacks(
                         onReset = callbacks.onReset,
                         onSwitchServe = callbacks.onSwitchServe,
                         onStartNewGame = callbacks.onStartNewGame,
                         onUndo = callbacks.onUndo,
-                        onSettings = callbacks.onNavigateToSettings
+                        onSettings = callbacks.onNavigateToSettings,
+                        onNavigateToHistory = callbacks.onNavigateToHistory
                     )
             )
         }

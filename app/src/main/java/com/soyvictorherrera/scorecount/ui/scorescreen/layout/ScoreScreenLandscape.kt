@@ -15,7 +15,7 @@ import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreScreenCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.CentralControls
-import com.soyvictorherrera.scorecount.ui.scorescreen.components.CentralControlsCallbacks
+import com.soyvictorherrera.scorecount.ui.scorescreen.components.GameBarActionsCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.GameSets
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.HorizontalMatchScore
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCard
@@ -84,13 +84,13 @@ fun ScoreScreenLandscape(
                 gameSettings = gameSettings,
                 hasUndoHistory = hasUndoHistory,
                 callbacks =
-                    CentralControlsCallbacks(
+                    GameBarActionsCallbacks(
                         onReset = callbacks.onReset,
                         onSwitchServe = callbacks.onSwitchServe,
                         onStartNewGame = callbacks.onStartNewGame,
-                        onNavigateToHistory = callbacks.onNavigateToHistory,
-                        onNavigateToSettings = callbacks.onNavigateToSettings,
-                        onUndo = callbacks.onUndo
+                        onUndo = callbacks.onUndo,
+                        onSettings = callbacks.onNavigateToSettings,
+                        onNavigateToHistory = callbacks.onNavigateToHistory
                     )
             )
 

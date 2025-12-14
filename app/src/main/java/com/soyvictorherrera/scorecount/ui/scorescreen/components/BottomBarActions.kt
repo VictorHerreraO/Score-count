@@ -39,7 +39,7 @@ fun BottomBarActions(
     isFinished: Boolean,
     showSwitchServe: Boolean,
     hasUndoHistory: Boolean,
-    callbacks: BottomBarActionsCallbacks,
+    callbacks: GameBarActionsCallbacks,
 ) {
     var showOverflowMenu by rememberSaveable { mutableStateOf(false) }
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
@@ -97,7 +97,7 @@ fun BottomBarActions(
                 ) {
                     when (it) {
                         GameBarAction.OVERFLOW -> showOverflowMenu = true
-                        else -> callbacks.forAction(action = it)
+                        else -> callbacks.handleAction(action = it)
                     }
                 }
             }
@@ -108,7 +108,7 @@ fun BottomBarActions(
         isVisible = showOverflowMenu,
         onDismiss = { showOverflowMenu = false },
         actions = barState.overflowActions,
-        onActionSelected = { action -> callbacks.forAction(action) }
+        onActionSelected = { action -> callbacks.handleAction(action) }
     )
 }
 
@@ -127,34 +127,14 @@ private fun rememberBottomBarState(
         } else {
             GameBarState(
                 actions =
-                    BottomBarActionsDefaults
-                        .gameBarActions
-                        .toMutableList()
-                        .apply {
-                            if (!showSwitchServe) {
-                                remove(element = GameBarAction.SWITCH_SERVE)
-                            }
-                        },
+                    if (showSwitchServe) {
+                        BottomBarActionsDefaults.gameBarActions
+                    } else {
+                        BottomBarActionsDefaults.gameBarActions.filterNot {
+                            it == GameBarAction.SWITCH_SERVE
+                        }
+                    },
                 maxActions = maxBarActions
             )
         }
     }
-
-/**
- * A helper function to map a [GameBarAction] to its corresponding callback function
- * defined in the [BottomBarActionsCallbacks] class. This simplifies the `onClick`
- * logic within the composable.
- *
- * @param action The [GameBarAction] that was triggered by the user.
- */
-private fun BottomBarActionsCallbacks.forAction(action: GameBarAction) {
-    when (action) {
-        // Should not happen
-        GameBarAction.OVERFLOW -> Unit
-        GameBarAction.RESET -> onReset()
-        GameBarAction.SETTINGS -> onSettings()
-        GameBarAction.START_NEW_GAME -> onStartNewGame()
-        GameBarAction.SWITCH_SERVE -> onSwitchServe()
-        GameBarAction.UNDO -> onUndo()
-    }
-}
