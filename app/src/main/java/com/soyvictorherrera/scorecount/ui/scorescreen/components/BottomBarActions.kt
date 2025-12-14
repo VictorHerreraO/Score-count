@@ -18,10 +18,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 
 private object BottomBarActionsDefaults {
     const val MAX_BOTTOM_BAR_ACTIONS = 3
+    const val MAX_BOTTOM_BAR_ACTIONS_LARGE = 4
 
     val gameBarActions: List<GameBarAction> =
         listOf(
@@ -37,12 +39,24 @@ fun BottomBarActions(
     isFinished: Boolean,
     showSwitchServe: Boolean,
     hasUndoHistory: Boolean,
-    callbacks: BottomBarActionsCallbacks,
+    callbacks: GameBarActionsCallbacks,
 ) {
-    val barState = rememberBottomBarState(isFinished, showSwitchServe)
     var showOverflowMenu by rememberSaveable { mutableStateOf(false) }
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    val showExpandedButton = windowSizeClass.isWidthAtLeastBreakpoint(widthDpBreakpoint = WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val isAtLeastMediumWidth = windowSizeClass.isWidthAtLeastBreakpoint(widthDpBreakpoint = WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val isAtLeastLargeWidth =
+        windowSizeClass.isWidthAtLeastBreakpoint(widthDpBreakpoint = WIDTH_DP_EXPANDED_LOWER_BOUND)
+    val barState =
+        rememberBottomBarState(
+            isFinished = isFinished,
+            showSwitchServe = showSwitchServe,
+            maxBarActions =
+                if (isAtLeastLargeWidth) {
+                    BottomBarActionsDefaults.MAX_BOTTOM_BAR_ACTIONS_LARGE
+                } else {
+                    BottomBarActionsDefaults.MAX_BOTTOM_BAR_ACTIONS
+                }
+        )
 
     Box(
         modifier = Modifier.fillMaxWidth(),
@@ -53,15 +67,21 @@ fun BottomBarActions(
         Row(
             modifier =
                 Modifier
-                    .widthIn(max = WIDTH_DP_MEDIUM_LOWER_BOUND.dp)
-                    .padding(all = 16.dp)
+                    .widthIn(
+                        max =
+                            if (isAtLeastLargeWidth) {
+                                WIDTH_DP_EXPANDED_LOWER_BOUND.dp
+                            } else {
+                                WIDTH_DP_MEDIUM_LOWER_BOUND.dp
+                            }
+                    ).padding(all = 16.dp)
                     .navigationBarsPadding(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             barState.visibleActions.forEach { action ->
                 val showText =
-                    showExpandedButton ||
+                    isAtLeastMediumWidth ||
                         (barState.visibleActions.size < BottomBarActionsDefaults.MAX_BOTTOM_BAR_ACTIONS)
 
                 GameBarActionButton(
@@ -77,7 +97,7 @@ fun BottomBarActions(
                 ) {
                     when (it) {
                         GameBarAction.OVERFLOW -> showOverflowMenu = true
-                        else -> callbacks.forAction(action = it)
+                        else -> callbacks.handleAction(action = it)
                     }
                 }
             }
@@ -88,7 +108,7 @@ fun BottomBarActions(
         isVisible = showOverflowMenu,
         onDismiss = { showOverflowMenu = false },
         actions = barState.overflowActions,
-        onActionSelected = { action -> callbacks.forAction(action) }
+        onActionSelected = { action -> callbacks.handleAction(action) }
     )
 }
 
@@ -96,44 +116,25 @@ fun BottomBarActions(
 private fun rememberBottomBarState(
     isFinished: Boolean,
     showSwitchServe: Boolean,
+    maxBarActions: Int = BottomBarActionsDefaults.MAX_BOTTOM_BAR_ACTIONS
 ): GameBarState =
     remember(isFinished, showSwitchServe) {
         if (isFinished) {
             GameBarState(
                 actions = listOf(GameBarAction.START_NEW_GAME),
-                maxActions = BottomBarActionsDefaults.MAX_BOTTOM_BAR_ACTIONS
+                maxActions = maxBarActions
             )
         } else {
             GameBarState(
                 actions =
-                    BottomBarActionsDefaults
-                        .gameBarActions
-                        .toMutableList()
-                        .apply {
-                            if (!showSwitchServe) {
-                                remove(element = GameBarAction.SWITCH_SERVE)
-                            }
-                        },
-                maxActions = BottomBarActionsDefaults.MAX_BOTTOM_BAR_ACTIONS
+                    if (showSwitchServe) {
+                        BottomBarActionsDefaults.gameBarActions
+                    } else {
+                        BottomBarActionsDefaults.gameBarActions.filterNot {
+                            it == GameBarAction.SWITCH_SERVE
+                        }
+                    },
+                maxActions = maxBarActions
             )
         }
     }
-
-/**
- * A helper function to map a [GameBarAction] to its corresponding callback function
- * defined in the [BottomBarActionsCallbacks] class. This simplifies the `onClick`
- * logic within the composable.
- *
- * @param action The [GameBarAction] that was triggered by the user.
- */
-private fun BottomBarActionsCallbacks.forAction(action: GameBarAction) {
-    when (action) {
-        // Should not happen
-        GameBarAction.OVERFLOW -> Unit
-        GameBarAction.RESET -> onReset()
-        GameBarAction.SETTINGS -> onSettings()
-        GameBarAction.START_NEW_GAME -> onStartNewGame()
-        GameBarAction.SWITCH_SERVE -> onSwitchServe()
-        GameBarAction.UNDO -> onUndo()
-    }
-}

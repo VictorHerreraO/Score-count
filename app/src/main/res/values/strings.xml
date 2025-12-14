@@ -61,4 +61,8 @@
     <!-- S Pen Air Actions -->
     <string name="spen_action_increment_player1">Increment Player 1 Score</string>
     <string name="spen_action_increment_player2">Increment Player 2 Score</string>
+    <string name="game_match_number">MATCH %1$d</string>
+    <string name="game_best_of">Best of %1$d</string>
+    <string name="player_p1">P1</string>
+    <string name="player_p2">P2</string>
 </resources>

@@ -6,12 +6,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,45 +19,46 @@ import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreScreenCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.BottomBarActions
-import com.soyvictorherrera.scorecount.ui.scorescreen.components.BottomBarActionsCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.DeuceIndicator
+import com.soyvictorherrera.scorecount.ui.scorescreen.components.MatchScoreTopAppBar
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCard
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCardState
+import com.soyvictorherrera.scorecount.ui.scorescreen.toGameBarActionsCallbacks
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun ScoreScreenLandscapeWithBottomBar(
     gameState: GameState,
     gameSettings: GameSettings,
     hasUndoHistory: Boolean,
     callbacks: ScoreScreenCallbacks
 ) {
-    val showDeuceIndicator = gameSettings.markDeuce && gameState.isDeuce
-
     Scaffold(
+        topBar = {
+            if (gameSettings.showSets) {
+                MatchScoreTopAppBar(
+                    gameState = gameState,
+                    gameSettings = gameSettings
+                )
+            }
+        },
         bottomBar = {
             BottomBarActions(
                 isFinished = gameState.isFinished,
                 showSwitchServe = gameSettings.markServe,
                 hasUndoHistory = hasUndoHistory,
-                callbacks =
-                    BottomBarActionsCallbacks(
-                        onReset = callbacks.onReset,
-                        onSwitchServe = callbacks.onSwitchServe,
-                        onStartNewGame = callbacks.onStartNewGame,
-                        onUndo = callbacks.onUndo,
-                        onSettings = callbacks.onNavigateToSettings
-                    )
+                callbacks = callbacks.toGameBarActionsCallbacks()
             )
         }
     ) { paddingValues ->
         Row(
             modifier =
                 Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+                    .fillMaxWidth()
+                    .padding(all = 16.dp)
+                    .padding(paddingValues),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(space = 8.dp)
         ) {
             PlayerScoreCard(
                 state =
@@ -71,21 +70,15 @@ fun ScoreScreenLandscapeWithBottomBar(
                     ),
                 showPlayerName = gameSettings.showNames,
                 onIncrement = { callbacks.onIncrement(gameState.player1.id) },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(weight = 1f)
             )
 
-            Column(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+            AnimatedVisibility(
+                visible = gameSettings.markDeuce && gameState.isDeuce,
+                enter = fadeIn() + expandHorizontally(),
+                exit = fadeOut() + shrinkHorizontally(),
             ) {
-                Spacer(modifier = Modifier.width(width = 16.dp))
-                AnimatedVisibility(
-                    visible = showDeuceIndicator,
-                    enter = fadeIn() + expandHorizontally(),
-                    exit = fadeOut() + shrinkHorizontally()
-                ) {
-                    DeuceIndicator()
-                }
+                DeuceIndicator()
             }
 
             PlayerScoreCard(

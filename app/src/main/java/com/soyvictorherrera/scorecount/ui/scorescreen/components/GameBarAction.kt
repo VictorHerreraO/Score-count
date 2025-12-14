@@ -30,7 +30,7 @@ enum class GameBarAction(
     RESET(icon = Icons.Default.RestartAlt, text = R.string.action_reset),
     SETTINGS(icon = Icons.Default.Settings, text = R.string.action_settings),
     START_NEW_GAME(icon = Icons.Default.Replay, text = R.string.action_start_new_game),
-    SWITCH_SERVE(icon = Icons.Default.SwapHoriz, text = R.string.action_switch_serve),
+    SWITCH_SERVE(icon = Icons.Default.SwapHoriz, text = R.string.action_switch),
     UNDO(icon = Icons.AutoMirrored.Default.Undo, text = R.string.action_undo),
 }
 
