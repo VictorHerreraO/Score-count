@@ -3,9 +3,9 @@
   <ManuallySuppressedIssues/>
   <CurrentIssues>
     <ID>LargeClass:ScoreCalculatorTest.kt$ScoreCalculatorTest</ID>
+    <ID>LongMethod:BottomBarActions.kt$@Composable fun BottomBarActions( isFinished: Boolean, showSwitchServe: Boolean, hasUndoHistory: Boolean, callbacks: BottomBarActionsCallbacks, )</ID>
     <ID>LongMethod:CentralControls.kt$@Composable fun CentralControls( gameState: GameState, gameSettings: GameSettings, hasUndoHistory: Boolean, callbacks: CentralControlsCallbacks, modifier: Modifier = Modifier )</ID>
-    <ID>LongMethod:ScoreScreenLandscape.kt$@Composable fun ScoreScreenLandscape( gameState: GameState, gameSettings: GameSettings, hasUndoHistory: Boolean, callbacks: ScoreScreenCallbacks )</ID>
-    <ID>LongMethod:ScoreScreenLandscapeWithBottomBar.kt$@Composable fun ScoreScreenLandscapeWithBottomBar( gameState: GameState, gameSettings: GameSettings, hasUndoHistory: Boolean, callbacks: ScoreScreenCallbacks )</ID>
+    <ID>LongMethod:ScoreScreenLandscapeWithBottomBar.kt$@Composable @OptIn(ExperimentalMaterial3Api::class) fun ScoreScreenLandscapeWithBottomBar( gameState: GameState, gameSettings: GameSettings, hasUndoHistory: Boolean, callbacks: ScoreScreenCallbacks )</ID>
     <ID>LongMethod:ScoreScreenPortrait.kt$@Composable fun ScoreScreenPortrait( gameState: GameState, gameSettings: GameSettings, hasUndoHistory: Boolean, callbacks: ScoreScreenCallbacks )</ID>
     <ID>TopLevelPropertyNaming:Color.kt$// Dark mode colors val DarkBackground = Color(0xFF1A1A2E) // --dark-bg</ID>
     <ID>TopLevelPropertyNaming:Color.kt$// Light mode colors val LightBackground = Color(0xFFF8FAFC) // --bg</ID>

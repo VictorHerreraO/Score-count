@@ -18,10 +18,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 
 private object BottomBarActionsDefaults {
     const val MAX_BOTTOM_BAR_ACTIONS = 3
+    const val MAX_BOTTOM_BAR_ACTIONS_LARGE = 4
 
     val gameBarActions: List<GameBarAction> =
         listOf(
@@ -39,10 +41,22 @@ fun BottomBarActions(
     hasUndoHistory: Boolean,
     callbacks: BottomBarActionsCallbacks,
 ) {
-    val barState = rememberBottomBarState(isFinished, showSwitchServe)
     var showOverflowMenu by rememberSaveable { mutableStateOf(false) }
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    val showExpandedButton = windowSizeClass.isWidthAtLeastBreakpoint(widthDpBreakpoint = WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val isAtLeastMediumWidth = windowSizeClass.isWidthAtLeastBreakpoint(widthDpBreakpoint = WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val isAtLeastLargeWidth =
+        windowSizeClass.isWidthAtLeastBreakpoint(widthDpBreakpoint = WIDTH_DP_EXPANDED_LOWER_BOUND)
+    val barState =
+        rememberBottomBarState(
+            isFinished = isFinished,
+            showSwitchServe = showSwitchServe,
+            maxBarActions =
+                if (isAtLeastLargeWidth) {
+                    BottomBarActionsDefaults.MAX_BOTTOM_BAR_ACTIONS_LARGE
+                } else {
+                    BottomBarActionsDefaults.MAX_BOTTOM_BAR_ACTIONS
+                }
+        )
 
     Box(
         modifier = Modifier.fillMaxWidth(),
@@ -53,15 +67,21 @@ fun BottomBarActions(
         Row(
             modifier =
                 Modifier
-                    .widthIn(max = WIDTH_DP_MEDIUM_LOWER_BOUND.dp)
-                    .padding(all = 16.dp)
+                    .widthIn(
+                        max =
+                            if (isAtLeastLargeWidth) {
+                                WIDTH_DP_EXPANDED_LOWER_BOUND.dp
+                            } else {
+                                WIDTH_DP_MEDIUM_LOWER_BOUND.dp
+                            }
+                    ).padding(all = 16.dp)
                     .navigationBarsPadding(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             barState.visibleActions.forEach { action ->
                 val showText =
-                    showExpandedButton ||
+                    isAtLeastMediumWidth ||
                         (barState.visibleActions.size < BottomBarActionsDefaults.MAX_BOTTOM_BAR_ACTIONS)
 
                 GameBarActionButton(
@@ -96,12 +116,13 @@ fun BottomBarActions(
 private fun rememberBottomBarState(
     isFinished: Boolean,
     showSwitchServe: Boolean,
+    maxBarActions: Int = BottomBarActionsDefaults.MAX_BOTTOM_BAR_ACTIONS
 ): GameBarState =
     remember(isFinished, showSwitchServe) {
         if (isFinished) {
             GameBarState(
                 actions = listOf(GameBarAction.START_NEW_GAME),
-                maxActions = BottomBarActionsDefaults.MAX_BOTTOM_BAR_ACTIONS
+                maxActions = maxBarActions
             )
         } else {
             GameBarState(
@@ -114,7 +135,7 @@ private fun rememberBottomBarState(
                                 remove(element = GameBarAction.SWITCH_SERVE)
                             }
                         },
-                maxActions = BottomBarActionsDefaults.MAX_BOTTOM_BAR_ACTIONS
+                maxActions = maxBarActions
             )
         }
     }

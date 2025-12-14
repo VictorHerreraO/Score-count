@@ -8,4 +8,6 @@ data class GameState(
     val player2SetsWon: Int = 0,
     val isDeuce: Boolean = false,
     val isFinished: Boolean = false
-)
+) {
+    val currentSet = 1 + (player1SetsWon + player2SetsWon)
+}
