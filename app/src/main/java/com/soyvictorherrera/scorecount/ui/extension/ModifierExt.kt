@@ -5,10 +5,12 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.unit.dp
 
 /**
  * A [Modifier] that applies a shimmering effect by animating the alpha value of the content.
@@ -33,4 +35,19 @@ fun Modifier.shimmering(minAlpha: Float = .25f): Modifier =
         )
 
         alpha(value)
+    }
+
+/**
+ * Applies appropriate vertical padding based on whether sets are being displayed in the top bar.
+ *
+ * When sets are shown in the top bar, only bottom padding is needed.
+ * When sets are not shown, both top and bottom padding are needed.
+ *
+ * @param hasTopBar Whether sets are being displayed in the top bar
+ */
+internal fun Modifier.contentVerticalPadding(hasTopBar: Boolean): Modifier =
+    if (hasTopBar) {
+        padding(bottom = 16.dp)
+    } else {
+        padding(vertical = 16.dp)
     }

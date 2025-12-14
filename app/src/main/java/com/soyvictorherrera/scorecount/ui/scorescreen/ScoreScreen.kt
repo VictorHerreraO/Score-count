@@ -57,6 +57,7 @@ fun ScoreScreen(
                     )
                 }
             }
+
             else -> {
                 ScoreScreenPortrait(
                     gameState = gameState,
@@ -67,4 +68,9 @@ fun ScoreScreen(
             }
         }
     }
+}
+
+object ScoreScreenDefaults {
+    const val ALPHA_PRIMARY = 1F
+    const val ALPHA_SECONDARY = 0.75F
 }

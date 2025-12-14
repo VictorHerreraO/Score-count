@@ -20,16 +20,15 @@ fun DeuceIndicator(modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+        color = MaterialTheme.colorScheme.secondary,
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.onSecondary)
     ) {
         Box(
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = stringResource(id = R.string.deuce_indicator_text),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
