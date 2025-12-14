@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -21,11 +20,10 @@ import com.soyvictorherrera.scorecount.domain.model.GameState
 import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreScreenCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.BottomBarActions
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.DeuceIndicator
-import com.soyvictorherrera.scorecount.ui.scorescreen.components.GameBarActionsCallbacks
-import com.soyvictorherrera.scorecount.ui.scorescreen.components.GameSets
-import com.soyvictorherrera.scorecount.ui.scorescreen.components.HorizontalMatchScore
+import com.soyvictorherrera.scorecount.ui.scorescreen.components.MatchScoreTopAppBar
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCard
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCardState
+import com.soyvictorherrera.scorecount.ui.scorescreen.toGameBarActionsCallbacks
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,18 +36,9 @@ fun ScoreScreenLandscapeWithBottomBar(
     Scaffold(
         topBar = {
             if (gameSettings.showSets) {
-                CenterAlignedTopAppBar(
-                    title = {
-                        HorizontalMatchScore(
-                            gameState = gameState,
-                            dividerContent = {
-                                GameSets(
-                                    matchNumber = gameState.currentSet,
-                                    numberOfSets = gameSettings.numberOfSets,
-                                )
-                            }
-                        )
-                    }
+                MatchScoreTopAppBar(
+                    gameState = gameState,
+                    gameSettings = gameSettings
                 )
             }
         },
@@ -58,15 +47,7 @@ fun ScoreScreenLandscapeWithBottomBar(
                 isFinished = gameState.isFinished,
                 showSwitchServe = gameSettings.markServe,
                 hasUndoHistory = hasUndoHistory,
-                callbacks =
-                    GameBarActionsCallbacks(
-                        onReset = callbacks.onReset,
-                        onSwitchServe = callbacks.onSwitchServe,
-                        onStartNewGame = callbacks.onStartNewGame,
-                        onUndo = callbacks.onUndo,
-                        onSettings = callbacks.onNavigateToSettings,
-                        onNavigateToHistory = callbacks.onNavigateToHistory
-                    )
+                callbacks = callbacks.toGameBarActionsCallbacks()
             )
         }
     ) { paddingValues ->

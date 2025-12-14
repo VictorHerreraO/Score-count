@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -13,13 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.soyvictorherrera.scorecount.domain.model.GameSettings
 import com.soyvictorherrera.scorecount.domain.model.GameState
+import com.soyvictorherrera.scorecount.ui.extension.contentVerticalPadding
 import com.soyvictorherrera.scorecount.ui.scorescreen.ScoreScreenCallbacks
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.CentralControls
-import com.soyvictorherrera.scorecount.ui.scorescreen.components.GameBarActionsCallbacks
-import com.soyvictorherrera.scorecount.ui.scorescreen.components.GameSets
-import com.soyvictorherrera.scorecount.ui.scorescreen.components.HorizontalMatchScore
+import com.soyvictorherrera.scorecount.ui.scorescreen.components.MatchScoreTopAppBar
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCard
 import com.soyvictorherrera.scorecount.ui.scorescreen.components.PlayerScoreCardState
+import com.soyvictorherrera.scorecount.ui.scorescreen.toGameBarActionsCallbacks
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,36 +31,20 @@ fun ScoreScreenLandscape(
     Scaffold(
         topBar = {
             if (gameSettings.showSets) {
-                CenterAlignedTopAppBar(
-                    title = {
-                        HorizontalMatchScore(
-                            gameState = gameState,
-                            dividerContent = {
-                                GameSets(
-                                    matchNumber = gameState.currentSet,
-                                    numberOfSets = gameSettings.numberOfSets,
-                                )
-                            }
-                        )
-                    }
+                MatchScoreTopAppBar(
+                    gameState = gameState,
+                    gameSettings = gameSettings
                 )
             }
         }
     ) { paddingValues ->
-        val verticalPadding =
-            if (gameSettings.showSets) {
-                Modifier.padding(bottom = 16.dp)
-            } else {
-                Modifier.padding(vertical = 16.dp)
-            }
-
         Row(
             modifier =
                 Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp)
-                    .then(other = verticalPadding),
+                    .contentVerticalPadding(hasTopBar = gameSettings.showSets),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -83,15 +66,7 @@ fun ScoreScreenLandscape(
                 gameState = gameState,
                 gameSettings = gameSettings,
                 hasUndoHistory = hasUndoHistory,
-                callbacks =
-                    GameBarActionsCallbacks(
-                        onReset = callbacks.onReset,
-                        onSwitchServe = callbacks.onSwitchServe,
-                        onStartNewGame = callbacks.onStartNewGame,
-                        onUndo = callbacks.onUndo,
-                        onSettings = callbacks.onNavigateToSettings,
-                        onNavigateToHistory = callbacks.onNavigateToHistory
-                    )
+                callbacks = callbacks.toGameBarActionsCallbacks()
             )
 
             PlayerScoreCard(
